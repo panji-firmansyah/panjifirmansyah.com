@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: hsl(15 15% 5%);
+  --color-surface: hsl(15 12% 8%);
+  --color-gold: hsl(39 61% 58%);
+  --color-gold-muted: hsl(39 61% 58% / 0.15);
+  --color-text-primary: hsl(42 33% 94%);
+  --color-text-muted: hsl(0 0% 54%);
+
+  --font-display: 'Playfair Display', serif;
+  --font-sans: 'Inter', sans-serif;
+
+  --animate-pulse-slow: pulse-slow 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+:root {
+  --background: 15 15% 5%;
+  --foreground: 42 33% 94%;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-text-primary font-sans antialiased overflow-x-hidden selection:bg-gold/30 selection:text-text-primary;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer utilities {
+  .bg-grain {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .glass-panel {
+    @apply bg-surface/40 backdrop-blur-md border border-white/5 shadow-xl;
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+.ambient-static {
+  background: radial-gradient(
+    800px circle at 50% 50%,
+    rgba(212, 168, 83, 0.08) 0%,
+    transparent 70%
+  );
+}
+
+.ambient-glow {
+  background: radial-gradient(
+    800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(212, 168, 83, 0.12) 0%,
+    transparent 60%
+  );
+  transition: opacity 0.5s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-glow {
+    background: radial-gradient(
+      800px circle at 50% 50%,
+      rgba(212, 168, 83, 0.08) 0%,
+      transparent 70%
+    );
+    animation: none !important;
+  }
+
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
