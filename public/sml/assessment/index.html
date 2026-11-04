@@ -52,19 +52,21 @@ button { cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action
 
 /* Bilah atas: pulau Kapur radius 24 yang melayang 12 dari tepi, bayang pulau */
 .kepala { position: sticky; top: var(--j3); z-index: 20; margin-top: var(--j3); }
-.pulau { background: var(--kapur); border-radius: var(--r-kartu); box-shadow: var(--bayang-pulau); padding: var(--j3) var(--j4); display: flex; flex-direction: column; gap: var(--j3); }
-.pulau__baris { display: flex; align-items: center; gap: var(--j3); min-height: var(--h-chip); }
-.pulau__judul { display: flex; flex-direction: column; min-width: 0; flex: 1; }
-.pulau__judul b { font: 900 20px/24px var(--f-display); font-variation-settings: "wdth" 80; letter-spacing: -0.02em; }
+.pulau { background: var(--kapur); border-radius: var(--r-kartu); box-shadow: var(--bayang-pulau); padding: var(--j4); display: flex; flex-direction: column; gap: var(--j3); }
+.pulau__baris { display: flex; align-items: flex-end; gap: var(--j3); }
+.pulau__judul { display: flex; flex-direction: column; gap: var(--j1); min-width: 0; flex: 1; }
+.pulau__judul b { font: 900 24px/28px var(--f-display); font-variation-settings: "wdth" 80; letter-spacing: -0.02em; text-wrap: balance; }
 .pulau__judul span { font: 400 13px/16px var(--f-teks); color: var(--asap); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Angka kemajuan: satu angka besar di kanan, garis dasarnya sejajar judul */
+.persen { flex: none; font: 900 32px/28px var(--f-display); font-variation-settings: "wdth" 80; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.persen small { font-size: 20px; }
 .tautan { flex: none; border: 0; background: none; padding: var(--j2) 0; font: 700 15px/20px var(--f-teks); color: var(--tinta);
   text-decoration: underline; text-decoration-color: var(--kunyit); text-decoration-thickness: 6px; text-underline-offset: -2px; text-decoration-skip-ink: none; }
 .tautan:hover { text-decoration-color: var(--secang); }
-/* Bilah kemajuan = Pasang dari kiri, tinggi 16, sudut pil, angka ikut tertulis */
-.kemajuan { display: flex; align-items: center; gap: var(--j3); }
+/* Bilah kemajuan = Pasang dari kiri ke kanan penuh, tinggi 16, sudut pil; angkanya di baris judul */
+.kemajuan { display: flex; }
 .pasang { flex: 1; height: 16px; border-radius: 8px; background: var(--awan); overflow: hidden; }
 .pasang span { display: block; height: 100%; border-radius: 8px; background: var(--pandan); transition: width 760ms var(--lentur); }
-.kemajuan b { font: 700 13px/16px var(--f-teks); font-variant-numeric: tabular-nums; min-width: 36px; text-align: right; }
 
 /* Stepper horizontal (desktop): satu kolom sama lebar per tahap, simpul di tengah, garis dari tengah ke tengah */
 .stepper { display: none; list-style: none; margin: 0; padding: 0; grid-template-columns: repeat(10, minmax(0, 1fr)); }
@@ -76,7 +78,7 @@ button { cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action
 .stepper .kini .simpul { background: var(--tinta); color: var(--kapur); box-shadow: var(--stiker-2); }
 .stepper .label { font: 400 12px/16px var(--f-teks); color: var(--asap); text-align: center; white-space: nowrap; }
 .stepper .kini .label { color: var(--tinta); font-weight: 700; }
-@media (min-width: 768px) { .stepper { display: grid; } .kemajuan { display: none; } .pulau { padding: var(--j3) var(--j6) var(--j4); } }
+@media (min-width: 768px) { .stepper { display: grid; } .kemajuan { display: none; } .pulau { padding: var(--j4) var(--j6); gap: var(--j4); } }
 
 /* Obrolan: satu panggung, satu agen */
 main { padding-block: var(--j8) calc(var(--tinggi-tulis, 96px) + var(--j6)); }
@@ -210,7 +212,8 @@ main { padding-block: var(--j8) calc(var(--tinggi-tulis, 96px) + var(--j6)); }
 .kirim[data-isi] svg path { stroke: var(--kapur); }
 .kirim[data-isi]:hover { transform: translateY(-2px); box-shadow: var(--stiker-4-tunjuk); }
 .kirim[data-isi]:active { transform: translateY(1px); box-shadow: var(--stiker-4-tekan); }
-.tulis .ket { padding: var(--j2) var(--j5) 0; }
+.kaki-tulis { display: flex; align-items: center; justify-content: space-between; gap: var(--j3); min-height: 36px; padding: var(--j1) var(--j5) 0; } /* 20 = tepi kiri teks di kolom */
+.kaki-tulis .tautan { font-size: 13px; line-height: 16px; text-decoration-thickness: 4px; }
 </style>
 </head>
 <body>
@@ -220,10 +223,10 @@ main { padding-block: var(--j8) calc(var(--tinggi-tulis, 96px) + var(--j6)); }
   <div class="wadah">
     <div class="pulau">
       <div class="pulau__baris">
-        <div class="pulau__judul"><b>Peta 10x Everchill</b><span id="tahap">Untuk Mba Yola, dari Panji</span></div>
-        <button type="button" class="tautan" id="btn-ringkas" hidden>Selesai dan kirim</button>
+        <div class="pulau__judul"><b id="judul-tahap">Halo, Mba Yola</b><span id="tahap">Sekitar 15 sampai 20 menit</span></div>
+        <span class="persen" id="bar-angka" aria-hidden="true">0<small>%</small></span>
       </div>
-      <div class="kemajuan"><div class="pasang" role="progressbar" aria-label="Kemajuan" aria-valuemin="0" aria-valuemax="100" id="bar"><span id="bar-isi" style="width:0%"></span></div><b id="bar-angka">0%</b></div>
+      <div class="kemajuan"><div class="pasang" role="progressbar" aria-label="Kemajuan" aria-valuemin="0" aria-valuemax="100" id="bar"><span id="bar-isi" style="width:0%"></span></div></div>
       <ol class="stepper" id="stepper" aria-label="Tahap"></ol>
     </div>
   </div>
@@ -239,10 +242,10 @@ main { padding-block: var(--j8) calc(var(--tinggi-tulis, 96px) + var(--j6)); }
 <div class="tulis" id="tulis">
   <div class="wadah">
     <div class="kolom">
-      <textarea id="teks" rows="1" placeholder="Tulis jawaban Mba" aria-label="Tulis jawaban Mba"></textarea>
+      <textarea id="teks" rows="1" placeholder="Tulis jawaban di sini" aria-label="Tulis jawaban di sini"></textarea>
       <button type="button" class="kirim" id="btn-kirim" aria-label="Kirim"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 18.5V5.5M6 11.5l6-6 6 6" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
-    <p class="ket" id="ket-simpan">Tersimpan otomatis. Kalau terputus, buka lagi link ini.</p>
+    <div class="kaki-tulis"><p class="ket" id="ket-simpan">Tersimpan otomatis</p><button type="button" class="tautan" id="btn-ringkas" hidden>Selesai dan kirim</button></div>
   </div>
 </div>
 
@@ -254,9 +257,8 @@ const KUNCI = "peta10x-everchill-chat-v1";
 const UJI = /[?&]uji=1\b/.test(location.search);
 const API = "/api/sml-assessment";
 const SAPAAN = [
-  "Halo Mba Yola. Saya Asisten Panji, asisten AI yang Panji siapkan untuk menyusun Peta 10x Everchill bersama Mba.",
-  "Sebelum proposal ditulis, saya ingin memastikan yang Panji tangkap di pertemuan 4 November sudah benar, lalu melengkapi beberapa fakta, akses, dan izin. Sekitar 15 sampai 20 menit, sebagian besar tinggal pilih. Mba boleh menjawab dengan kata-kata sendiri, tidak harus persis.",
-  "Jawaban hanya dibaca Panji, dan tersimpan otomatis di perangkat ini. Kalau terputus di tengah, buka lagi link ini dan kita lanjut dari terakhir."
+  "Halo Mba Yola. Saya Asisten Panji, asisten AI yang membantu Panji menyiapkan proposal Everchill.",
+  "Sekitar 15 sampai 20 menit, kebanyakan tinggal pilih, dan Mba boleh menjawab dengan kata-kata sendiri. Jawaban hanya dibaca Panji dan tersimpan otomatis, jadi bisa dilanjutkan kapan saja."
 ];
 
 // ---------- State (tersimpan tiap perubahan; obrolan, jawaban, draf ketikan) ----------
@@ -386,11 +388,13 @@ function perbaruiKepala() {
   const inti = SASARAN.filter((s) => !s.angka);
   const persen = Math.round(inti.filter((s) => t(s.id)).length / inti.length * 100);
   document.getElementById("bar-isi").style.width = persen + "%";
-  document.getElementById("bar-angka").textContent = persen + "%";
+  document.getElementById("bar-angka").innerHTML = `${persen}<small>%</small>`;
   document.getElementById("bar").setAttribute("aria-valuenow", persen);
   const s = sasaranDari(S.sedang);
   const nomor = s ? s.bagian : S.sedang === "selesai" ? 9 : -1;
-  document.getElementById("tahap").textContent = nomor < 0 ? "Untuk Mba Yola, dari Panji" : nomor === 0 ? "Konfirmasi: Yang kami dengar" : nomor === 9 ? "Ringkasan dan kirim" : `Bagian ${nomor} dari 8: ${BAGIAN[nomor].judul}`;
+  const JUDUL = ["Cek catatan meeting", "Target yang dikejar", "Siapa yang diincar", "Pipeline sekarang", "Apa yang boleh disentuh", "Event dan production", "Siapa yang dilibatkan", "Batas yang dijaga", "Bentuk kerja sama", "Tinggal kirim ke Panji"];
+  document.getElementById("judul-tahap").textContent = nomor < 0 ? "Halo, Mba Yola" : JUDUL[nomor];
+  document.getElementById("tahap").textContent = nomor < 0 ? "Sekitar 15 sampai 20 menit" : nomor === 0 ? "Sebelum bagian 1" : nomor === 9 ? "Ringkasan" : `Bagian ${nomor} dari 8`;
   const tahap = [{ label: "Konfirmasi", no: 0 }].concat(BAGIAN.slice(1).map((b) => ({ label: ["Objective", "Audiens", "Pipeline", "Akses", "Channel", "Tim", "Rambu", "Kerja sama"][b.no - 1], no: b.no }))).concat([{ label: "Kirim", no: 9 }]);
   document.getElementById("stepper").innerHTML = tahap.map((x) => `<li class="${x.no === nomor ? "kini" : x.no < nomor ? "lewat" : ""}"${x.no === nomor ? ' aria-current="step"' : ""}><span class="simpul">${x.no === 0 ? "K" : x.no === 9 ? "" : x.no}</span><span class="label">${x.label}</span></li>`).join("");
   // "Selesai dan kirim" muncul begitu obrolan masuk bagian 1, supaya Mba bisa berhenti dan mengirim kapan saja.
