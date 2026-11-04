@@ -200,6 +200,17 @@ main { padding-block: var(--j8) calc(var(--tinggi-tulis, 96px) + var(--j6) + var
 .salin-teks { min-height: 160px; font: 400 13px/16px var(--f-teks); }
 .galat-baris { margin-left: var(--kolom-agen); display: flex; flex-wrap: wrap; align-items: center; gap: var(--j3); font: 600 15px/20px var(--f-teks); color: var(--secang-tua); }
 
+/* Gerbang masuk: kartu Kapur dengan agen di takik kiri atasnya, tombol Google resmi */
+.gerbang { display: flex; flex-direction: column; gap: var(--j4); padding: var(--j6); background: var(--kapur); border-radius: var(--r-kartu); margin-top: var(--j8); }
+.gerbang[hidden] { display: none; }
+.gerbang .kartu__judul { font-size: 28px; line-height: 32px; }
+.gerbang p { font: 400 17px/24px var(--f-teks); color: var(--asap); }
+.gerbang .tombol-google { min-height: 44px; }
+.gerbang .pesan-masuk { font: 600 15px/20px var(--f-teks); color: var(--secang-tua); }
+.gerbang .pesan-masuk:empty { display: none; }
+body[data-masuk="belum"] .tulis, body[data-masuk="belum"] #agen, body[data-masuk="belum"] .pulau .kemajuan, body[data-masuk="belum"] .stepper { display: none; }
+body[data-masuk="belum"] main { padding-bottom: var(--j8); }
+
 /* Kolom tulis: pulau Kapur radius 24, isian di kiri, tombol ikon Tinta 48 radius 16 (24 - 8) di kanan; alas warna halaman */
 .tulis { position: fixed; inset: auto 0 0 0; z-index: 20; padding-block: var(--j3) calc(var(--j3) + env(safe-area-inset-bottom, 0px)); background: var(--awan); }
 .tulis::before { content: ""; position: absolute; inset: calc(-1 * var(--j6)) 0 100% 0; background: linear-gradient(to bottom, rgb(243 244 247 / 0), var(--awan)); pointer-events: none; }
@@ -216,7 +227,7 @@ main { padding-block: var(--j8) calc(var(--tinggi-tulis, 96px) + var(--j6) + var
 .kaki-tulis .tautan { font-size: 13px; line-height: 16px; text-decoration-thickness: 4px; }
 </style>
 </head>
-<body>
+<body data-masuk="belum">
 <div class="konsep-panji-pita" role="note" style="all:initial;display:block;box-sizing:border-box;position:relative;z-index:100;width:100%;padding:8px 16px 7px;background:#F5F5F7;color:#1D1D1F;border-bottom:1px solid #D2D2D7;text-align:center;font:400 13px/20px -apple-system,BlinkMacSystemFont,&quot;SF Pro Text&quot;,&quot;Helvetica Neue&quot;,Arial,sans-serif;">Konsep oleh Panji Firmansyah untuk PT Surya Marga Luhur. Bukan situs resmi.</div>
 
 <header class="kepala">
@@ -233,6 +244,13 @@ main { padding-block: var(--j8) calc(var(--tinggi-tulis, 96px) + var(--j6) + var
 </header>
 
 <main class="wadah">
+  <section class="gerbang" id="gerbang" aria-labelledby="judul-gerbang">
+    <h1 class="kartu__judul" id="judul-gerbang">Halo, Mba Yola</h1>
+    <p>Masuk dengan akun Google yang Mba pakai untuk email kerja. Progres tersimpan di akun itu, jadi bisa dilanjutkan dari HP atau laptop kapan saja.</p>
+    <div class="tombol-google" id="tombol-google"></div>
+    <p class="pesan-masuk" id="pesan-masuk" role="alert"></p>
+    <p class="ket">Halaman ini hanya bisa dibuka email yang diundang Panji. Jawaban hanya dibaca Panji.</p>
+  </section>
   <div class="panggung" id="panggung">
     <dynamic-square id="agen" warna="telang" kedalaman="melayang" latar="awan" watak="hidup" aria-label="Asisten Panji. Coba ketuk atau seret."></dynamic-square>
     <div class="log" id="log" aria-live="polite"></div>
@@ -262,17 +280,39 @@ const SAPAAN = [
 ];
 
 // ---------- State (tersimpan tiap perubahan; obrolan, jawaban, draf ketikan) ----------
-function baca() { try { const x = localStorage.getItem(KUNCI); return x ? JSON.parse(x) : null; } catch { return null; } }
-const tersimpan = baca();
-const S = tersimpan || { pesan: SAPAAN.map((t, i) => ({ role: "assistant", content: t, pilihan: i === SAPAAN.length - 1 ? ["Mulai"] : [] })), tangkap: {}, sedang: "", kartu: {} };
-S.kartu ||= {};
-// Kembali ke obrolan yang sudah berjalan: tampilkan tanda lanjut (tidak ikut terkirim ke model).
-let lanjut = Boolean(tersimpan && tersimpan.pesan && tersimpan.pesan.length > SAPAAN.length);
-let menunggu = false, galat = null, pilihBanyak = [], baru = 0;
+// Sumber utama = akun (server, per email login Google); localStorage per email = cadangan kalau sinyal putus.
+let EMAIL = null, kunciLokal = KUNCI;
+const awal = () => ({ pesan: SAPAAN.map((t, i) => ({ role: "assistant", content: t, pilihan: i === SAPAAN.length - 1 ? ["Mulai"] : [] })), tangkap: {}, sedang: "", kartu: {}, diubah: 0 });
+function baca() { try { const x = localStorage.getItem(kunciLokal); return x ? JSON.parse(x) : null; } catch { return null; } }
+let S = awal();
+let lanjut = false, menunggu = false, galat = null, pilihBanyak = [], baru = 0;
+let tSimpan = null, simpanGagal = 0;
 function simpan() {
+  S.diubah = Date.now();
   const ket = document.getElementById("ket-simpan");
-  try { localStorage.setItem(KUNCI, JSON.stringify(S)); }
-  catch { ket.textContent = "Perangkat ini tidak bisa menyimpan jawaban. Mohon selesaikan dalam sekali buka."; }
+  try { localStorage.setItem(kunciLokal, JSON.stringify(S)); } catch { /* cadangan perangkat tidak tersedia; akun tetap dipakai */ }
+  if (!EMAIL) return;
+  ket.textContent = "Menyimpan ke akun";
+  clearTimeout(tSimpan);
+  tSimpan = setTimeout(async () => {
+    try {
+      const b = await api({ aksi: "simpan", progres: S });
+      if (!b.ok) throw new Error(b.pesan);
+      simpanGagal = 0; ket.textContent = "Tersimpan di akun Mba";
+    } catch {
+      simpanGagal++; ket.textContent = "Belum tersimpan ke akun, dicoba lagi";
+      if (simpanGagal < 5) setTimeout(simpan, 3000 * simpanGagal);
+    }
+  }, 800);
+}
+
+// Semua panggilan server lewat sini; sesi berakhir = kembali ke layar masuk tanpa kehilangan progres.
+async function api(isi, sinyal) {
+  const r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(isi), signal: sinyal, credentials: "same-origin" });
+  const b = await r.json().catch(() => ({}));
+  if (r.status === 401 && b.sesi === false) { tampilGerbang("Sesi berakhir. Silakan masuk lagi, progres Mba aman."); }
+  b.status = r.status;
+  return b;
 }
 
 const t = (k) => { const v = S.tangkap[k]; return typeof v === "string" ? v.trim() : ""; };
@@ -403,9 +443,8 @@ function perbaruiKepala() {
 
 // ---------- Giliran (satu kali coba ulang otomatis kalau jaringan putus) ----------
 async function mintaGiliran() {
-  const r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ aksi: "chat", pesan: S.pesan.map(({ role, content }) => ({ role, content })), tangkap: S.tangkap }) });
-  const b = await r.json().catch(() => ({}));
-  if (!r.ok || !b.ok) { const e = new Error(b.pesan || `Server menjawab ${r.status}.`); e.ulang = r.status >= 500 || r.status === 0; throw e; }
+  const b = await api({ aksi: "chat", pesan: S.pesan.map(({ role, content }) => ({ role, content })), tangkap: S.tangkap });
+  if (!b.ok) { const e = new Error(b.pesan || `Server menjawab ${b.status}.`); e.ulang = b.status >= 500; throw e; }
   return b;
 }
 async function giliran() {
@@ -559,10 +598,8 @@ async function kirimEmail(tombol) {
   tombol.disabled = true; tombol.textContent = "Mengirim...";
   const ctrl = new AbortController(), batas = setTimeout(() => ctrl.abort(), 20000);
   try {
-    const r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, signal: ctrl.signal,
-      body: JSON.stringify({ aksi: "kirim", uji: UJI, bagian: susunLaporan(), mentah: S.tangkap, transkrip: S.pesan.map(({ role, content }) => ({ role, content })) }) });
-    const b = await r.json().catch(() => ({}));
-    if (!r.ok || !b.ok) throw new Error(b.pesan || `Server menjawab ${r.status}.`);
+    const b = await api({ aksi: "kirim", uji: UJI, bagian: susunLaporan(), mentah: S.tangkap, transkrip: S.pesan.map(({ role, content }) => ({ role, content })) }, ctrl.signal);
+    if (!b.ok) throw new Error(b.pesan || `Server menjawab ${b.status}.`);
     S.terkirim = new Date().toISOString(); simpan();
     statusEl.innerHTML = statusBerhasil();
     tombol.textContent = "Kirim lagi ke Panji"; tombol.classList.add("beres");
@@ -588,11 +625,57 @@ new ResizeObserver(([e]) => document.documentElement.style.setProperty("--tinggi
 new ResizeObserver(() => letakkanAgen()).observe(logEl);
 document.fonts?.ready.then(letakkanAgen);
 
-teksEl.value = S.draf || ""; ukurTeks();
-baru = S.pesan.length;
-render();
-// Terputus saat asisten sedang menjawab (halaman ditutup, sinyal hilang): jawaban Mba sudah tersimpan, giliran itu diulang.
-if (S.pesan[S.pesan.length - 1]?.role === "user") giliran();
+// ---------- Masuk dengan Google ----------
+const gerbang = document.getElementById("gerbang");
+function tampilGerbang(pesan = "") {
+  document.body.dataset.masuk = "belum";
+  gerbang.hidden = false; logEl.innerHTML = "";
+  document.getElementById("pesan-masuk").textContent = pesan;
+  document.getElementById("judul-tahap").textContent = "Halo, Mba Yola";
+  document.getElementById("tahap").textContent = "Masuk dulu dengan Google";
+}
+function muatGoogle(clientId) {
+  const pasang = () => {
+    google.accounts.id.initialize({ client_id: clientId, callback: saatMasuk, auto_select: true, cancel_on_tap_outside: false, context: "signin", ux_mode: "popup" });
+    google.accounts.id.renderButton(document.getElementById("tombol-google"), { theme: "outline", size: "large", shape: "pill", text: "signin_with", logo_alignment: "left", locale: "id", width: 280 });
+  };
+  if (window.google?.accounts?.id) return pasang();
+  const sk = document.createElement("script");
+  sk.src = "https://accounts.google.com/gsi/client"; sk.async = true; sk.onload = pasang;
+  sk.onerror = () => { document.getElementById("pesan-masuk").textContent = "Tombol Google tidak termuat. Periksa koneksi lalu muat ulang halaman."; };
+  document.head.appendChild(sk);
+}
+async function saatMasuk({ credential }) {
+  document.getElementById("pesan-masuk").textContent = "";
+  const b = await api({ aksi: "masuk", credential }).catch(() => ({ ok: false, pesan: "Koneksi terputus. Coba lagi." }));
+  if (!b.ok) { document.getElementById("pesan-masuk").textContent = b.pesan || "Login tidak berhasil."; return; }
+  await mulaiObrolan(b.email);
+}
+async function mulaiObrolan(email) {
+  EMAIL = email; kunciLokal = `${KUNCI}:${email}`;
+  const lokal = baca();
+  let akun = null;
+  try { const b = await api({ aksi: "muat" }); if (b.ok) akun = b.progres; } catch { /* pakai cadangan perangkat */ }
+  // Ambil yang paling baru: akun (perangkat lain) atau cadangan perangkat ini (kalau sempat terputus sebelum tersimpan).
+  const pilih = [akun, lokal].filter((x) => x && Array.isArray(x.pesan)).sort((a, b) => (b.diubah || 0) - (a.diubah || 0))[0];
+  S = pilih || awal(); S.kartu ||= {};
+  lanjut = Boolean(pilih && pilih.pesan.length > SAPAAN.length);
+  if (pilih && pilih !== akun) simpan();
+  document.body.dataset.masuk = "sudah"; gerbang.hidden = true;
+  teksEl.value = S.draf || ""; ukurTeks();
+  baru = S.pesan.length;
+  render();
+  // Terputus saat asisten sedang menjawab (halaman ditutup, sinyal hilang): jawaban Mba sudah tersimpan, giliran itu diulang.
+  if (S.pesan[S.pesan.length - 1]?.role === "user") giliran();
+}
+(async () => {
+  try {
+    const b = await api({ aksi: "saya" });
+    if (b.email) return mulaiObrolan(b.email);
+    tampilGerbang(b.clientId ? "" : "Login sedang disiapkan Panji. Coba lagi sebentar lagi.");
+    if (b.clientId) muatGoogle(b.clientId);
+  } catch { tampilGerbang("Halaman belum bisa terhubung. Periksa koneksi lalu muat ulang."); }
+})();
 </script>
 </body>
 </html>
