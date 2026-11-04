@@ -66,6 +66,17 @@ async function masuk(body, res) {
   return res.status(200).json({ ok: true, email, nama: String(data.given_name || data.name || "") });
 }
 
+// Google mengirim form POST (ux_mode redirect) berisi credential. Hasilnya dikembalikan ke halaman lewat ?masuk=...,
+// tanpa email di URL. Cek g_csrf_token hanya kalau kukinya terkirim; token tetap diverifikasi tanda tangan dan audience-nya.
+async function masukRedirect(req, body, res) {
+  const kuki = Object.fromEntries((req.headers.cookie || "").split(";").map((k) => k.trim().split("=")).filter((k) => k[0]));
+  const balik = (hasil) => { res.statusCode = 303; res.setHeader("Location", `/sml/assessment/${hasil ? `?masuk=${hasil}` : ""}`); res.end(); };
+  if (kuki.g_csrf_token && kuki.g_csrf_token !== body.g_csrf_token) return balik("gagal");
+  const tangkap = { status: (k) => ({ json: () => k }) };
+  const kode = await masuk(body, { setHeader: (...a) => res.setHeader(...a), ...tangkap });
+  return balik({ 200: "", 403: "ditolak", 503: "belum" }[kode] ?? "gagal");
+}
+
 // ---------- Progres per akun ----------
 const jalurProgres = (email) => `progres/${createHash("sha256").update(email).digest("hex").slice(0, 32)}.json`;
 
@@ -246,6 +257,7 @@ export default async function handler(req, res) {
   try {
     if (body.aksi === "saya") return res.status(200).json({ ok: true, clientId: process.env.SML_GOOGLE_CLIENT_ID || null, email: bacaSesi(req) });
     if (body.aksi === "masuk") return await masuk(body, res);
+    if (!body.aksi && body.credential) return await masukRedirect(req, body, res);
     if (body.aksi === "keluar") { pasangKuki(res, "", 0); return res.status(200).json({ ok: true }); }
     const email = bacaSesi(req);
     if (!email) return res.status(401).json({ ok: false, sesi: false, pesan: "Sesi berakhir. Silakan masuk lagi dengan Google." });
