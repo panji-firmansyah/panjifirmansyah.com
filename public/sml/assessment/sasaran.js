@@ -64,7 +64,7 @@ export const SASARAN = [
   // Bagian 2
   { id: "q2_1", bagian: 2, q: "Segmen mana yang paling ingin Mba menangkan dulu? Urutkan.", tujuan: "Urutan prioritas segmen, minimal tiga teratas.", opsi: ["Pabrik dan produksi (plastik, maklon, F&B)", "Rumah sakit", "Data center", "Hotel dan gedung komersial", "Proyek konstruksi", "Kebutuhan sementara"], banyak: true, urut: true },
   { id: "q2_2", bagian: 2, q: "Siapa yang biasanya memutuskan sewa, dan siapa yang paling berpengaruh?", tujuan: "Siapa saja yang ikut memutuskan, dan satu yang paling berpengaruh.", opsi: ["Owner", "Plant manager atau chief engineer", "Procurement", "Konsultan MEP", "Main contractor"], banyak: true },
-  { id: "q2_3", bagian: 2, q: "Sudah ada daftar target account? Kalau ada, kira-kira berapa nama?", tujuan: "Ada atau belum, dan jumlahnya kalau ada.", opsi: ["Sudah ada", "Sebagian", "Belum"] },
+  { id: "q2_3", bagian: 2, q: "Sudah ada daftar target account? Kalau ada, kira-kira berapa nama?", tujuan: "Ada atau belum, dan jumlahnya kalau ada. Kalau belum, jangan tanya jumlah.", opsi: ["Sudah ada", "Sebagian", "Belum"] },
   { id: "q2_4", bagian: 2, q: "Berapa lama dari kontak pertama sampai kontrak ditandatangani?", tujuan: "Lama sales cycle.", opsi: ["Kurang dari 1 bulan", "1 sampai 3 bulan", "3 sampai 6 bulan", "Lebih dari 6 bulan"] },
   { id: "q2_5", bagian: 2, q: "Tiga pertanyaan atau keberatan yang paling sering didengar tim sales.", tujuan: "Sampai tiga keberatan nyata dari calon klien, dengan kata-kata mereka." },
   { id: "q2_6", bagian: 2, q: "Kenapa klien memilih Everchill, dan kenapa yang tidak jadi memilih yang lain?", tujuan: "Alasan menang dan alasan kalah." },
@@ -74,7 +74,7 @@ export const SASARAN = [
   { id: "q3_1", bagian: 3, q: "Rata-rata lead per bulan?", tujuan: "Volume lead per bulan.", opsi: ["Kurang dari 10", "10 sampai 30", "30 sampai 60", "Lebih dari 60"] },
   { id: "q3_2", bagian: 3, q: "Dari mana saja lead datang?", tujuan: "Sumber lead dengan perkiraan porsi persen. Format nilai: 'Google Ads 60%, Referral 20%, ...'.", opsi: ["Google Ads", "Referral", "Klien lama", "Outreach sales", "Pameran", "Lainnya"], banyak: true },
   { id: "q3_3", bagian: 3, q: "Lead dan deal dicatat di mana?", tujuan: "Tempat pencatatan lead dan deal. Kalau CRM, sebut namanya.", opsi: ["Spreadsheet", "CRM", "Hanya di WhatsApp", "Belum dicatat"] },
-  { id: "q3_4", bagian: 3, q: "Boleh berbagi data 6 bulan terakhir (lead, meeting, quotation, deal) tanpa nama klien?", tujuan: "Izin berbagi data baseline.", opsi: ["Boleh", "Sebagian", "Tidak"] },
+  { id: "q3_4", bagian: 3, q: "Boleh berbagi data 6 bulan terakhir (lead, meeting, quotation, deal) tanpa nama klien?", tujuan: "Izin berbagi data baseline. Kalau q3_3 Belum dicatat atau Hanya di WhatsApp, tanyakan apakah Mba bisa memberi perkiraan dari ingatan atau dari tim sales.", opsi: ["Boleh", "Sebagian", "Tidak"] },
   { id: "q3_5", bagian: 3, q: "Admin WhatsApp aktif jam berapa, dan bagaimana lead di luar jam itu?", tujuan: "Jam aktif admin dan penanganan lead di luar jam." },
 
   // Bagian 4
@@ -84,15 +84,15 @@ export const SASARAN = [
 
   // Bagian 5
   { id: "q5_1", bagian: 5, q: "Event, pameran, atau forum yang sudah pernah diikuti, dan undangan speaker yang sudah masuk?", tujuan: "Daftar event atau forum yang pernah diikuti dan undangan speaker. 'Belum ada' juga jawaban sah." },
-  { id: "q5_2", bagian: 5, q: "Vendor eksekusi event (backdrop, venue, production)?", tujuan: "Sudah punya vendor atau perlu dicarikan.", opsi: ["Sudah punya", "Perlu dicarikan"] },
+  { id: "q5_2", bagian: 5, q: "Vendor eksekusi event (backdrop, venue, production)?", tujuan: "Sudah punya vendor atau perlu dicarikan. Kalau q5_1 menunjukkan Everchill belum pernah ikut atau membuat event, tetap tanyakan dengan kalimat \"Kalau nanti ada event\".", opsi: ["Sudah punya", "Perlu dicarikan"] },
   { id: "q5_3", bagian: 5, q: "Boleh content production foto dan video di workshop SML dan di lokasi klien?", tujuan: "Izin production di workshop dan lokasi klien.", opsi: ["Boleh keduanya", "Workshop saja", "Belum boleh"] },
 
   // Bagian 6
   { id: "q6_1", bagian: 6, q: "Siapa representative Everchill yang tampil di event dan content, dan sudah siap meluangkan waktu untuk production?", tujuan: "Nama, jabatan, dan status kesiapan (Siap, Perlu ditanya dulu, Belum ada). Kandidat yang sempat disebut: adik Mba Yola, engineer senior, sales manager. Format nilai: 'Nama, jabatan. Status: ...'." },
   { id: "q6_2", bagian: 6, q: "Technical atau product engineer yang bisa di-interview untuk content dan sales material?", tujuan: "Nama dan jabatan, boleh lebih dari satu." },
   { id: "q6_3", bagian: 6, q: "Sales rep yang bisa di-interview soal pertanyaan dan keberatan klien?", tujuan: "Nama dari 4 sales, siapa saja." },
-  { id: "q6_4", bagian: 6, q: "Tiap orang di atas bisa meluangkan waktu alignment 1 jam per minggu?", tujuan: "Kesiapan alignment per orang yang disebut: Siap 1 jam per minggu, 2 minggu sekali, atau Perlu ditanya dulu.", opsi: ["Semua siap 1 jam per minggu", "2 minggu sekali", "Perlu ditanya dulu"] },
-  { id: "q6_5", bagian: 6, q: "Kickoff sales activation 2 jam di minggu pertama bersama tim di atas?", tujuan: "Bisa atau tidak.", opsi: ["Bisa", "Jadwal menyusul", "Belum bisa"] },
+  { id: "q6_4", bagian: 6, q: "Tiap orang di atas bisa meluangkan waktu alignment 1 jam per minggu?", tujuan: "Kesiapan alignment per orang yang disebut: Siap 1 jam per minggu, 2 minggu sekali, atau Perlu ditanya dulu. Sebut nama orang yang tadi Mba sebut; kalau belum ada nama, tanyakan untuk Mba sendiri dan sales manager.", opsi: ["Semua siap 1 jam per minggu", "2 minggu sekali", "Perlu ditanya dulu"] },
+  { id: "q6_5", bagian: 6, q: "Kickoff sales activation 2 jam di minggu pertama bersama tim di atas?", tujuan: "Bisa atau tidak. Kalau belum ada orang yang disebut di bagian ini, tanyakan untuk Mba dan 4 sales.", opsi: ["Bisa", "Jadwal menyusul", "Belum bisa"] },
 
   // Bagian 7
   { id: "q7_1", bagian: 7, q: "Mba ingin kompetitor tidak bisa menebak langkah berikutnya. Yang boleh dibuka ke publik?", tujuan: "Hal yang boleh dibuka ke publik.", opsi: ["Nama klien", "Angka kerugian downtime", "Kisaran harga", "Unit buatan sendiri", "Proyek yang sedang jalan"], banyak: true },
@@ -103,12 +103,12 @@ export const SASARAN = [
   // Bagian 8
   { id: "q8_1", bagian: 8, q: "Apa yang paling mengecewakan dari kerja sama marketing sebelumnya?", tujuan: "Kekecewaan konkret, dengan kata-kata Mba sendiri." },
   { id: "q8_2", bagian: 8, q: "Apa yang harus terlihat di 30 hari pertama supaya Mba yakin ini jalan yang benar?", tujuan: "Tanda keberhasilan 30 hari pertama." },
-  { id: "q8_3", bagian: 8, q: "Kalau di hari ke-90 tanda awal belum terlihat, apa yang adil buat Mba?", tujuan: "Bentuk jaminan yang dianggap adil, dengan kata-kata Mba sendiri." },
+  { id: "q8_3", bagian: 8, q: "Kalau di hari ke-90 tanda awal belum terlihat, apa yang adil buat Mba?", tujuan: "Bentuk jaminan yang dianggap adil, dengan kata-kata Mba sendiri. Jangan memberi contoh yang terdengar seperti tawaran atau janji; kalau Mba bingung, tanyakan apa yang biasanya Mba harapkan dari vendor yang hasilnya belum terlihat." },
   { id: "q8_4", bagian: 8, q: "Berapa waktu yang bisa Mba luangkan per minggu?", tujuan: "Waktu Mba per minggu.", opsi: ["30 menit", "1 jam", "2 jam atau lebih"] },
   { id: "q8_5", bagian: 8, q: "Lingkup yang Mba bayangkan?", tujuan: "Lingkup kerja.", opsi: ["Rencana 6 bulan saja", "Rencana plus implementasi penuh", "Rencana dulu, lalu putuskan implementasi"] },
   { id: "model", bagian: 8, kartu: "model", q: "What feels good for you? Tiga model biaya (Retainer, Hybrid, Performance-based), masing-masing dinilai Nyaman, Bisa dipertimbangkan, atau Tidak cocok.", tujuan: "Diisi lewat kartu model. Tanpa angka harga." },
-  { id: "q8_7", bagian: 8, q: "Dari ketiganya, yang paling terasa pas?", tujuan: "Satu model pilihan, atau lihat ketiganya.", opsi: ["Retainer", "Hybrid", "Performance-based", "Saya mau lihat ketiganya di proposal"] },
-  { id: "q8_8", bagian: 8, q: "Kalau ada komponen performance-based, metric yang paling adil?", tujuan: "Metric hasil yang adil.", opsi: ["Sales qualified lead", "Meeting pertama", "Quotation keluar", "Deal ditandatangani"] },
+  { id: "q8_7", bagian: 8, q: "Dari ketiganya, yang paling terasa pas?", tujuan: "Satu model pilihan, atau lihat ketiganya. Kalau di kartu model hanya satu yang dinilai Nyaman, tangkap model itu tanpa bertanya. Kalau semua Tidak cocok, tanyakan bentuk kerja sama apa yang Mba bayangkan, dengan kata-kata Mba.", opsi: ["Retainer", "Hybrid", "Performance-based", "Saya mau lihat ketiganya di proposal"] },
+  { id: "q8_8", bagian: 8, q: "Kalau ada komponen performance-based, metric yang paling adil?", tujuan: "Metric hasil yang adil. Lewati (Tidak relevan) kalau Hybrid dan Performance-based sama-sama dinilai Tidak cocok di kartu model, atau q8_7 Retainer.", opsi: ["Sales qualified lead", "Meeting pertama", "Quotation keluar", "Deal ditandatangani"] },
   { id: "q8_9", bagian: 8, q: "Lama kontrak awal dan cara bayar?", tujuan: "Lama kontrak (3, 6, atau 12 bulan) dan cara bayar (di muka per bulan, akhir bulan, atau per fase). Dua-duanya.", opsi: ["3 bulan", "6 bulan", "12 bulan", "Di muka per bulan", "Akhir bulan", "Per fase"], banyak: true },
   { id: "q8_10", bagian: 8, q: "Di luar biaya kerja sama, berapa total yang siap dikeluarkan per bulan untuk mencapai target: iklan (Meta, LinkedIn, Google), produksi konten (misalnya video berkualitas tinggi), dan event?", tujuan: "Kisaran total anggaran kerja per bulan di luar fee, dan kalau Mba tahu, kira-kira pembagiannya ke iklan, produksi konten, dan event. Jelaskan singkat alasannya: supaya playing field-nya jelas, karena ruang anggaran ini yang menentukan funnel mana yang dipilih untuk dikejar. Boleh juga dibahas langsung.", opsi: ["Di bawah Rp50 juta", "Rp50 sampai 100 juta", "Rp100 sampai 250 juta", "Di atas Rp250 juta", "Lebih suka dibahas langsung"] },
   { id: "q8_11", bagian: 8, q: "Laporan seperti apa yang Mba mau?", tujuan: "Bentuk laporan.", opsi: ["Ringkasan mingguan di WhatsApp", "Meeting bulanan", "Dashboard yang bisa dibuka kapan saja"] },
