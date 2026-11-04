@@ -6,204 +6,211 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Peta 10x Everchill</title>
 <meta name="description" content="Obrolan singkat dengan Mba Yola sebelum proposal Everchill disusun.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@80,900&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap">
 <style>
-/* Peta 10x Everchill: assessment berbentuk obrolan, pola dari Suara v2 (avatar wajah, gelembung, pilihan cepat,
-   kolom tulis kapsul), aksen satu: biru Everchill.
-   Sistem ukuran (semua angka dari token di :root):
-   radius gelembung 20 (ekor 4), kartu 16, kontrol 12, kapsul = tinggi / 2, kecil 4
-   garis 1 pemisah, 1,5 kontrol diam, 2 terpilih dan fokus
-   jarak kelipatan 4: 4 judul ke keterangan, 8 antar gelembung dan pilihan, 12 isi kartu kecil, 16 isi kartu, 24 antar giliran
-   tinggi: kolom tulis 56, kirim 40, pilihan cepat 40, tombol 48 */
+/* Peta 10x Everchill: assessment berbentuk obrolan dengan sistem visual Agent Jakarta (Warna Asli, kit Stiker,
+   agen <dynamic-square> dari pustaka fondasi, salinan di ./aj/). Halaman pribadi Panji: sistem visual AJ dipakai,
+   wordmark AJ tidak (brand.md, 4 Nov 2026).
+   Satu agen untuk seluruh obrolan: ia meluncur ke gelembung asisten terbaru, tidak digambar ulang per pesan.
+   Sistem ukuran dari tokens AJ: radius pil (kontrol berteks), kartu 24, ubin 16, isian 12, kotak 8;
+   garis 1 pemisah, 1,5 kontrol diam, 2 fokus dan terpilih; jarak 4, 8, 12, 16, 20, 24, 32;
+   tinggi tombol 48, tombol kirim 56, chip 36, isian 48, tombol ikon 48. */
 :root {
-  --putih: #FFFFFF; --abu: #F5F5F7; --tinta: #1D1D1F; --tinta2: #6E6E73; --kosong: #8E8E93; --garis: #D2D2D7;
-  --aksen: #006BC7; --aksen-tua: #00559E; --aksen-muda: #EAF3FC;
-  --galat: #B42318; --galat-muda: #FDECEA; --hijau: #2E7D4F; --hijau-muda: #F0F8F2;
-  --huruf: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --r-gelembung: 20px; --r-kartu: 16px; --r-kontrol: 12px; --r-kecil: 4px;
+  --pandan: #0CBD5D; --telang: #314DF5; --kunyit: #FFD119; --secang: #EF3F81; --tinta: #031130;
+  --kapur: #FFFFFF; --awan: #F3F4F7; --asap: #5B6478; --benang: #D9DCE3; --batas: #8A93A8;
+  --pandan-tua: #0A793A; --secang-tua: #C30D60;
+  --f-display: "Anybody", "Arial Black", system-ui, sans-serif;
+  --f-teks: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --r-kartu: 24px; --r-ubin: 16px; --r-isian: 12px; --r-kotak: 8px;
   --g-tipis: 1px; --g-diam: 1.5px; --g-aktif: 2px;
   --j1: 4px; --j2: 8px; --j3: 12px; --j4: 16px; --j5: 20px; --j6: 24px; --j8: 32px;
-  --h-tulis: 56px; --h-kirim: 40px; --h-pilihan: 40px; --h: 48px;
-  --avatar: 28px; --sela-avatar: 36px; /* avatar 28 + jarak 8 */
+  --h-tombol: 48px; --h-kirim: 56px; --h-chip: 36px; --h-isian: 48px; --h-ikon: 48px;
+  --stiker-4: 0 0 0 4px var(--kapur), 0 2px 6px 4px rgba(3, 17, 48, 0.18);
+  --stiker-4-tunjuk: 0 0 0 4px var(--kapur), 0 8px 16px 4px rgba(3, 17, 48, 0.2);
+  --stiker-4-tekan: 0 0 0 4px var(--kapur), 0 1px 2px 4px rgba(3, 17, 48, 0.12);
+  --stiker-3: 0 0 0 3px var(--kapur), 0 2px 4px 3px rgba(3, 17, 48, 0.18);
+  --stiker-2: 0 0 0 2px var(--kapur), 0 1px 3px 2px rgba(3, 17, 48, 0.18);
+  --bayang-pulau: 0 4px 12px rgba(3, 17, 48, 0.18);
+  --cepat: 160ms; --sedang: 320ms; --lentur: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --agen: 40px; --kolom-agen: 52px; /* agen 40 + jarak 12 */
   --wadah: 720px;
-  --pegas: cubic-bezier(.34, 1.35, .64, 1);
   color-scheme: light;
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--putih); color: var(--tinta); font: 400 16px/24px var(--huruf); -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: var(--awan); color: var(--tinta); font: 400 17px/24px var(--f-teks); -webkit-font-smoothing: antialiased; }
 h1, h2, p { margin: 0; }
 button, input, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-:focus-visible { outline: var(--g-aktif) solid var(--aksen); outline-offset: var(--g-aktif); }
+:focus-visible { outline: var(--g-aktif) solid var(--telang); outline-offset: var(--g-aktif); }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .wadah { width: 100%; max-width: calc(var(--wadah) + 2 * var(--j4)); margin-inline: auto;
   padding-inline: max(var(--j4), env(safe-area-inset-left, 0px)) max(var(--j4), env(safe-area-inset-right, 0px)); }
+.display { font-family: var(--f-display); font-weight: 900; font-variation-settings: "wdth" 80; letter-spacing: -0.02em; }
 
-/* Avatar: wajah Suara (KA1, mata saja) dengan warna Everchill. Ukuran dari font-size. */
-.cincin { flex: none; }
-.fw { position: relative; width: 1em; height: 1em; }
-.fb { position: absolute; inset: 0; border-radius: .3em; background: linear-gradient(160deg, #2A8BE0 0%, #006BC7 52%, #0058A6 100%);
-  box-shadow: 0 0 0 .07em #FFFFFF, 0 .16em .34em rgba(0, 40, 80, .28), inset 0 .025em .04em rgba(255, 255, 255, .22), inset 0 -.03em .06em rgba(0, 30, 70, .22); }
-.fe { position: absolute; top: .46em; width: 0; height: 0; }
-.fe1 { left: .355em; } .fe2 { left: .645em; }
-.fg { position: absolute; left: 0; top: 0; width: 0; height: 0; }
-.fs { position: absolute; left: 0; top: 0; width: .15em; height: .24em; border-radius: .075em; background: #FFFFFF; transform: translate(-50%, -50%); }
-@media (prefers-reduced-motion: no-preference) {
-  .cincin[data-wajah="diam"] .fw { transform-origin: 50% 100%; animation: napas 3.2s ease-in-out infinite; }
-  .cincin[data-wajah="diam"] .fs { animation: kedip 4.8s ease-in-out infinite; }
-  .cincin[data-wajah="pikir"] .fw { transform-origin: 50% 100%; animation: pikir-kepala 4.4s var(--pegas) infinite; }
-  .cincin[data-wajah="pikir"] .fg { animation: pikir-sapu 4.4s cubic-bezier(.45, 0, .25, 1) infinite; }
-  .cincin[data-wajah="pikir"] .fs { animation: pikir-mata 4.4s ease-in-out infinite; }
-}
-@keyframes napas { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-.05em) scale(1.03); } }
-@keyframes kedip { 0%, 29%, 34%, 100% { transform: translate(-50%, -50%) scaleY(1); } 31% { transform: translate(-50%, -50%) scaleY(.1); } }
-@keyframes pikir-kepala { 0%, 12%, 29%, 48%, 84%, 100% { transform: translateY(0) scale(1, 1); } 3%, 20%, 37% { transform: translateY(-.02em) scale(1, 1); } 62% { transform: translateY(0) scale(1.07, .9); } 69% { transform: translateY(-.09em) scale(.95, 1.07); } 77% { transform: translateY(0) scale(1.02, .98); } }
-@keyframes pikir-sapu { 0% { transform: translate(-.05em, -.01em); } 14% { transform: translate(.05em, -.01em); } 17% { transform: translate(-.05em, .02em); } 31% { transform: translate(.05em, .02em); } 34% { transform: translate(-.05em, .05em); } 48% { transform: translate(.05em, .05em); } 56%, 80% { transform: translate(0, -.06em); } 92%, 100% { transform: translate(-.05em, -.01em); } }
-@keyframes pikir-mata { 0%, 50%, 58%, 100% { transform: translate(-50%, -50%) scale(1, 1); } 54% { transform: translate(-50%, -50%) scale(1, .1); } 66%, 76% { transform: translate(-50%, -50%) scale(1.15, 1.2); } 84% { transform: translate(-50%, -50%) scale(1, 1); } }
+/* Bilah atas: pulau Kapur radius 24 yang melayang 12 dari tepi, bayang pulau */
+.kepala { position: sticky; top: var(--j3); z-index: 20; margin-top: var(--j3); }
+.pulau { background: var(--kapur); border-radius: var(--r-kartu); box-shadow: var(--bayang-pulau); padding: var(--j3) var(--j4); display: flex; flex-direction: column; gap: var(--j3); }
+.pulau__baris { display: flex; align-items: center; gap: var(--j3); min-height: var(--h-chip); }
+.pulau__judul { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.pulau__judul b { font: 900 20px/24px var(--f-display); font-variation-settings: "wdth" 80; letter-spacing: -0.02em; }
+.pulau__judul span { font: 400 13px/16px var(--f-teks); color: var(--asap); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tautan { flex: none; border: 0; background: none; padding: var(--j2) 0; font: 700 15px/20px var(--f-teks); color: var(--tinta);
+  text-decoration: underline; text-decoration-color: var(--kunyit); text-decoration-thickness: 6px; text-underline-offset: -2px; text-decoration-skip-ink: none; }
+.tautan:hover { text-decoration-color: var(--secang); }
+/* Bilah kemajuan = Pasang dari kiri, tinggi 16, sudut pil, angka ikut tertulis */
+.kemajuan { display: flex; align-items: center; gap: var(--j3); }
+.pasang { flex: 1; height: 16px; border-radius: 8px; background: var(--awan); overflow: hidden; }
+.pasang span { display: block; height: 100%; border-radius: 8px; background: var(--pandan); transition: width 760ms var(--lentur); }
+.kemajuan b { font: 700 13px/16px var(--f-teks); font-variant-numeric: tabular-nums; min-width: 36px; text-align: right; }
 
-/* Kepala */
-.kepala { position: sticky; top: 0; z-index: 20; background: var(--putih); border-bottom: var(--g-tipis) solid var(--garis); }
-.kepala__baris { display: flex; align-items: center; gap: var(--j3); height: var(--h); }
-.kepala__judul { display: flex; flex-direction: column; min-width: 0; flex: 1; }
-.kepala__judul b { font: 600 15px/20px var(--huruf); }
-.kepala__judul span { font: 400 13px/16px var(--huruf); color: var(--tinta2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.btn-teks { flex: none; border: 0; background: none; padding: var(--j2) 0; font: 600 15px/20px var(--huruf); color: var(--aksen); }
-.bar { height: 4px; border-radius: 2px; background: var(--abu); overflow: hidden; margin-bottom: var(--j3); }
-.bar span { display: block; height: 100%; border-radius: 2px; background: var(--aksen); transition: width 400ms var(--pegas); }
-
-/* Stepper horizontal (desktop): kolom sama lebar per tahap, simpul di tengah, garis dari tengah ke tengah */
-.stepper { display: none; list-style: none; margin: 0; padding: var(--j1) 0 var(--j3); grid-template-columns: repeat(10, minmax(0, 1fr)); }
+/* Stepper horizontal (desktop): satu kolom sama lebar per tahap, simpul di tengah, garis dari tengah ke tengah */
+.stepper { display: none; list-style: none; margin: 0; padding: 0; grid-template-columns: repeat(10, minmax(0, 1fr)); }
 .stepper li { position: relative; display: flex; flex-direction: column; align-items: center; gap: var(--j1); }
-.stepper li + li::before { content: ""; position: absolute; top: 9px; right: 50%; width: 100%; height: var(--g-diam); background: var(--garis); } /* 9 = (simpul 20 - garis 1,5) / 2, dibulatkan */
-.stepper li.lewat + li::before { background: var(--aksen); }
-.stepper .simpul { position: relative; z-index: 1; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font: 600 11px/16px var(--huruf); font-variant-numeric: tabular-nums; background: var(--putih); color: var(--tinta2); box-shadow: inset 0 0 0 var(--g-diam) var(--garis); }
-.stepper .lewat .simpul { background: var(--aksen); color: var(--putih); box-shadow: none; }
-.stepper .kini .simpul { color: var(--aksen); box-shadow: inset 0 0 0 var(--g-aktif) var(--aksen); }
-.stepper .label { font: 400 12px/16px var(--huruf); color: var(--tinta2); text-align: center; white-space: nowrap; }
-.stepper .kini .label { color: var(--tinta); font-weight: 600; }
-@media (min-width: 768px) { .stepper { display: grid; } .bar { display: none; } }
+.stepper li + li::before { content: ""; position: absolute; top: 11px; right: 50%; width: 100%; height: var(--g-aktif); background: var(--benang); } /* 11 = (simpul 24 - garis 2) / 2 */
+.stepper li.lewat + li::before, .stepper li.lewat + li.kini::before { background: var(--pandan); }
+.stepper .simpul { position: relative; z-index: 1; width: 24px; height: 24px; border-radius: var(--r-kotak); display: grid; place-items: center; font: 700 12px/16px var(--f-teks); font-variant-numeric: tabular-nums; background: var(--kapur); color: var(--asap); box-shadow: inset 0 0 0 var(--g-diam) var(--batas); }
+.stepper .lewat .simpul { background: var(--pandan); color: var(--tinta); box-shadow: var(--stiker-2); }
+.stepper .kini .simpul { background: var(--tinta); color: var(--kapur); box-shadow: var(--stiker-2); }
+.stepper .label { font: 400 12px/16px var(--f-teks); color: var(--asap); text-align: center; white-space: nowrap; }
+.stepper .kini .label { color: var(--tinta); font-weight: 700; }
+@media (min-width: 768px) { .stepper { display: grid; } .kemajuan { display: none; } .pulau { padding: var(--j3) var(--j6) var(--j4); } }
 
-/* Obrolan */
-main { padding-block: var(--j6) calc(var(--tinggi-tulis, 88px) + var(--j6)); }
+/* Obrolan: satu panggung, satu agen */
+main { padding-block: var(--j8) calc(var(--tinggi-tulis, 96px) + var(--j6)); }
+.panggung { position: relative; }
+#agen { position: absolute; left: 0; top: 0; --dsq: var(--agen); z-index: 2; transition: transform 520ms var(--lentur); will-change: transform; }
+@media (prefers-reduced-motion: reduce) { #agen { transition: none; } }
 .log { display: flex; flex-direction: column; gap: var(--j6); }
 .giliran { display: flex; flex-direction: column; gap: var(--j2); }
-.baris-asisten { display: flex; gap: var(--j2); align-items: flex-end; }
-.baris-asisten .kosong { flex: none; width: var(--avatar); }
-.gelembung { padding: var(--j2) var(--j4); font: 400 16px/24px var(--huruf); max-width: min(560px, calc(100% - var(--sela-avatar))); white-space: pre-wrap; overflow-wrap: anywhere; }
-.gelembung-asisten { background: var(--abu); border-radius: var(--r-gelembung) var(--r-gelembung) var(--r-gelembung) var(--r-kecil); }
-.gelembung-mba { align-self: flex-end; background: var(--aksen-muda); border-radius: var(--r-gelembung) var(--r-gelembung) var(--r-kecil) var(--r-gelembung); }
-.ketik { height: var(--h-kirim); padding: 0 var(--j4); display: flex; align-items: center; gap: var(--j1); background: var(--abu); border-radius: var(--r-gelembung) var(--r-gelembung) var(--r-gelembung) var(--r-kecil); }
-.ketik span { width: 8px; height: 8px; border-radius: var(--r-kecil); background: var(--kosong); animation: titik 1.1s ease-in-out infinite; }
+.gelembung { padding: var(--j3) var(--j4); font: 400 17px/24px var(--f-teks); white-space: pre-wrap; overflow-wrap: anywhere; max-width: 560px; }
+.gelembung-asisten { margin-left: var(--kolom-agen); align-self: flex-start; background: var(--kapur); border-radius: var(--r-kartu) var(--r-kartu) var(--r-kartu) var(--r-kotak); }
+.gelembung-mba { align-self: flex-end; margin-left: var(--kolom-agen); background: var(--tinta); color: var(--kapur); border-radius: var(--r-kartu) var(--r-kartu) var(--r-kotak) var(--r-kartu); }
+.ketik { margin-left: var(--kolom-agen); align-self: flex-start; height: var(--h-isian); padding: 0 var(--j5); display: flex; align-items: center; gap: 6px; background: var(--kapur); border-radius: var(--r-kartu) var(--r-kartu) var(--r-kartu) var(--r-kotak); }
+.ketik span { width: 8px; height: 8px; border-radius: 50%; background: var(--batas); animation: titik 1.1s ease-in-out infinite; }
 .ketik span:nth-child(2) { animation-delay: .15s; } .ketik span:nth-child(3) { animation-delay: .3s; }
 @keyframes titik { 0%, 60%, 100% { transform: translateY(0); opacity: .55; } 30% { transform: translateY(-4px); opacity: 1; } }
-@keyframes pop { 0% { opacity: 0; transform: scale(.6); } 50% { opacity: 1; transform: scale(1.06); } 75% { transform: scale(.98); } 100% { opacity: 1; transform: scale(1); } }
-@media (prefers-reduced-motion: no-preference) { .baru .gelembung, .baru .ketik { animation: pop 560ms ease-out both; transform-origin: 0 100%; } .baru .gelembung-mba { transform-origin: 100% 100%; } }
+@keyframes masuk { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: no-preference) { .baru .gelembung, .baru .ketik, .baru .pilihan, .baru .kartu { animation: masuk var(--sedang) var(--lentur) both; } }
 @media (prefers-reduced-motion: reduce) { .ketik span { animation: none; } }
-.isi-asisten { padding-left: var(--sela-avatar); display: flex; flex-direction: column; gap: var(--j2); }
+.isi-asisten { margin-left: var(--kolom-agen); display: flex; flex-direction: column; gap: var(--j3); }
+.isi-asisten.lebar { margin-left: 0; }
+.catatan-lanjut { align-self: center; font: 600 13px/16px var(--f-teks); color: var(--asap); background: var(--kapur); border-radius: 999px; padding: var(--j2) var(--j4); }
 
-/* Pilihan cepat: kapsul 40, garis 1,5 aksen; terpilih (pilih banyak) = isi aksen */
-.pilihan { display: flex; flex-wrap: wrap; gap: var(--j2); }
-.pilihan button { min-height: var(--h-pilihan); padding: var(--j2) var(--j4); border: 0; border-radius: calc(var(--h-pilihan) / 2); background: var(--putih); color: var(--aksen-tua); box-shadow: inset 0 0 0 var(--g-diam) var(--aksen); font: 600 15px/24px var(--huruf); text-align: left; display: inline-flex; align-items: center; gap: var(--j2); transition: background-color 120ms ease-out, color 120ms ease-out, transform 300ms var(--pegas); }
-.pilihan button:active { transform: scale(.97); }
-.pilihan button[aria-pressed="true"] { background: var(--aksen); color: var(--putih); }
-.pilihan .no { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--putih); color: var(--aksen); font: 600 12px/20px var(--huruf); text-align: center; font-variant-numeric: tabular-nums; }
-.pilihan .kirim-pilihan { background: var(--aksen); color: var(--putih); box-shadow: none; }
-.pilihan .kirim-pilihan[disabled] { opacity: .4; cursor: default; }
-.ket { font: 400 13px/20px var(--huruf); color: var(--tinta2); }
+/* Chip: pil 36, Kapur bergaris Benang 1,5; terpilih menempel jadi stiker Pandan bertepi 3 */
+.pilihan { display: flex; flex-wrap: wrap; gap: var(--j3); padding: 3px; } /* 3 = ruang tepi stiker chip terpilih */
+.chip { min-height: var(--h-chip); padding: var(--j2) var(--j4); border: 0; border-radius: 18px; background: var(--kapur); color: var(--tinta); box-shadow: inset 0 0 0 var(--g-diam) var(--benang); font: 600 15px/20px var(--f-teks); text-align: left; display: inline-flex; align-items: center; gap: var(--j2); transition: box-shadow var(--cepat) ease-out, background-color var(--cepat) ease-out, transform var(--sedang) var(--lentur); }
+.chip:hover { box-shadow: inset 0 0 0 var(--g-diam) var(--batas); }
+.chip[aria-pressed="true"], .chip.terpilih { background: var(--pandan); box-shadow: var(--stiker-3); }
+@media (prefers-reduced-motion: no-preference) { .chip[aria-pressed="true"] { animation: tempel var(--sedang) var(--lentur); } }
+@keyframes tempel { from { transform: scale(1.06) translateY(-6px); } to { transform: none; } }
+.chip .no { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--tinta); color: var(--kapur); font: 700 12px/20px var(--f-teks); text-align: center; font-variant-numeric: tabular-nums; }
+.chip-kirim { background: var(--tinta); color: var(--kapur); box-shadow: var(--stiker-3); }
+.chip-kirim:hover { box-shadow: var(--stiker-3); transform: translateY(-2px); }
+.chip-kirim[disabled] { background: var(--benang); color: var(--asap); box-shadow: 0 0 0 3px var(--kapur); cursor: default; transform: none; }
+.ket { font: 400 13px/16px var(--f-teks); color: var(--asap); }
 
-/* Kartu di dalam obrolan */
-.kartu { background: var(--abu); border-radius: var(--r-kartu); padding: var(--j4); display: flex; flex-direction: column; gap: var(--j4); }
-.kartu.putih { background: var(--putih); box-shadow: inset 0 0 0 var(--g-tipis) var(--garis); }
-.kartu__judul { font: 600 17px/24px var(--huruf); }
-.kartu__isi { font: 400 15px/20px var(--huruf); color: var(--tinta2); }
-.kartu[data-selesai] { opacity: .72; }
+/* Tombol: pil Tinta 48, stiker tepi 4; ditunjuk naik 2, ditekan turun 1 */
+.tombol { display: inline-flex; align-items: center; justify-content: center; gap: var(--j2); height: var(--h-tombol); padding: 0 var(--j6); border: 0; border-radius: 999px; background: var(--tinta); color: var(--kapur); font: 700 17px/24px var(--f-teks); white-space: nowrap; box-shadow: var(--stiker-4); transition: transform var(--cepat) var(--lentur), box-shadow var(--cepat) var(--lentur), background-color var(--sedang) ease-out; }
+.tombol:hover { transform: translateY(-2px); box-shadow: var(--stiker-4-tunjuk); }
+.tombol:active { transform: translateY(1px); box-shadow: var(--stiker-4-tekan); transition-duration: 80ms; }
+.tombol:focus-visible { outline-offset: 6px; }
+.tombol[disabled] { background: var(--benang); color: var(--asap); box-shadow: 0 0 0 4px var(--kapur); transform: none; cursor: progress; }
+.tombol.kedua { background: var(--kunyit); color: var(--tinta); }
+.tombol.kirim-besar { height: var(--h-kirim); width: 100%; max-width: 296px; }
+.tombol.beres { background: var(--pandan); color: var(--tinta); }
+@media (prefers-reduced-motion: reduce) { .tombol, .tombol:hover, .tombol:active { transform: none; } }
+
+/* Kartu Kapur radius 24, rata tanpa bayang. Isi berubin memakai jarak 12 supaya ubin radius 12 sepusat (24 - 12). */
+.kartu { background: var(--kapur); border-radius: var(--r-kartu); padding: var(--j3); display: flex; flex-direction: column; gap: var(--j3); }
+.kartu > .teks-kartu { padding: var(--j2) var(--j2) 0; display: flex; flex-direction: column; gap: var(--j1); }
+.kartu > .aksi-kartu { padding: var(--j2) var(--j2) var(--j2); display: flex; flex-direction: column; gap: var(--j3); align-items: flex-start; }
+.kartu__judul { font: 900 24px/28px var(--f-display); font-variation-settings: "wdth" 80; letter-spacing: -0.02em; }
+.kartu__sub { font: 700 17px/24px var(--f-teks); }
+.kartu__isi { font: 400 15px/20px var(--f-teks); color: var(--asap); }
+.kartu[data-selesai] { opacity: .6; }
 .kartu[data-selesai] input, .kartu[data-selesai] button:not(.boleh) { pointer-events: none; }
-.angka { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--j2); }
-@media (min-width: 768px) { .angka { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.angka > div { background: var(--putih); border-radius: var(--r-kontrol); padding: var(--j3) var(--j4); display: flex; flex-direction: column; gap: var(--j1); }
-.angka b { font: 700 28px/32px var(--huruf); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-.angka .utama { background: var(--aksen); color: var(--putih); }
-.angka .utama .kartu__isi { color: rgb(255 255 255 / .85); }
-.janji { border-left: var(--g-aktif) solid var(--aksen); padding-left: var(--j3); font: 500 15px/20px var(--huruf); }
+.ubin-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--j3); }
+@media (min-width: 768px) { .ubin-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.ubin { background: var(--awan); border-radius: var(--r-isian); padding: var(--j4); display: flex; flex-direction: column; gap: var(--j1); }
+.ubin b { font: 900 32px/36px var(--f-display); font-variation-settings: "wdth" 80; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.ubin.sorot { background: var(--kunyit); }
+.ubin.sorot .kartu__isi { color: var(--tinta); }
+.janji { margin: 0 var(--j2); padding-left: var(--j3); border-left: 4px solid var(--secang); font: 600 15px/20px var(--f-teks); }
 
 /* Tabel izin: kartu per baris di HP, tabel di desktop */
-.izin { display: flex; flex-direction: column; gap: var(--j2); }
+.izin { display: flex; flex-direction: column; gap: var(--j3); }
 .izin__kepala { display: none; }
-.izin__baris { background: var(--putih); border-radius: var(--r-kontrol); padding: var(--j3); display: flex; flex-direction: column; gap: var(--j3); }
-.izin__area b { display: block; font: 600 15px/20px var(--huruf); }
-.izin__area span { display: block; font: 400 13px/20px var(--huruf); color: var(--tinta2); }
-.izin__opsi { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--j2); border: 0; margin: 0; padding: 0; min-width: 0; }
-.izin__opsi label { position: relative; display: flex; align-items: center; justify-content: center; text-align: center; min-height: var(--h-pilihan); padding: var(--j2); border-radius: var(--r-kontrol); background: var(--putih); box-shadow: inset 0 0 0 var(--g-diam) var(--garis); font: 600 13px/16px var(--huruf); cursor: pointer; }
-.izin__opsi input, .nilai-opsi input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
-.izin__opsi label:has(input:checked), .nilai-opsi label:has(input:checked) { box-shadow: inset 0 0 0 var(--g-aktif) var(--aksen); background: var(--aksen-muda); color: var(--aksen-tua); }
-.izin__opsi label:has(input:focus-visible), .nilai-opsi label:has(input:focus-visible) { outline: var(--g-aktif) solid var(--aksen); outline-offset: var(--g-aktif); }
-.izin__opsi .bulat { display: none; }
-.isian { width: 100%; min-height: var(--h-kirim); padding: var(--j2) var(--j3); border: 0; border-radius: var(--r-kontrol); background: var(--abu); box-shadow: inset 0 0 0 var(--g-diam) var(--garis); font: 400 15px/24px var(--huruf); outline: none; -webkit-appearance: none; appearance: none; }
-.izin .isian { background: var(--putih); }
-.isian:focus { box-shadow: inset 0 0 0 var(--g-aktif) var(--aksen); }
-.isian::placeholder { color: var(--kosong); }
+.izin__baris { background: var(--awan); border-radius: var(--r-isian); padding: var(--j3); display: flex; flex-direction: column; gap: var(--j3); }
+.izin__area b { display: block; font: 700 15px/20px var(--f-teks); }
+.izin__area span { display: block; font: 400 13px/16px var(--f-teks); color: var(--asap); }
+.izin__opsi, .nilai-opsi { display: flex; flex-wrap: wrap; gap: var(--j2); border: 0; margin: 0; padding: 3px; min-width: 0; }
+.opsi-chip { position: relative; display: inline-flex; align-items: center; min-height: var(--h-chip); padding: var(--j2) var(--j4); border-radius: 18px; background: var(--kapur); box-shadow: inset 0 0 0 var(--g-diam) var(--benang); font: 600 15px/20px var(--f-teks); cursor: pointer; transition: box-shadow var(--cepat) ease-out, background-color var(--cepat) ease-out; }
+.opsi-chip:hover { box-shadow: inset 0 0 0 var(--g-diam) var(--batas); }
+.opsi-chip input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.opsi-chip:has(input:checked) { background: var(--pandan); box-shadow: var(--stiker-3); }
+.opsi-chip:has(input:focus-visible) { outline: var(--g-aktif) solid var(--telang); outline-offset: 5px; }
+.izin__opsi .kotak { display: none; }
+.isian { width: 100%; min-height: var(--h-isian); padding: var(--j3) var(--j4); border: 0; border-radius: var(--r-isian); background: var(--kapur); box-shadow: inset 0 0 0 var(--g-diam) var(--batas); font: 400 17px/24px var(--f-teks); outline: none; -webkit-appearance: none; appearance: none; }
+.isian:focus { box-shadow: inset 0 0 0 var(--g-aktif) var(--telang); }
+.isian::placeholder { color: var(--asap); }
 @media (min-width: 768px) {
-  .izin { gap: 0; background: var(--putih); border-radius: var(--r-kontrol); box-shadow: inset 0 0 0 var(--g-tipis) var(--garis); overflow: hidden; }
-  .izin__kepala, .izin__baris { display: grid; grid-template-columns: minmax(0, 1fr) repeat(4, 76px); column-gap: var(--j2); align-items: center; padding: var(--j3); }
-  .izin__kepala { font: 600 12px/16px var(--huruf); color: var(--tinta2); }
+  .izin { gap: 0; background: var(--awan); border-radius: var(--r-isian); overflow: hidden; }
+  .izin__kepala, .izin__baris { display: grid; grid-template-columns: minmax(0, 1fr) repeat(4, 80px); column-gap: var(--j2); align-items: center; padding: var(--j3) var(--j4); }
+  .izin__kepala { font: 600 13px/16px var(--f-teks); color: var(--asap); }
   .izin__kepala span:not(:first-child) { text-align: center; }
-  .izin__baris { border-radius: 0; border-top: var(--g-tipis) solid var(--garis); row-gap: var(--j2); }
+  .izin__baris { border-radius: 0; border-top: var(--g-tipis) solid var(--benang); row-gap: var(--j2); }
   .izin__area { grid-column: 1; grid-row: 1; }
   .izin__siapa { grid-column: 1; grid-row: 2; }
   .izin__opsi { display: contents; }
-  .izin__opsi label { grid-row: 1 / span 2; min-height: var(--h); padding: 0; background: none; box-shadow: none; }
-  .izin__opsi label:nth-of-type(1) { grid-column: 2; } .izin__opsi label:nth-of-type(2) { grid-column: 3; }
-  .izin__opsi label:nth-of-type(3) { grid-column: 4; } .izin__opsi label:nth-of-type(4) { grid-column: 5; }
-  .izin__opsi label:has(input:checked) { background: none; box-shadow: none; }
+  .izin__opsi .opsi-chip { grid-row: 1 / span 2; justify-self: center; min-height: var(--h-tombol); padding: 0 var(--j3); background: none; box-shadow: none; }
+  .izin__opsi .opsi-chip:has(input:checked) { background: none; box-shadow: none; }
+  .izin__opsi .opsi-chip:nth-of-type(1) { grid-column: 2; } .izin__opsi .opsi-chip:nth-of-type(2) { grid-column: 3; }
+  .izin__opsi .opsi-chip:nth-of-type(3) { grid-column: 4; } .izin__opsi .opsi-chip:nth-of-type(4) { grid-column: 5; }
   .izin__opsi .teks-opsi { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-  .izin__opsi .bulat { display: block; width: 20px; height: 20px; border-radius: 50%; box-shadow: inset 0 0 0 var(--g-diam) var(--garis); }
-  .izin__opsi label:has(input:checked) .bulat { box-shadow: inset 0 0 0 6px var(--aksen); } /* 6 = (20 - lubang 8) / 2 */
+  /* Kotak pilihan 24 radius 8, Batas 1,5; terpilih menempel jadi stiker Pandan bertepi 2 */
+  .izin__opsi .kotak { display: block; width: 24px; height: 24px; border-radius: var(--r-kotak); background: var(--kapur); box-shadow: inset 0 0 0 var(--g-diam) var(--batas); }
+  .izin__opsi .opsi-chip:has(input:checked) .kotak { background: var(--pandan); box-shadow: var(--stiker-2); }
+  .izin__opsi .opsi-chip:hover .kotak { box-shadow: inset 0 0 0 var(--g-aktif) var(--batas); }
+  .izin__opsi .opsi-chip:has(input:checked):hover .kotak { box-shadow: var(--stiker-2); }
 }
 
 /* Model kerja sama */
-.model { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--j2); }
-.model > div { background: var(--putih); border-radius: var(--r-kontrol); padding: var(--j3) var(--j4) var(--j4); display: flex; flex-direction: column; gap: var(--j3); }
+.model { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--j3); }
+.model > div { background: var(--awan); border-radius: var(--r-isian); padding: var(--j4); display: flex; flex-direction: column; gap: var(--j3); }
 .model .butuh { display: flex; flex-direction: column; gap: var(--j1); }
-.model .butuh span { font: 600 12px/16px var(--huruf); color: var(--tinta2); }
-.model .butuh p { font: 400 15px/20px var(--huruf); }
-.nilai-opsi { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--j2); border: 0; margin: 0; padding: 0; min-width: 0; }
-@media (min-width: 560px) { .nilai-opsi { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.nilai-opsi label { position: relative; display: flex; align-items: center; justify-content: center; text-align: center; min-height: var(--h-pilihan); padding: var(--j1) var(--j2); border-radius: var(--r-kontrol); background: var(--putih); box-shadow: inset 0 0 0 var(--g-diam) var(--garis); font: 600 13px/16px var(--huruf); cursor: pointer; }
+.model .butuh span { font: 600 13px/16px var(--f-teks); color: var(--asap); }
+.model .butuh p { font: 400 15px/20px var(--f-teks); }
 
 /* Penutup */
-.celah { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--j2); }
-.celah li { display: flex; gap: var(--j3); align-items: flex-start; font: 400 15px/20px var(--huruf); }
-.celah .no { flex: none; width: 20px; height: 20px; border-radius: 50%; background: var(--aksen); color: var(--putih); display: grid; place-items: center; font: 600 12px/16px var(--huruf); }
-.isi-proposal { margin: 0; padding-left: var(--j5); display: flex; flex-direction: column; gap: var(--j1); font: 400 15px/20px var(--huruf); color: var(--tinta2); }
-.dua-kolom { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--j2); }
-.label-isian { display: flex; flex-direction: column; gap: var(--j1); font: 400 13px/20px var(--huruf); color: var(--tinta2); }
-.label-isian .isian { background: var(--putih); color: var(--tinta); }
-.btn { display: inline-flex; align-items: center; justify-content: center; height: var(--h); padding: 0 var(--j6); border: 0; border-radius: var(--r-kontrol); font: 600 16px/20px var(--huruf); white-space: nowrap; }
-.btn-utama { background: var(--aksen); color: var(--putih); }
-.btn-utama:hover { background: var(--aksen-tua); }
-.btn-utama[disabled] { opacity: .6; cursor: progress; }
-.btn-kedua { background: var(--putih); color: var(--tinta); box-shadow: inset 0 0 0 var(--g-diam) var(--garis); }
-.kartu .btn { align-self: flex-start; }
-@media (max-width: 767px) { .kartu .btn-utama { align-self: stretch; } }
-.status { border-radius: var(--r-kontrol); padding: var(--j3) var(--j4); display: flex; flex-direction: column; gap: var(--j2); font: 400 15px/20px var(--huruf); }
-.status b { font-weight: 600; }
-.status.gagal { background: var(--galat-muda); } .status.gagal b { color: var(--galat); }
-.status.berhasil { background: var(--hijau-muda); } .status.berhasil b { color: var(--hijau); }
-.status .btn { height: var(--h-kirim); padding-inline: var(--j4); font-size: 15px; }
-.salin-teks { min-height: 160px; font: 400 12px/16px ui-monospace, Menlo, monospace; background: var(--putih); }
-.galat-baris { display: flex; flex-wrap: wrap; align-items: center; gap: var(--j2) var(--j3); font: 400 15px/20px var(--huruf); color: var(--galat); }
+.celah { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--j3); }
+.celah li { display: flex; gap: var(--j3); align-items: flex-start; font: 400 15px/20px var(--f-teks); }
+.celah .no { flex: none; width: 24px; height: 24px; border-radius: var(--r-kotak); background: var(--secang); color: var(--tinta); display: grid; place-items: center; font: 700 13px/16px var(--f-teks); box-shadow: var(--stiker-2); margin: 2px; }
+.isi-proposal { margin: 0; padding-left: var(--j5); display: flex; flex-direction: column; gap: var(--j1); font: 400 15px/20px var(--f-teks); color: var(--asap); }
+.dua-kolom { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--j3); }
+.label-isian { display: flex; flex-direction: column; gap: var(--j2); font: 600 15px/20px var(--f-teks); }
+.status { border-radius: var(--r-isian); padding: var(--j3) var(--j4); display: flex; flex-direction: column; gap: var(--j2); font: 400 15px/20px var(--f-teks); width: 100%; }
+.status b { font-weight: 700; }
+.status.gagal { background: #FDE8F0; } .status.gagal b { color: var(--secang-tua); }
+.status.berhasil { background: #E4F7EC; } .status.berhasil b { color: var(--pandan-tua); }
+.salin-teks { min-height: 160px; font: 400 13px/16px var(--f-teks); }
+.galat-baris { margin-left: var(--kolom-agen); display: flex; flex-wrap: wrap; align-items: center; gap: var(--j3); font: 600 15px/20px var(--f-teks); color: var(--secang-tua); }
 
-/* Kolom tulis: kapsul 56 abu, tombol kirim 40 di jarak 8 (28 - 8 = 20, konsentris), alas warna halaman */
-.tulis { position: fixed; inset: auto 0 0 0; z-index: 20; background: var(--putih); padding-block: var(--j2) calc(var(--j3) + env(safe-area-inset-bottom, 0px)); }
-.tulis::before { content: ""; position: absolute; inset: calc(-1 * var(--j6)) 0 100% 0; background: linear-gradient(to bottom, rgb(255 255 255 / 0), var(--putih)); pointer-events: none; }
-.kolom { display: flex; align-items: flex-end; gap: var(--j2); min-height: var(--h-tulis); padding: 0 var(--j2) var(--j2) var(--j5); border-radius: calc(var(--h-tulis) / 2); background: var(--abu); }
-.kolom textarea { flex: 1; min-width: 0; border: 0; background: transparent; padding: var(--j4) 0 var(--j2); margin: 0; resize: none; font: 400 16px/24px var(--huruf); max-height: calc(6 * 24px + var(--j4) + var(--j2)); overflow-y: auto; outline: none; }
-.kolom textarea::placeholder { color: var(--kosong); }
-.kirim { flex: none; width: var(--h-kirim); height: var(--h-kirim); border: 0; padding: 0; border-radius: 50%; background: var(--garis); display: grid; place-items: center; transition: background-color 120ms ease-out, transform 300ms var(--pegas); }
-.kirim[data-isi] { background: var(--aksen); }
-.kirim:active { transform: scale(.97); }
-.kirim svg { display: block; }
-.tulis .ket { padding: var(--j1) var(--j5) 0; }
+/* Kolom tulis: pulau Kapur radius 24, isian di kiri, tombol ikon Tinta 48 radius 16 (24 - 8) di kanan; alas warna halaman */
+.tulis { position: fixed; inset: auto 0 0 0; z-index: 20; padding-block: var(--j3) calc(var(--j3) + env(safe-area-inset-bottom, 0px)); background: var(--awan); }
+.tulis::before { content: ""; position: absolute; inset: calc(-1 * var(--j6)) 0 100% 0; background: linear-gradient(to bottom, rgb(243 244 247 / 0), var(--awan)); pointer-events: none; }
+.kolom { display: flex; align-items: flex-end; gap: var(--j2); min-height: 64px; padding: var(--j2) var(--j2) var(--j2) var(--j5); border-radius: var(--r-kartu); background: var(--kapur); box-shadow: var(--bayang-pulau); }
+.kolom textarea { flex: 1; min-width: 0; border: 0; background: transparent; padding: var(--j3) 0; margin: 0; resize: none; font: 400 17px/24px var(--f-teks); max-height: calc(6 * 24px + var(--j6)); overflow-y: auto; outline: none; }
+.kolom textarea::placeholder { color: var(--asap); }
+.kirim { flex: none; width: var(--h-ikon); height: var(--h-ikon); border: 0; padding: 0; border-radius: var(--r-ubin); background: var(--benang); display: grid; place-items: center; transition: background-color var(--cepat) ease-out, transform var(--cepat) var(--lentur), box-shadow var(--cepat) var(--lentur); }
+.kirim svg path { stroke: var(--asap); }
+.kirim[data-isi] { background: var(--tinta); box-shadow: var(--stiker-4); }
+.kirim[data-isi] svg path { stroke: var(--kapur); }
+.kirim[data-isi]:hover { transform: translateY(-2px); box-shadow: var(--stiker-4-tunjuk); }
+.kirim[data-isi]:active { transform: translateY(1px); box-shadow: var(--stiker-4-tekan); }
+.tulis .ket { padding: var(--j2) var(--j5) 0; }
 </style>
 </head>
 <body>
@@ -211,31 +218,36 @@ main { padding-block: var(--j6) calc(var(--tinggi-tulis, 88px) + var(--j6)); }
 
 <header class="kepala">
   <div class="wadah">
-    <div class="kepala__baris">
-      <div class="cincin" data-wajah="diam" aria-hidden="true" style="font-size:24px"><div class="fw"><div class="fb"><span class="fe fe1"><span class="fg"><span class="fs"></span></span></span><span class="fe fe2"><span class="fg"><span class="fs"></span></span></span></div></div></div>
-      <div class="kepala__judul"><b>Peta 10x Everchill</b><span id="tahap">Untuk Mba Yola, dari Panji</span></div>
-      <button type="button" class="btn-teks" id="btn-ringkas" hidden>Selesai dan kirim</button>
+    <div class="pulau">
+      <div class="pulau__baris">
+        <div class="pulau__judul"><b>Peta 10x Everchill</b><span id="tahap">Untuk Mba Yola, dari Panji</span></div>
+        <button type="button" class="tautan" id="btn-ringkas" hidden>Selesai dan kirim</button>
+      </div>
+      <div class="kemajuan"><div class="pasang" role="progressbar" aria-label="Kemajuan" aria-valuemin="0" aria-valuemax="100" id="bar"><span id="bar-isi" style="width:0%"></span></div><b id="bar-angka">0%</b></div>
+      <ol class="stepper" id="stepper" aria-label="Tahap"></ol>
     </div>
-    <div class="bar" role="progressbar" aria-label="Kemajuan" aria-valuemin="0" aria-valuemax="100" id="bar"><span id="bar-isi" style="width:0%"></span></div>
-    <ol class="stepper" id="stepper" aria-label="Tahap"></ol>
   </div>
 </header>
 
 <main class="wadah">
-  <div class="log" id="log" aria-live="polite"></div>
+  <div class="panggung" id="panggung">
+    <dynamic-square id="agen" warna="telang" kedalaman="melayang" latar="awan" watak="hidup" aria-label="Asisten Panji. Coba ketuk atau seret."></dynamic-square>
+    <div class="log" id="log" aria-live="polite"></div>
+  </div>
 </main>
 
 <div class="tulis" id="tulis">
   <div class="wadah">
     <div class="kolom">
       <textarea id="teks" rows="1" placeholder="Tulis jawaban Mba" aria-label="Tulis jawaban Mba"></textarea>
-      <button type="button" class="kirim" id="btn-kirim" aria-label="Kirim"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 15.5V4.5M5 9.5l5-5 5 5" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="kirim" id="btn-kirim" aria-label="Kirim"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 18.5V5.5M6 11.5l6-6 6 6" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
-    <p class="ket" id="ket-simpan">Jawaban tersimpan otomatis di perangkat ini.</p>
+    <p class="ket" id="ket-simpan">Tersimpan otomatis. Kalau terputus, buka lagi link ini.</p>
   </div>
 </div>
 
 <script type="module">
+import "./aj/dsq/dsq.mjs";
 import { ANGKA_AWAL, BAGIAN, IZIN_BARIS, IZIN_OPSI, MODEL, MODEL_OPSI, SASARAN } from "./sasaran.js";
 
 const KUNCI = "peta10x-everchill-chat-v1";
@@ -244,17 +256,20 @@ const API = "/api/sml-assessment";
 const SAPAAN = [
   "Halo Mba Yola. Saya Asisten Panji, asisten AI yang Panji siapkan untuk menyusun Peta 10x Everchill bersama Mba.",
   "Sebelum proposal ditulis, saya ingin memastikan yang Panji tangkap di pertemuan 4 November sudah benar, lalu melengkapi beberapa fakta, akses, dan izin. Sekitar 15 sampai 20 menit, sebagian besar tinggal pilih. Mba boleh menjawab dengan kata-kata sendiri, tidak harus persis.",
-  "Jawaban hanya dibaca Panji, dan tersimpan otomatis di perangkat ini kalau Mba ingin melanjutkan nanti."
+  "Jawaban hanya dibaca Panji, dan tersimpan otomatis di perangkat ini. Kalau terputus di tengah, buka lagi link ini dan kita lanjut dari terakhir."
 ];
 
-// ---------- State ----------
+// ---------- State (tersimpan tiap perubahan; obrolan, jawaban, draf ketikan) ----------
 function baca() { try { const x = localStorage.getItem(KUNCI); return x ? JSON.parse(x) : null; } catch { return null; } }
-const S = baca() || { pesan: SAPAAN.map((t, i) => ({ role: "assistant", content: t, pilihan: i === SAPAAN.length - 1 ? ["Mulai"] : [] })), tangkap: {}, sedang: "", kartu: {} };
+const tersimpan = baca();
+const S = tersimpan || { pesan: SAPAAN.map((t, i) => ({ role: "assistant", content: t, pilihan: i === SAPAAN.length - 1 ? ["Mulai"] : [] })), tangkap: {}, sedang: "", kartu: {} };
 S.kartu ||= {};
+// Kembali ke obrolan yang sudah berjalan: tampilkan tanda lanjut (tidak ikut terkirim ke model).
+let lanjut = Boolean(tersimpan && tersimpan.pesan && tersimpan.pesan.length > SAPAAN.length);
 let menunggu = false, galat = null, pilihBanyak = [], baru = 0;
 function simpan() {
   const ket = document.getElementById("ket-simpan");
-  try { localStorage.setItem(KUNCI, JSON.stringify(S)); ket.textContent = "Jawaban tersimpan otomatis di perangkat ini."; }
+  try { localStorage.setItem(KUNCI, JSON.stringify(S)); }
   catch { ket.textContent = "Perangkat ini tidak bisa menyimpan jawaban. Mohon selesaikan dalam sekali buka."; }
 }
 
@@ -266,84 +281,96 @@ function hitung() { const d = n("d"), k = n("k"), p = n("p"), v = n("v"); return
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const sasaranDari = (id) => SASARAN.find((s) => s.id === id);
 
+// ---------- Agen: satu <dynamic-square> untuk seluruh obrolan ----------
+const agen = document.getElementById("agen");
+const panggung = document.getElementById("panggung");
+function letakkanAgen() {
+  const sasaran = [...logEl.querySelectorAll("[data-agen]")].pop();
+  if (!sasaran) return;
+  const atas = sasaran.offsetTop + sasaran.offsetHeight - agen.offsetHeight;
+  agen.style.transform = `translateY(${Math.max(0, atas)}px)`;
+}
+function wajah(nama) { try { agen.bawaan?.(nama); } catch { /* agen belum siap: abaikan */ } }
+
 // ---------- Render ----------
 const logEl = document.getElementById("log");
-const WAJAH = (keadaan) => `<div class="cincin" data-wajah="${keadaan || ""}" aria-hidden="true" style="font-size:28px"><div class="fw"><div class="fb"><span class="fe fe1"><span class="fg"><span class="fs"></span></span></span><span class="fe fe2"><span class="fg"><span class="fs"></span></span></span></div></div></div>`;
 
 function render() {
-  // Giliran = rangkaian pesan sepihak berturut-turut; avatar hanya di gelembung asisten terakhir dalam giliran.
   const giliran = [];
   S.pesan.forEach((p, i) => { const g = giliran[giliran.length - 1]; if (g && g.role === p.role) g.isi.push([p, i]); else giliran.push({ role: p.role, isi: [[p, i]] }); });
   const terakhir = S.pesan.length - 1;
   let h = "";
-  giliran.forEach((g, gi) => {
+  giliran.forEach((g) => {
     const kelasBaru = g.isi.some(([, i]) => i >= baru) ? " baru" : "";
     h += `<div class="giliran${kelasBaru}">`;
     if (g.role === "user") g.isi.forEach(([p]) => { h += `<div class="gelembung gelembung-mba">${esc(p.content)}</div>`; });
-    else g.isi.forEach(([p, i], k) => {
-      const akhirGiliran = k === g.isi.length - 1;
+    else g.isi.forEach(([p, i]) => {
       const aktif = i === terakhir && !menunggu;
-      h += `<div class="baris-asisten">${akhirGiliran ? WAJAH(aktif ? "diam" : "") : '<span class="kosong"></span>'}<div class="gelembung gelembung-asisten">${esc(p.content)}</div></div>`;
-      if (p.kartu && p.kartu !== "tidak") h += `<div class="isi-asisten">${rKartu(p.kartu, i)}</div>`;
+      h += `<div class="gelembung gelembung-asisten" data-agen>${esc(p.content)}</div>`;
+      if (p.kartu && p.kartu !== "tidak") h += `<div class="isi-asisten lebar">${rKartu(p.kartu, i)}</div>`;
       if (aktif && p.pilihan && p.pilihan.length && !(p.kartu && p.kartu !== "tidak" && p.kartu !== "angka")) h += `<div class="isi-asisten">${rPilihan(p)}</div>`;
     });
     h += "</div>";
   });
-  if (menunggu) h += `<div class="giliran baru"><div class="baris-asisten">${WAJAH("pikir")}<div class="ketik" role="status" aria-label="Asisten sedang menulis"><span></span><span></span><span></span></div></div></div>`;
-  if (galat) h += `<div class="giliran"><div class="isi-asisten"><div class="galat-baris" role="alert"><span>${esc(galat)}</span><button type="button" class="btn btn-kedua boleh" data-ulang style="height:var(--h-kirim);padding-inline:var(--j4);font-size:15px">Coba lagi</button></div></div></div>`;
+  if (lanjut) h += `<div class="catatan-lanjut" role="status">Lanjut dari terakhir. Jawaban sebelumnya aman tersimpan.</div>`;
+  if (menunggu) h += `<div class="giliran baru"><div class="ketik" data-agen role="status" aria-label="Asisten sedang menulis"><span></span><span></span><span></span></div></div>`;
+  if (galat) h += `<div class="giliran"><div class="galat-baris" role="alert"><span>${esc(galat)}</span><button type="button" class="tombol kedua boleh" data-ulang>Coba lagi</button></div></div>`;
   logEl.innerHTML = h;
   isiNilaiKartu();
   baru = S.pesan.length;
   perbaruiKepala();
+  letakkanAgen();
   requestAnimationFrame(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" }));
 }
 
 function rPilihan(p) {
   const s = sasaranDari(S.sedang);
-  if (!p.banyak) return `<div class="pilihan">${p.pilihan.map((o) => `<button type="button" data-pilih="${esc(o)}">${esc(o)}</button>`).join("")}</div>`;
+  if (!p.banyak) return `<div class="pilihan">${p.pilihan.map((o) => `<button type="button" class="chip" data-pilih="${esc(o)}">${esc(o)}</button>`).join("")}</div>`;
   const urut = s && s.urut;
-  return `<div class="pilihan">${p.pilihan.map((o) => { const pos = pilihBanyak.indexOf(o); return `<button type="button" data-toggle="${esc(o)}" aria-pressed="${pos > -1}">${urut && pos > -1 ? `<span class="no">${pos + 1}</span>` : ""}${esc(o)}</button>`; }).join("")}<button type="button" class="kirim-pilihan" data-kirim-pilihan ${pilihBanyak.length ? "" : "disabled"}>Kirim pilihan</button></div>` +
+  return `<div class="pilihan">${p.pilihan.map((o) => { const pos = pilihBanyak.indexOf(o); return `<button type="button" class="chip" data-toggle="${esc(o)}" aria-pressed="${pos > -1}">${urut && pos > -1 ? `<span class="no">${pos + 1}</span>` : ""}${esc(o)}</button>`; }).join("")}<button type="button" class="chip chip-kirim" data-kirim-pilihan ${pilihBanyak.length ? "" : "disabled"}>Kirim pilihan</button></div>` +
     `<p class="ket">${urut ? "Ketuk sesuai urutan prioritas. Ketuk lagi untuk membatalkan." : "Boleh pilih lebih dari satu, atau tulis sendiri."}</p>`;
 }
+
+const opsiChip = (nama, o, kotak) => `<label class="opsi-chip"><input type="radio" name="${nama}" value="${esc(o)}">${kotak ? '<span class="kotak" aria-hidden="true"></span>' : ""}<span class="teks-opsi">${esc(o)}</span></label>`;
 
 function rKartu(jenis, i) {
   const selesai = S.kartu[jenis + i] ? " data-selesai" : "";
   if (jenis === "angka") {
     const h = hitung();
-    return `<div class="kartu"><span class="kartu__judul">Angka yang Mba sebut sendiri</span><div class="angka">
-      <div><b>${rp(h.sekarang)}</b><span class="kartu__isi">Nilai kontrak per tahun dari ${fmt(h.d * h.p)} deal dalam ${fmt(h.p)} bulan, kalau kondisi tetap seperti sekarang.</span></div>
-      <div><b>${rp(h.tujuan)}</b><span class="kartu__isi">Nilai kontrak per tahun dari ${fmt(h.target * h.p)} deal dalam ${fmt(h.p)} bulan, kalau target ${fmt(h.k)}x tercapai.</span></div>
-      <div class="utama"><b>${rp(h.selisih)}</b><span class="kartu__isi">Nilai kontrak yang belum terambil setiap bulan selama mesin pipeline belum jalan (${fmt(h.selisihDeal)} deal per bulan).</span></div>
-      <div><b>x lama kontrak</b><span class="kartu__isi">Semua angka di atas masih dikali rata-rata berapa tahun klien bertahan. Ini ditanyakan sebentar lagi.</span></div>
+    return `<div class="kartu"><div class="teks-kartu"><span class="kartu__judul">Angka yang Mba sebut sendiri</span><span class="kartu__isi">Dihitung dari angka yang Mba konfirmasi.</span></div><div class="ubin-grid">
+      <div class="ubin"><b>${rp(h.sekarang)}</b><span class="kartu__isi">Nilai kontrak per tahun dari ${fmt(h.d * h.p)} deal dalam ${fmt(h.p)} bulan, kalau kondisi tetap seperti sekarang.</span></div>
+      <div class="ubin"><b>${rp(h.tujuan)}</b><span class="kartu__isi">Nilai kontrak per tahun dari ${fmt(h.target * h.p)} deal dalam ${fmt(h.p)} bulan, kalau target ${fmt(h.k)}x tercapai.</span></div>
+      <div class="ubin sorot"><b>${rp(h.selisih)}</b><span class="kartu__isi">Nilai kontrak yang belum terambil setiap bulan selama mesin pipeline belum jalan (${fmt(h.selisihDeal)} deal per bulan).</span></div>
+      <div class="ubin"><b>x lama kontrak</b><span class="kartu__isi">Semua angka di atas masih dikali rata-rata berapa tahun klien bertahan. Ini ditanyakan sebentar lagi.</span></div>
     </div><p class="janji">Ini peluang yang ingin dikejar, bukan hasil yang dijanjikan. Seperti Mba bilang, marketing tidak sama dengan sales.</p>
-    <p class="ket">Rumus: deal per bulan x ${fmt(h.p)} bulan x nilai deal ${rp(h.v)} per tahun. Selisih per bulan: (${fmt(h.target)} dikurangi ${fmt(h.d)} deal) x ${rp(h.v)}.</p></div>`;
+    <p class="ket" style="padding:0 var(--j2) var(--j2)">Rumus: deal per bulan x ${fmt(h.p)} bulan x nilai deal ${rp(h.v)} per tahun. Selisih per bulan: (${fmt(h.target)} dikurangi ${fmt(h.d)} deal) x ${rp(h.v)}.</p></div>`;
   }
   if (jenis === "izin") {
-    return `<div class="kartu"${selesai} data-kartu="izin" data-i="${i}"><div><span class="kartu__judul">Akses dan izin</span><p class="kartu__isi">Tiap area cukup pilih satu. Isi siapa yang pegang sekarang kalau ada.</p></div>
+    return `<div class="kartu"${selesai} data-kartu="izin" data-i="${i}"><div class="teks-kartu"><span class="kartu__judul">Akses dan izin</span><span class="kartu__isi">Tiap area cukup pilih satu. Isi siapa yang pegang sekarang kalau ada.</span></div>
       <div class="izin"><div class="izin__kepala" aria-hidden="true"><span>Area</span>${IZIN_OPSI.map((o) => `<span>${esc(o)}</span>`).join("")}</div>
       ${IZIN_BARIS.map((r) => `<div class="izin__baris"><div class="izin__area"><b id="izin-${r.id}">${esc(r.area)}</b>${r.ket ? `<span>${esc(r.ket)}</span>` : ""}</div>
-        <fieldset class="izin__opsi" aria-labelledby="izin-${r.id}">${IZIN_OPSI.map((o) => `<label><input type="radio" name="izin.${r.id}" value="${esc(o)}"><span class="bulat" aria-hidden="true"></span><span class="teks-opsi">${esc(o)}</span></label>`).join("")}</fieldset>
+        <fieldset class="izin__opsi" aria-labelledby="izin-${r.id}">${IZIN_OPSI.map((o) => opsiChip(`izin.${r.id}`, o, true)).join("")}</fieldset>
         <input class="isian izin__siapa" name="izin.${r.id}.siapa" placeholder="Siapa yang pegang sekarang" aria-label="Siapa yang pegang ${esc(r.area)} sekarang"></div>`).join("")}</div>
-      <button type="button" class="btn btn-utama" data-simpan-kartu="izin" data-i="${i}">Simpan tabel izin</button></div>`;
+      <div class="aksi-kartu"><button type="button" class="tombol" data-simpan-kartu="izin" data-i="${i}">Simpan tabel izin</button></div></div>`;
   }
   if (jenis === "model") {
-    return `<div class="kartu"${selesai} data-kartu="model" data-i="${i}"><div><span class="kartu__judul">What feels good for you?</span><p class="kartu__isi">Nilai masing-masing sesuai rasa Mba. Angkanya ada di proposal.</p></div><div class="model">
-      ${MODEL.map((m) => `<div><div><span class="kartu__judul">${esc(m.nama)}</span><p class="kartu__isi">${esc(m.isi)}</p></div><div class="butuh"><span>Yang dibutuhkan dari Mba</span><p>${esc(m.butuh)}</p></div>
-        <fieldset class="nilai-opsi"><legend class="sr">Penilaian ${esc(m.nama)}</legend>${MODEL_OPSI.map((o) => `<label><input type="radio" name="model.${m.id}" value="${esc(o)}">${esc(o)}</label>`).join("")}</fieldset></div>`).join("")}
-      </div><button type="button" class="btn btn-utama" data-simpan-kartu="model" data-i="${i}">Simpan penilaian</button></div>`;
+    return `<div class="kartu"${selesai} data-kartu="model" data-i="${i}"><div class="teks-kartu"><span class="kartu__judul">What feels good for you?</span><span class="kartu__isi">Nilai masing-masing sesuai rasa Mba. Angkanya ada di proposal.</span></div><div class="model">
+      ${MODEL.map((m) => `<div><div><span class="kartu__sub">${esc(m.nama)}</span><p class="kartu__isi">${esc(m.isi)}</p></div><div class="butuh"><span>Yang dibutuhkan dari Mba</span><p>${esc(m.butuh)}</p></div>
+        <fieldset class="nilai-opsi"><legend class="sr">Penilaian ${esc(m.nama)}</legend>${MODEL_OPSI.map((o) => opsiChip(`model.${m.id}`, o)).join("")}</fieldset></div>`).join("")}
+      </div><div class="aksi-kartu"><button type="button" class="tombol" data-simpan-kartu="model" data-i="${i}">Simpan penilaian</button></div></div>`;
   }
   if (jenis === "penutup") {
     const h = hitung();
-    return `<div class="kartu" data-kartu="penutup"><span class="kartu__judul">Ringkasan Peta 10x</span>
-      <div class="angka"><div><span class="kartu__isi">Target yang Mba konfirmasi</span><b>${fmt(h.target)} deal per bulan</b><span class="kartu__isi">Dari ${fmt(h.d)} deal per bulan sekarang, dalam ${fmt(h.p)} bulan.</span></div>
-      <div class="utama"><span class="kartu__isi">Nilai celah</span><b>${rp(h.selisih)}</b><span class="kartu__isi">Nilai kontrak per tahun yang belum terambil setiap bulan.</span></div></div>
-      <div style="display:flex;flex-direction:column;gap:var(--j3)"><span class="kartu__judul">Tiga celah terbesar</span><ol class="celah">${tigaCelah().map((c, k) => `<li><span class="no">${k + 1}</span><span>${esc(c)}</span></li>`).join("")}</ol><p class="ket">Cara menutupnya ada di proposal.</p></div>
-      <div style="display:flex;flex-direction:column;gap:var(--j2)"><span class="kartu__judul">Proposal datang Rabu, 11 November 2026</span><ul class="isi-proposal">${BAGIAN.slice(1).map((b) => `<li>${esc(b.proposal)}</li>`).join("")}</ul></div>
-      <div style="display:flex;flex-direction:column;gap:var(--j3)"><span class="kartu__judul">Pilih jadwal presentasi proposal</span><p class="kartu__isi">Sekitar 60 menit, setelah proposal datang. Jadwal ini ikut terkirim ke Panji.</p>
+    return `<div class="kartu" data-kartu="penutup"><div class="teks-kartu"><span class="kartu__judul">Ringkasan Peta 10x</span></div>
+      <div class="ubin-grid"><div class="ubin"><span class="kartu__isi">Target yang Mba konfirmasi</span><b>${fmt(h.target)} deal per bulan</b><span class="kartu__isi">Dari ${fmt(h.d)} deal per bulan sekarang, dalam ${fmt(h.p)} bulan.</span></div>
+      <div class="ubin sorot"><span class="kartu__isi">Nilai celah</span><b>${rp(h.selisih)}</b><span class="kartu__isi">Nilai kontrak per tahun yang belum terambil setiap bulan.</span></div></div>
+      <div class="teks-kartu" style="gap:var(--j3)"><span class="kartu__sub">Tiga celah terbesar</span><ol class="celah">${tigaCelah().map((c, k) => `<li><span class="no">${k + 1}</span><span>${esc(c)}</span></li>`).join("")}</ol><p class="ket">Cara menutupnya ada di proposal.</p></div>
+      <div class="teks-kartu" style="gap:var(--j2)"><span class="kartu__sub">Proposal datang Rabu, 11 November 2026</span><ul class="isi-proposal">${BAGIAN.slice(1).map((b) => `<li>${esc(b.proposal)}</li>`).join("")}</ul></div>
+      <div class="teks-kartu" style="gap:var(--j3)"><span class="kartu__sub">Pilih jadwal presentasi proposal</span><p class="kartu__isi">Sekitar 60 menit, setelah proposal datang. Jadwal ini ikut terkirim ke Panji.</p>
         <div class="dua-kolom"><label class="label-isian">Tanggal<input class="isian" type="date" name="jadwal.tanggal" min="2026-11-11"></label><label class="label-isian">Jam<input class="isian" type="time" name="jadwal.jam" step="1800"></label></div>
         <label class="label-isian">Atau tulis waktu yang enak<input class="isian" name="jadwal.catatan" placeholder="Misalnya Jumat 13 November, setelah makan siang"></label></div>
-      <button type="button" class="btn btn-utama boleh" data-kirim-email>${S.terkirim ? "Kirim lagi ke Panji" : "Kirim ke Panji"}</button>
-      <div id="status-kirim">${S.terkirim ? statusBerhasil() : ""}</div></div>`;
+      <div class="aksi-kartu"><button type="button" class="tombol kirim-besar boleh${S.terkirim ? " beres" : ""}" data-kirim-email>${S.terkirim ? "Kirim lagi ke Panji" : "Kirim ke Panji"}</button>
+      <div id="status-kirim" style="width:100%">${S.terkirim ? statusBerhasil() : ""}</div></div></div>`;
   }
   return "";
 }
@@ -357,9 +384,9 @@ function isiNilaiKartu() {
 
 function perbaruiKepala() {
   const inti = SASARAN.filter((s) => !s.angka);
-  const terisi = inti.filter((s) => t(s.id)).length;
-  const persen = Math.round(terisi / inti.length * 100);
+  const persen = Math.round(inti.filter((s) => t(s.id)).length / inti.length * 100);
   document.getElementById("bar-isi").style.width = persen + "%";
+  document.getElementById("bar-angka").textContent = persen + "%";
   document.getElementById("bar").setAttribute("aria-valuenow", persen);
   const s = sasaranDari(S.sedang);
   const nomor = s ? s.bagian : S.sedang === "selesai" ? 9 : -1;
@@ -370,20 +397,28 @@ function perbaruiKepala() {
   document.getElementById("btn-ringkas").hidden = !SASARAN.some((x) => x.bagian >= 1 && t(x.id)) && nomor < 1;
 }
 
-// ---------- Giliran ----------
+// ---------- Giliran (satu kali coba ulang otomatis kalau jaringan putus) ----------
+async function mintaGiliran() {
+  const r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ aksi: "chat", pesan: S.pesan.map(({ role, content }) => ({ role, content })), tangkap: S.tangkap }) });
+  const b = await r.json().catch(() => ({}));
+  if (!r.ok || !b.ok) { const e = new Error(b.pesan || `Server menjawab ${r.status}.`); e.ulang = r.status >= 500 || r.status === 0; throw e; }
+  return b;
+}
 async function giliran() {
-  menunggu = true; galat = null; render();
+  menunggu = true; galat = null; wajah("memuat"); render();
   try {
-    const r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ aksi: "chat", pesan: S.pesan.map(({ role, content }) => ({ role, content })), tangkap: S.tangkap }) });
-    const b = await r.json().catch(() => ({}));
-    if (!r.ok || !b.ok) throw new Error(b.pesan || `Server menjawab ${r.status}.`);
+    let b;
+    try { b = await mintaGiliran(); }
+    catch (e) { if (e.ulang === false) throw e; await new Promise((r) => setTimeout(r, 1500)); b = await mintaGiliran(); }
     b.tangkap.forEach((x) => { S.tangkap[x.id] = x.nilai; });
     S.sedang = b.sedang;
     S.pesan.push({ role: "assistant", content: b.balasan, pilihan: b.pilihan, banyak: b.banyak, kartu: b.kartu });
     pilihBanyak = [];
     simpan();
+    wajah("netral"); agen.angguk?.();
   } catch (e) {
-    galat = `Asisten belum bisa menjawab. ${e.message || ""}`.trim();
+    galat = `Asisten belum bisa menjawab. ${e.message || ""} Jawaban Mba tetap tersimpan.`.trim();
+    wajah("netral"); agen.gagal?.();
   } finally { menunggu = false; render(); }
 }
 
@@ -391,6 +426,7 @@ function kirimJawaban(teks) {
   teks = teks.trim();
   if (!teks || menunggu) return;
   S.pesan.push({ role: "user", content: teks });
+  S.draf = ""; lanjut = false;
   simpan();
   giliran();
 }
@@ -398,7 +434,7 @@ function kirimJawaban(teks) {
 // ---------- Kejadian ----------
 const teksEl = document.getElementById("teks"), btnKirim = document.getElementById("btn-kirim");
 function ukurTeks() { teksEl.style.height = "auto"; teksEl.style.height = teksEl.scrollHeight + "px"; btnKirim.toggleAttribute("data-isi", teksEl.value.trim() !== ""); }
-teksEl.addEventListener("input", ukurTeks);
+teksEl.addEventListener("input", () => { ukurTeks(); S.draf = teksEl.value; simpan(); });
 teksEl.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); kirimDariKolom(); } });
 btnKirim.addEventListener("mousedown", (e) => e.preventDefault());
 btnKirim.addEventListener("click", kirimDariKolom);
@@ -414,8 +450,7 @@ document.addEventListener("click", (e) => {
   else if (b.hasAttribute("data-toggle")) {
     const o = b.getAttribute("data-toggle"), pos = pilihBanyak.indexOf(o);
     if (pos > -1) pilihBanyak.splice(pos, 1); else pilihBanyak.push(o);
-    const p = S.pesan[S.pesan.length - 1];
-    b.closest(".isi-asisten").innerHTML = rPilihan(p);
+    b.closest(".isi-asisten").innerHTML = rPilihan(S.pesan[S.pesan.length - 1]);
   } else if (b.hasAttribute("data-kirim-pilihan")) {
     const s = sasaranDari(S.sedang);
     kirimJawaban(s && s.urut ? pilihBanyak.map((o, k) => `${k + 1}. ${o}`).join("\n") : pilihBanyak.join(", "));
@@ -445,7 +480,7 @@ function bukaPenutup() {
   const akhir = S.pesan[S.pesan.length - 1];
   if (akhir && akhir.kartu === "penutup") return window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
   S.pesan.push({ role: "assistant", content: "Tentu, Mba. Ini ringkasan dari yang sudah Mba jawab. Bagian yang belum terjawab bisa dibahas langsung dengan Panji.", kartu: "penutup", pilihan: [] });
-  S.sedang = "selesai";
+  S.sedang = "selesai"; lanjut = false;
   simpan(); render();
 }
 
@@ -526,11 +561,13 @@ async function kirimEmail(tombol) {
     if (!r.ok || !b.ok) throw new Error(b.pesan || `Server menjawab ${r.status}.`);
     S.terkirim = new Date().toISOString(); simpan();
     statusEl.innerHTML = statusBerhasil();
-    tombol.textContent = "Kirim lagi ke Panji";
+    tombol.textContent = "Kirim lagi ke Panji"; tombol.classList.add("beres");
+    agen.selesai?.();
   } catch (e) {
     const pesan = e.name === "AbortError" ? "Koneksi terlalu lama menjawab." : e.message || "Koneksi terputus.";
-    statusEl.innerHTML = `<div class="status gagal" role="alert"><b>Jawaban belum terkirim.</b><span>${esc(pesan)} Jawaban Mba tetap tersimpan di perangkat ini. Coba kirim lagi, atau salin jawaban lalu kirim ke Panji lewat WhatsApp atau email.</span><button type="button" class="btn btn-kedua boleh" data-salin style="align-self:flex-start">Salin jawaban</button><textarea class="isian salin-teks" readonly aria-label="Jawaban dalam bentuk teks" hidden></textarea></div>`;
+    statusEl.innerHTML = `<div class="status gagal" role="alert"><b>Jawaban belum terkirim.</b><span>${esc(pesan)} Jawaban Mba tetap tersimpan di perangkat ini. Coba kirim lagi, atau salin jawaban lalu kirim ke Panji lewat WhatsApp atau email.</span><button type="button" class="tombol kedua boleh" data-salin style="align-self:flex-start">Salin jawaban</button><textarea class="isian salin-teks" readonly aria-label="Jawaban dalam bentuk teks" hidden></textarea></div>`;
     tombol.textContent = S.terkirim ? "Kirim lagi ke Panji" : "Kirim ke Panji";
+    agen.gagal?.();
   } finally { clearTimeout(batas); tombol.disabled = false; statusEl.scrollIntoView({ behavior: "smooth", block: "center" }); }
 }
 
@@ -542,10 +579,16 @@ function salin(b) {
   else tampil("Pilih teks di bawah lalu salin");
 }
 
-// Tinggi kolom tulis menentukan ruang bawah obrolan
+// Tinggi kolom tulis menentukan ruang bawah obrolan; agen mengikuti gelembung terakhir saat tata letak berubah.
 new ResizeObserver(([e]) => document.documentElement.style.setProperty("--tinggi-tulis", Math.ceil(e.target.getBoundingClientRect().height) + "px")).observe(document.getElementById("tulis"));
+new ResizeObserver(() => letakkanAgen()).observe(logEl);
+document.fonts?.ready.then(letakkanAgen);
+
+teksEl.value = S.draf || ""; ukurTeks();
 baru = S.pesan.length;
 render();
+// Terputus saat asisten sedang menjawab (halaman ditutup, sinyal hilang): jawaban Mba sudah tersimpan, giliran itu diulang.
+if (S.pesan[S.pesan.length - 1]?.role === "user") giliran();
 </script>
 </body>
 </html>
