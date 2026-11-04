@@ -553,7 +553,7 @@ function tandaBahaya() {
   if (isFinite(kap) && kap > 0 && kap < h.target) x.push(`Target ${fmt(h.target)} deal per bulan melebihi kapasitas engineering ${fmt(kap)} proyek per bulan.`);
   const condongPerf = /performance/i.test(t("q8_7")) || t("model.perf") === "Nyaman";
   if (condongPerf && (/whatsapp|belum/i.test(t("q3_3")) || /^tidak/i.test(t("q3_4")))) x.push("Condong ke performance-based, tetapi data lead dan deal belum tercatat atau belum boleh dibagi.");
-  if (/di bawah/i.test(t("q8_10")) && /implementasi penuh/i.test(t("q8_5"))) x.push("Anggaran di bawah Rp50 juta per bulan untuk implementasi penuh plus event dan iklan.");
+  if (/di bawah/i.test(t("q8_10")) && /implementasi penuh/i.test(t("q8_5"))) x.push("Anggaran kerja (iklan, produksi konten, event) di bawah Rp50 juta per bulan untuk implementasi penuh.");
   if (/seminggu/i.test(t("q7_3"))) x.push("Approval seminggu akan memperlambat content production dan event.");
   if (/belum boleh/i.test(t("q5_3"))) x.push("Content production di workshop dan lokasi klien belum boleh.");
   const koreksi = SASARAN.filter((s) => /^koreksi/i.test(t(s.id))).map((s) => `${s.id}: ${t(s.id)}`);
