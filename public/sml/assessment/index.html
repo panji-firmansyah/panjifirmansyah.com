@@ -81,7 +81,7 @@ button { cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action
 @media (min-width: 768px) { .stepper { display: grid; } .kemajuan { display: none; } .pulau { padding: var(--j4) var(--j6); gap: var(--j4); } }
 
 /* Obrolan: satu panggung, satu agen */
-main { padding-block: var(--j8) calc(var(--tinggi-tulis, 96px) + var(--j6)); }
+main { padding-block: var(--j8) calc(var(--tinggi-tulis, 96px) + var(--j6) + var(--j4)); } /* 24 = gradasi di atas kolom tulis, lalu 16 ruang bebas */
 .panggung { position: relative; }
 #agen { position: absolute; left: 0; top: 0; --dsq: var(--agen); z-index: 2; transition: transform 520ms var(--lentur); will-change: transform; }
 @media (prefers-reduced-motion: reduce) { #agen { transition: none; } }
