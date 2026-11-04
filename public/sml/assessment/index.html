@@ -205,7 +205,8 @@ main { padding-block: var(--j8) calc(var(--tinggi-tulis, 96px) + var(--j6) + var
 .gerbang[hidden] { display: none; }
 .gerbang .kartu__judul { font-size: 28px; line-height: 32px; }
 .gerbang p:not(.ket):not(.pesan-masuk) { font: 400 17px/24px var(--f-teks); color: var(--asap); }
-.gerbang .tombol-google { min-height: 44px; }
+.gerbang .tombol-google { align-self: flex-start; background: var(--kapur); color: var(--tinta); box-shadow: inset 0 0 0 var(--g-diam) var(--benang), var(--stiker-4); text-decoration: none; }
+.gerbang .tombol-google:hover { box-shadow: inset 0 0 0 var(--g-diam) var(--batas), var(--stiker-4-tunjuk); }
 .gerbang .pesan-masuk { font: 600 15px/20px var(--f-teks); color: var(--secang-tua); }
 .gerbang .pesan-masuk:empty { display: none; }
 body[data-masuk="belum"] .tulis, body[data-masuk="belum"] #agen, body[data-masuk="belum"] .pulau .kemajuan, body[data-masuk="belum"] .stepper, body[data-masuk="belum"] .persen { display: none; }
@@ -247,7 +248,7 @@ body[data-masuk="belum"] main { padding-bottom: var(--j8); }
   <section class="gerbang" id="gerbang" aria-labelledby="judul-gerbang">
     <h1 class="kartu__judul" id="judul-gerbang">Masuk dulu, Mba</h1>
     <p>Masuk dengan akun Gmail Mba yang dipakai untuk undangan pertemuan 4 November. Progres tersimpan di akun itu, jadi bisa dilanjutkan dari HP atau laptop kapan saja.</p>
-    <div class="tombol-google" id="tombol-google"></div>
+    <a class="tombol tombol-google" id="tombol-google" href="/api/sml-assessment?masuk=google"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.6 13.2l7.9 6.2C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 7l7.4 5.7c4.3-4 6.9-9.9 6.9-17.2z"/><path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-2.9-.8-4.6s.3-3.2.8-4.6l-7.9-6.2C1 16.5 0 20.1 0 24s1 7.5 2.6 10.8l7.9-6.2z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.7c-2.1 1.4-4.8 2.3-8.5 2.3-6.3 0-11.6-4.1-13.5-9.7l-7.9 6.2C6.6 42.6 14.6 48 24 48z"/></svg><span>Masuk dengan Google</span></a>
     <p class="pesan-masuk" id="pesan-masuk" role="alert"></p>
     <p class="ket">Halaman ini hanya bisa dibuka email yang diundang Panji. Jawaban hanya dibaca Panji.</p>
   </section>
@@ -634,19 +635,7 @@ function tampilGerbang(pesan = "") {
   document.getElementById("judul-tahap").textContent = "Halo, Mba Yola";
   document.getElementById("tahap").textContent = "Masuk dulu dengan Google";
 }
-function muatGoogle(clientId) {
-  const pasang = () => {
-    // Mode redirect: tanpa popup, jadi tetap jalan di browser dalam WhatsApp dan browser yang memblokir jendela baru.
-    google.accounts.id.initialize({ client_id: clientId, context: "signin", ux_mode: "redirect", login_uri: `${location.origin}${API}` });
-    google.accounts.id.renderButton(document.getElementById("tombol-google"), { theme: "outline", size: "large", shape: "pill", text: "signin_with", logo_alignment: "left", locale: "id", width: 280 });
-  };
-  if (window.google?.accounts?.id) return pasang();
-  const sk = document.createElement("script");
-  sk.src = "https://accounts.google.com/gsi/client"; sk.async = true; sk.onload = pasang;
-  sk.onerror = () => { document.getElementById("pesan-masuk").textContent = "Tombol Google tidak termuat. Periksa koneksi lalu muat ulang halaman."; };
-  document.head.appendChild(sk);
-}
-// Hasil masuk dikembalikan server lewat ?masuk=... sesudah redirect dari Google.
+// Hasil masuk dikembalikan server lewat ?masuk=... sesudah kembali dari Google.
 const HASIL_MASUK = {
   ditolak: "Akun Google itu belum punya akses ke halaman ini. Coba akun lain, atau kabari Panji kalau ini keliru.",
   gagal: "Login Google tidak berhasil. Coba lagi.",
@@ -676,7 +665,6 @@ async function mulaiObrolan(email) {
     const b = await api({ aksi: "saya" });
     if (b.email) return mulaiObrolan(b.email);
     tampilGerbang(b.clientId ? HASIL_MASUK[hasilMasuk] || "" : HASIL_MASUK.belum);
-    if (b.clientId) muatGoogle(b.clientId);
   } catch { tampilGerbang("Halaman belum bisa terhubung. Periksa koneksi lalu muat ulang."); }
 })();
 </script>

@@ -10,7 +10,7 @@
 // Blob privat (store sml-assessment), nama berkas = hash email, supaya obrolan lanjut di perangkat mana pun.
 // Env tambahan: SML_GOOGLE_CLIENT_ID (OAuth Client ID, bukan rahasia), SML_ASSESSMENT_EMAILS (dipisah koma),
 // SML_SESSION_SECRET (kunci tanda tangan kuki sesi), BLOB_READ_WRITE_TOKEN (dipasang Vercel saat store ditautkan).
-import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { get, put } from "@vercel/blob";
@@ -56,6 +56,7 @@ async function masuk(body, res) {
   let data;
   try {
     ({ payload: data } = await jwtVerify(String(body.credential || ""), JWKS, { audience: klien, issuer: ["https://accounts.google.com", "accounts.google.com"] }));
+    if (body.nonce && data.nonce !== body.nonce) throw new Error("nonce");
   } catch { return res.status(401).json({ ok: false, pesan: "Login Google tidak berhasil. Coba lagi." }); }
   const email = String(data.email || "").toLowerCase();
   if (!data.email_verified || !daftarEmail().includes(email)) {
@@ -66,15 +67,36 @@ async function masuk(body, res) {
   return res.status(200).json({ ok: true, email, nama: String(data.given_name || data.name || "") });
 }
 
-// Google mengirim form POST (ux_mode redirect) berisi credential. Hasilnya dikembalikan ke halaman lewat ?masuk=...,
-// tanpa email di URL. Cek g_csrf_token hanya kalau kukinya terkirim; token tetap diverifikasi tanda tangan dan audience-nya.
-async function masukRedirect(req, body, res) {
-  const kuki = Object.fromEntries((req.headers.cookie || "").split(";").map((k) => k.trim().split("=")).filter((k) => k[0]));
-  const balik = (hasil) => { res.statusCode = 303; res.setHeader("Location", `/sml/assessment/${hasil ? `?masuk=${hasil}` : ""}`); res.end(); };
-  if (kuki.g_csrf_token && kuki.g_csrf_token !== body.g_csrf_token) return balik("gagal");
-  const tangkap = { status: (k) => ({ json: () => k }) };
-  const kode = await masuk(body, { setHeader: (...a) => res.setHeader(...a), ...tangkap });
-  return balik({ 200: "", 403: "ditolak", 503: "belum" }[kode] ?? "gagal");
+// Masuk lewat OAuth biasa (navigasi penuh, tanpa popup dan tanpa skrip Google), supaya jalan di browser dalam WhatsApp
+// dan browser yang memblokir jendela baru. GET ?masuk=google -> ke Google; Google mengirim form POST berisi id_token.
+// state dan nonce disimpan di kuki singkat SameSite=None karena POST dari Google lintas situs.
+const KUKI_OAUTH = "sml_oauth";
+const bacaKuki = (req) => Object.fromEntries((req.headers.cookie || "").split(";").map((k) => k.trim().split("=")).filter((k) => k[0]));
+const asal = (req) => `https://${req.headers["x-forwarded-host"] || req.headers.host}`;
+
+function keGoogle(req, res) {
+  const klien = process.env.SML_GOOGLE_CLIENT_ID;
+  if (!klien || !process.env.SML_SESSION_SECRET) return balikKeHalaman(res, "belum");
+  const state = randomBytes(16).toString("base64url"), nonce = randomBytes(16).toString("base64url");
+  res.setHeader("Set-Cookie", `${KUKI_OAUTH}=${state}.${nonce}; Path=/api/sml-assessment; HttpOnly; Secure; SameSite=None; Max-Age=600`);
+  const q = new URLSearchParams({ client_id: klien, redirect_uri: `${asal(req)}/api/sml-assessment`, response_type: "id_token", response_mode: "form_post", scope: "openid email profile", prompt: "select_account", state, nonce });
+  res.statusCode = 302; res.setHeader("Location", `https://accounts.google.com/o/oauth2/v2/auth?${q}`); res.end();
+}
+function balikKeHalaman(res, hasil) {
+  res.statusCode = 303; res.setHeader("Location", `/sml/assessment/${hasil ? `?masuk=${hasil}` : ""}`); res.end();
+}
+async function dariGoogle(req, body, res) {
+  const [state, nonce] = String(bacaKuki(req)[KUKI_OAUTH] || "").split(".");
+  const kukiOauth = `${KUKI_OAUTH}=; Path=/api/sml-assessment; HttpOnly; Secure; SameSite=None; Max-Age=0`;
+  if (body.error) { res.setHeader("Set-Cookie", kukiOauth); return balikKeHalaman(res, body.error === "access_denied" ? "" : "gagal"); }
+  if (!state || state !== body.state) { res.setHeader("Set-Cookie", kukiOauth); return balikKeHalaman(res, "gagal"); }
+  const kuki = [kukiOauth];
+  const kode = await masuk({ credential: body.id_token, nonce }, {
+    setHeader: (_n, v) => kuki.push(v),
+    status: (k) => ({ json: () => k })
+  });
+  res.setHeader("Set-Cookie", kuki);
+  return balikKeHalaman(res, { 200: "", 403: "ditolak", 503: "belum" }[kode] ?? "gagal");
 }
 
 // ---------- Progres per akun ----------
@@ -251,13 +273,14 @@ ${blok.map((b) => `<h2 style="font-size:17px;margin:28px 0 8px">${esc(b.judul)}<
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("X-Robots-Tag", "noindex, nofollow");
+  if (req.method === "GET" && req.query?.masuk === "google") return keGoogle(req, res);
   if (req.method !== "POST") return res.status(405).json({ ok: false, pesan: "Hanya POST." });
   const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+  if (!body.aksi && (body.id_token || body.error)) return await dariGoogle(req, body, res);
   if (JSON.stringify(body).length > 400000) return res.status(413).json({ ok: false, pesan: "Jawaban terlalu panjang." });
   try {
     if (body.aksi === "saya") return res.status(200).json({ ok: true, clientId: process.env.SML_GOOGLE_CLIENT_ID || null, email: bacaSesi(req) });
     if (body.aksi === "masuk") return await masuk(body, res);
-    if (!body.aksi && body.credential) return await masukRedirect(req, body, res);
     if (body.aksi === "keluar") { pasangKuki(res, "", 0); return res.status(200).json({ ok: true }); }
     const email = bacaSesi(req);
     if (!email) return res.status(401).json({ ok: false, sesi: false, pesan: "Sesi berakhir. Silakan masuk lagi dengan Google." });
