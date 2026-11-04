@@ -246,7 +246,7 @@ body[data-masuk="belum"] main { padding-bottom: var(--j8); }
 <main class="wadah">
   <section class="gerbang" id="gerbang" aria-labelledby="judul-gerbang">
     <h1 class="kartu__judul" id="judul-gerbang">Masuk dulu, Mba</h1>
-    <p>Masuk dengan akun Google yang Mba pakai untuk email kerja. Progres tersimpan di akun itu, jadi bisa dilanjutkan dari HP atau laptop kapan saja.</p>
+    <p>Masuk dengan akun Gmail Mba yang dipakai untuk undangan pertemuan 4 November. Progres tersimpan di akun itu, jadi bisa dilanjutkan dari HP atau laptop kapan saja.</p>
     <div class="tombol-google" id="tombol-google"></div>
     <p class="pesan-masuk" id="pesan-masuk" role="alert"></p>
     <p class="ket">Halaman ini hanya bisa dibuka email yang diundang Panji. Jawaban hanya dibaca Panji.</p>
@@ -636,7 +636,8 @@ function tampilGerbang(pesan = "") {
 }
 function muatGoogle(clientId) {
   const pasang = () => {
-    google.accounts.id.initialize({ client_id: clientId, callback: saatMasuk, auto_select: true, cancel_on_tap_outside: false, context: "signin", ux_mode: "popup" });
+    // Mode redirect: tanpa popup, jadi tetap jalan di browser dalam WhatsApp dan browser yang memblokir jendela baru.
+    google.accounts.id.initialize({ client_id: clientId, context: "signin", ux_mode: "redirect", login_uri: `${location.origin}${API}` });
     google.accounts.id.renderButton(document.getElementById("tombol-google"), { theme: "outline", size: "large", shape: "pill", text: "signin_with", logo_alignment: "left", locale: "id", width: 280 });
   };
   if (window.google?.accounts?.id) return pasang();
@@ -645,12 +646,14 @@ function muatGoogle(clientId) {
   sk.onerror = () => { document.getElementById("pesan-masuk").textContent = "Tombol Google tidak termuat. Periksa koneksi lalu muat ulang halaman."; };
   document.head.appendChild(sk);
 }
-async function saatMasuk({ credential }) {
-  document.getElementById("pesan-masuk").textContent = "";
-  const b = await api({ aksi: "masuk", credential }).catch(() => ({ ok: false, pesan: "Koneksi terputus. Coba lagi." }));
-  if (!b.ok) { document.getElementById("pesan-masuk").textContent = b.pesan || "Login tidak berhasil."; return; }
-  await mulaiObrolan(b.email);
-}
+// Hasil masuk dikembalikan server lewat ?masuk=... sesudah redirect dari Google.
+const HASIL_MASUK = {
+  ditolak: "Akun Google itu belum punya akses ke halaman ini. Coba akun lain, atau kabari Panji kalau ini keliru.",
+  gagal: "Login Google tidak berhasil. Coba lagi.",
+  belum: "Login sedang disiapkan Panji. Coba lagi sebentar lagi."
+};
+const hasilMasuk = new URLSearchParams(location.search).get("masuk");
+if (hasilMasuk) history.replaceState(null, "", location.pathname);
 async function mulaiObrolan(email) {
   EMAIL = email; kunciLokal = `${KUNCI}:${email}`;
   const lokal = baca();
@@ -672,7 +675,7 @@ async function mulaiObrolan(email) {
   try {
     const b = await api({ aksi: "saya" });
     if (b.email) return mulaiObrolan(b.email);
-    tampilGerbang(b.clientId ? "" : "Login sedang disiapkan Panji. Coba lagi sebentar lagi.");
+    tampilGerbang(b.clientId ? HASIL_MASUK[hasilMasuk] || "" : HASIL_MASUK.belum);
     if (b.clientId) muatGoogle(b.clientId);
   } catch { tampilGerbang("Halaman belum bisa terhubung. Periksa koneksi lalu muat ulang."); }
 })();
