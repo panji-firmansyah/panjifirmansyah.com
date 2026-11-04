@@ -5,8 +5,17 @@
 // Pengecualian aturan AI Gateway (AGENTS.md bagian 9), keputusan Panji 4 Nov 2026: proyek pribadi, bukan Dayalima, dan
 // BYOK lewat Gateway butuh kredit Vercel berbayar. Jadi panggilan model ini langsung ke Anthropic, tidak tercatat di Gateway.
 // Penerima tetap di sini, tidak pernah dari permintaan.
+// Akses (Panji 4 Nov 2026): masuk dengan Google, hanya email di SML_ASSESSMENT_EMAILS. Semua aksi kecuali saya, masuk,
+// dan keluar butuh sesi, jadi kredit model dan email tidak bisa dipakai orang lain. Progres tersimpan per akun di Vercel
+// Blob privat (store sml-assessment), nama berkas = hash email, supaya obrolan lanjut di perangkat mana pun.
+// Env tambahan: SML_GOOGLE_CLIENT_ID (OAuth Client ID, bukan rahasia), SML_ASSESSMENT_EMAILS (dipisah koma),
+// SML_SESSION_SECRET (kunci tanda tangan kuki sesi), BLOB_READ_WRITE_TOKEN (dipasang Vercel saat store ditautkan).
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+
 import { createAnthropic } from "@ai-sdk/anthropic";
+import { get, put } from "@vercel/blob";
 import { generateText, jsonSchema, Output } from "ai";
+import { createRemoteJWKSet, jwtVerify } from "jose";
 
 import { BAGIAN, SASARAN } from "../public/sml/assessment/sasaran.js";
 
@@ -16,6 +25,66 @@ const MODEL = "claude-sonnet-5-5";
 const PENGIRIM = "assistant@panjifirmansyah.com";
 const PENERIMA = "panjifrmansyah@gmail.com";
 const KARTU = ["tidak", "angka", "izin", "model", "penutup"];
+const KUKI = "sml_sesi";
+const UMUR_SESI = 30 * 24 * 3600; // 30 hari, cukup sampai presentasi proposal
+const JWKS = createRemoteJWKSet(new URL("https://www.googleapis.com/oauth2/v3/certs"));
+
+// ---------- Sesi dan akses ----------
+const b64 = (s) => Buffer.from(s).toString("base64url");
+const tanda = (isi) => createHmac("sha256", process.env.SML_SESSION_SECRET || "").update(isi).digest("base64url");
+const daftarEmail = () => (process.env.SML_ASSESSMENT_EMAILS || "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+
+function bacaSesi(req) {
+  if (!process.env.SML_SESSION_SECRET) return null;
+  const kuki = Object.fromEntries((req.headers.cookie || "").split(";").map((k) => k.trim().split("=")).filter((k) => k[0]));
+  const [isi, ttd] = String(kuki[KUKI] || "").split(".");
+  if (!isi || !ttd) return null;
+  const a = Buffer.from(ttd), b = Buffer.from(tanda(isi));
+  if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
+  try {
+    const { e, x } = JSON.parse(Buffer.from(isi, "base64url").toString());
+    // Email yang dicabut dari daftar langsung kehilangan akses walau kukinya masih berlaku.
+    return x > Date.now() / 1000 && daftarEmail().includes(e) ? e : null;
+  } catch { return null; }
+}
+const pasangKuki = (res, nilai, umur) =>
+  res.setHeader("Set-Cookie", `${KUKI}=${nilai}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${umur}`);
+
+async function masuk(body, res) {
+  const klien = process.env.SML_GOOGLE_CLIENT_ID;
+  if (!klien || !process.env.SML_SESSION_SECRET) return res.status(503).json({ ok: false, pesan: "Login belum disiapkan." });
+  let data;
+  try {
+    ({ payload: data } = await jwtVerify(String(body.credential || ""), JWKS, { audience: klien, issuer: ["https://accounts.google.com", "accounts.google.com"] }));
+  } catch { return res.status(401).json({ ok: false, pesan: "Login Google tidak berhasil. Coba lagi." }); }
+  const email = String(data.email || "").toLowerCase();
+  if (!data.email_verified || !daftarEmail().includes(email)) {
+    return res.status(403).json({ ok: false, pesan: `Email ${email} belum punya akses ke halaman ini. Kalau ini keliru, kabari Panji.` });
+  }
+  const isi = b64(JSON.stringify({ e: email, x: Math.floor(Date.now() / 1000) + UMUR_SESI }));
+  pasangKuki(res, `${isi}.${tanda(isi)}`, UMUR_SESI);
+  return res.status(200).json({ ok: true, email, nama: String(data.given_name || data.name || "") });
+}
+
+// ---------- Progres per akun ----------
+const jalurProgres = (email) => `progres/${createHash("sha256").update(email).digest("hex").slice(0, 32)}.json`;
+
+async function muat(email, res) {
+  const hasil = await get(jalurProgres(email), { access: "private", useCache: false }).catch((e) => {
+    if (/not.?found|404/i.test(String(e?.message))) return null;
+    throw e;
+  });
+  if (!hasil || hasil.statusCode !== 200) return res.status(200).json({ ok: true, progres: null });
+  const teks = await new Response(hasil.stream).text();
+  return res.status(200).json({ ok: true, progres: JSON.parse(teks) });
+}
+
+async function simpanProgres(email, body, res) {
+  const teks = JSON.stringify(body.progres ?? null);
+  if (teks.length > 300000) return res.status(413).json({ ok: false, pesan: "Progres terlalu besar." });
+  await put(jalurProgres(email), teks, { access: "private", allowOverwrite: true, addRandomSuffix: false, contentType: "application/json", cacheControlMaxAge: 60 });
+  return res.status(200).json({ ok: true });
+}
 
 const SKEMA = jsonSchema({
   type: "object",
@@ -124,14 +193,14 @@ async function chat(body, res) {
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
-async function kirim(body, res) {
+async function kirim(body, res, email) {
   const kunci = process.env.AGENTMAIL_API_KEY;
   if (!kunci) return res.status(503).json({ ok: false, pesan: "Pengirim email belum disiapkan." });
   const bagian = Array.isArray(body.bagian) ? body.bagian.slice(0, 20) : [];
   if (!bagian.length) return res.status(400).json({ ok: false, pesan: "Tidak ada jawaban untuk dikirim." });
   const transkrip = Array.isArray(body.transkrip) ? body.transkrip.slice(-200) : [];
   const awalan = body.uji ? "[UJI] " : "";
-  const subjek = `${awalan}Peta 10x Everchill: jawaban Mba Yola`;
+  const subjek = `${awalan}Peta 10x Everchill: jawaban dari ${email}`;
 
   const blok = bagian.map((b) => ({
     judul: String(b.judul ?? "").slice(0, 200),
@@ -142,12 +211,14 @@ async function kirim(body, res) {
 
   const teks = [
     body.uji ? "INI KIRIMAN UJI, BUKAN JAWABAN MBA YOLA.\n" : "",
+    `Diisi oleh: ${email} (login Google)\n\n`,
     blok.map((b) => `${b.judul.toUpperCase()}\n${b.item.map(([q, a]) => `${q}\n${a}`).join("\n\n")}`).join("\n\n\n"),
     `\n\n\nTRANSKRIP OBROLAN\n${obrolan}`,
     `\n\n\nJSON MENTAH\n${mentah}`,
   ].join("");
   const html = `<div style="font:15px/1.5 -apple-system,Helvetica,Arial,sans-serif;color:#1D1D1F;max-width:680px">
 ${body.uji ? '<p style="background:#FFF4E0;color:#8A5300;padding:8px 12px;border-radius:8px"><b>Kiriman uji, bukan jawaban Mba Yola.</b></p>' : ""}
+<p style="color:#6E6E73;margin:0 0 8px">Diisi oleh ${esc(email)} (login Google)</p>
 ${blok.map((b) => `<h2 style="font-size:17px;margin:28px 0 8px">${esc(b.judul)}</h2>${b.item.map(([q, a]) => `<p style="margin:0 0 12px"><span style="color:#6E6E73">${esc(q)}</span><br>${esc(a).replace(/\n/g, "<br>")}</p>`).join("")}`).join("")}
 <h2 style="font-size:17px;margin:28px 0 8px">Transkrip obrolan</h2><pre style="white-space:pre-wrap;font:13px/1.5 Menlo,monospace;background:#F5F5F7;padding:12px;border-radius:8px">${esc(obrolan)}</pre>
 <h2 style="font-size:17px;margin:28px 0 8px">JSON mentah</h2><pre style="white-space:pre-wrap;font:12px/1.4 Menlo,monospace;background:#F5F5F7;padding:12px;border-radius:8px">${esc(mentah)}</pre>
@@ -173,11 +244,19 @@ export default async function handler(req, res) {
   const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
   if (JSON.stringify(body).length > 400000) return res.status(413).json({ ok: false, pesan: "Jawaban terlalu panjang." });
   try {
+    if (body.aksi === "saya") return res.status(200).json({ ok: true, clientId: process.env.SML_GOOGLE_CLIENT_ID || null, email: bacaSesi(req) });
+    if (body.aksi === "masuk") return await masuk(body, res);
+    if (body.aksi === "keluar") { pasangKuki(res, "", 0); return res.status(200).json({ ok: true }); }
+    const email = bacaSesi(req);
+    if (!email) return res.status(401).json({ ok: false, sesi: false, pesan: "Sesi berakhir. Silakan masuk lagi dengan Google." });
+    if (body.aksi === "muat") return await muat(email, res);
+    if (body.aksi === "simpan") return await simpanProgres(email, body, res);
     if (body.aksi === "chat") return await chat(body, res);
-    if (body.aksi === "kirim") return await kirim(body, res);
+    if (body.aksi === "kirim") return await kirim(body, res, email);
     return res.status(400).json({ ok: false, pesan: "Aksi tidak dikenal." });
   } catch (e) {
     console.error("sml-assessment:", body.aksi, e?.name, e?.message);
-    return res.status(500).json({ ok: false, pesan: body.aksi === "chat" ? "Asisten sedang tidak bisa menjawab." : "Email belum terkirim." });
+    const pesan = { chat: "Asisten sedang tidak bisa menjawab.", kirim: "Email belum terkirim.", muat: "Progres belum bisa dimuat.", simpan: "Progres belum tersimpan ke akun." }[body.aksi] || "Terjadi galat.";
+    return res.status(500).json({ ok: false, pesan });
   }
 }
