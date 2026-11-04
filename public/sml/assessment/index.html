@@ -204,11 +204,11 @@ main { padding-block: var(--j8) calc(var(--tinggi-tulis, 96px) + var(--j6) + var
 .gerbang { display: flex; flex-direction: column; gap: var(--j4); padding: var(--j6); background: var(--kapur); border-radius: var(--r-kartu); margin-top: var(--j8); }
 .gerbang[hidden] { display: none; }
 .gerbang .kartu__judul { font-size: 28px; line-height: 32px; }
-.gerbang p { font: 400 17px/24px var(--f-teks); color: var(--asap); }
+.gerbang p:not(.ket):not(.pesan-masuk) { font: 400 17px/24px var(--f-teks); color: var(--asap); }
 .gerbang .tombol-google { min-height: 44px; }
 .gerbang .pesan-masuk { font: 600 15px/20px var(--f-teks); color: var(--secang-tua); }
 .gerbang .pesan-masuk:empty { display: none; }
-body[data-masuk="belum"] .tulis, body[data-masuk="belum"] #agen, body[data-masuk="belum"] .pulau .kemajuan, body[data-masuk="belum"] .stepper { display: none; }
+body[data-masuk="belum"] .tulis, body[data-masuk="belum"] #agen, body[data-masuk="belum"] .pulau .kemajuan, body[data-masuk="belum"] .stepper, body[data-masuk="belum"] .persen { display: none; }
 body[data-masuk="belum"] main { padding-bottom: var(--j8); }
 
 /* Kolom tulis: pulau Kapur radius 24, isian di kiri, tombol ikon Tinta 48 radius 16 (24 - 8) di kanan; alas warna halaman */
@@ -245,7 +245,7 @@ body[data-masuk="belum"] main { padding-bottom: var(--j8); }
 
 <main class="wadah">
   <section class="gerbang" id="gerbang" aria-labelledby="judul-gerbang">
-    <h1 class="kartu__judul" id="judul-gerbang">Halo, Mba Yola</h1>
+    <h1 class="kartu__judul" id="judul-gerbang">Masuk dulu, Mba</h1>
     <p>Masuk dengan akun Google yang Mba pakai untuk email kerja. Progres tersimpan di akun itu, jadi bisa dilanjutkan dari HP atau laptop kapan saja.</p>
     <div class="tombol-google" id="tombol-google"></div>
     <p class="pesan-masuk" id="pesan-masuk" role="alert"></p>
