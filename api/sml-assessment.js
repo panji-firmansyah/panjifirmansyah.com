@@ -1,15 +1,18 @@
 // Peta 10x Everchill: agent chat assessment dan pengiriman jawaban ke Panji.
-// POST { aksi: "chat", pesan, tangkap } -> satu giliran agent (Claude lewat Vercel AI Gateway, BYOK kunci Anthropic Panji).
+// POST { aksi: "chat", pesan, tangkap } -> satu giliran agent (Claude, langsung ke API Anthropic dengan kunci Panji).
 // POST { aksi: "kirim", ... } -> email jawaban dari assistant@panjifirmansyah.com (AgentMail) ke Gmail pribadi Panji.
-// Env: ANTHROPIC_API_KEY (BYOK, kredit Claude API Panji), AGENTMAIL_API_KEY (kunci yang boleh mengirim dari assistant@).
+// Env: ANTHROPIC_API_KEY (kredit Claude API Panji), AGENTMAIL_API_KEY (kunci yang boleh mengirim dari assistant@).
+// Pengecualian aturan AI Gateway (AGENTS.md bagian 9), keputusan Panji 4 Nov 2026: proyek pribadi, bukan Dayalima, dan
+// BYOK lewat Gateway butuh kredit Vercel berbayar. Jadi panggilan model ini langsung ke Anthropic, tidak tercatat di Gateway.
 // Penerima tetap di sini, tidak pernah dari permintaan.
+import { createAnthropic } from "@ai-sdk/anthropic";
 import { generateText, jsonSchema, Output } from "ai";
 
 import { BAGIAN, SASARAN } from "../public/sml/assessment/sasaran.js";
 
 export const config = { maxDuration: 60 };
 
-const MODEL = "anthropic/claude-sonnet-5.5";
+const MODEL = "claude-sonnet-5-5";
 const PENGIRIM = "assistant@panjifirmansyah.com";
 const PENERIMA = "panjifrmansyah@gmail.com";
 const KARTU = ["tidak", "angka", "izin", "model", "penutup"];
@@ -98,12 +101,11 @@ async function chat(body, res) {
   const pesan = Array.isArray(body.pesan) ? body.pesan : [];
   const tangkap = body.tangkap && typeof body.tangkap === "object" ? body.tangkap : {};
   const { output } = await generateText({
-    model: MODEL,
+    model: createAnthropic({ apiKey: kunci })(MODEL),
     system: `${PERAN}\n\nDaftar sasaran (urut; nilai BELUM = belum didapat):\n${daftarSasaran(tangkap)}`,
     messages: rapikanPesan(pesan),
     output: Output.object({ schema: SKEMA }),
     maxOutputTokens: 1500,
-    providerOptions: { gateway: { byok: { anthropic: [{ apiKey: kunci }] }, tags: ["sml-assessment", "everchill"], user: "sml-assessment" } },
   });
   const id = new Set(SASARAN.map((s) => s.id));
   return res.status(200).json({
