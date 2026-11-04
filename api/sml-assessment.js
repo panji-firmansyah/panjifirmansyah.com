@@ -50,20 +50,45 @@ function bacaSesi(req) {
 const pasangKuki = (res, nilai, umur) =>
   res.setHeader("Set-Cookie", `${KUKI}=${nilai}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${umur}`);
 
-async function masuk(body, res) {
+// ---------- Catatan akses ----------
+// Setiap percobaan masuk (diterima atau ditolak) dan setiap halaman dibuka dengan sesi, supaya Panji tahu pasti
+// kapan Mba Yola membuka halaman, termasuk kalau ia mencoba dengan akun Google lain. Hanya Panji yang bisa membacanya.
+const JALUR_AKSES = "akses/log.json";
+async function bacaAkses() {
+  const h = await get(JALUR_AKSES, { access: "private", useCache: false }).catch(() => null);
+  if (!h || h.statusCode !== 200) return [];
+  try { return JSON.parse(await new Response(h.stream).text()); } catch { return []; }
+}
+async function catatAkses(req, email, hasil) {
+  try {
+    const isi = await bacaAkses();
+    const ua = String(req.headers["user-agent"] || "");
+    const perangkat = /iPhone|Android.*Mobile|Mobile Safari/i.test(ua) ? "HP" : /iPad|Tablet/i.test(ua) ? "Tablet" : "Laptop";
+    const waktu = new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta", dateStyle: "medium", timeStyle: "short" });
+    isi.push({ waktu: `${waktu} WIB`, iso: new Date().toISOString(), email: email || null, hasil, perangkat, peramban: ua.slice(0, 160) });
+    await put(JALUR_AKSES, JSON.stringify(isi.slice(-1000)), { access: "private", allowOverwrite: true, addRandomSuffix: false, contentType: "application/json", cacheControlMaxAge: 60 });
+  } catch (e) { console.error("sml-assessment: catat akses", e?.message); }
+}
+
+async function masuk(body, res, req) {
   const klien = process.env.SML_GOOGLE_CLIENT_ID;
   if (!klien || !process.env.SML_SESSION_SECRET) return res.status(503).json({ ok: false, pesan: "Login belum disiapkan." });
   let data;
   try {
     ({ payload: data } = await jwtVerify(String(body.credential || ""), JWKS, { audience: klien, issuer: ["https://accounts.google.com", "accounts.google.com"] }));
     if (body.nonce && data.nonce !== body.nonce) throw new Error("nonce");
-  } catch { return res.status(401).json({ ok: false, pesan: "Login Google tidak berhasil. Coba lagi." }); }
+  } catch {
+    if (req) await catatAkses(req, null, "gagal: token Google tidak sah");
+    return res.status(401).json({ ok: false, pesan: "Login Google tidak berhasil. Coba lagi." });
+  }
   const email = String(data.email || "").toLowerCase();
   if (!data.email_verified || !daftarEmail().includes(email)) {
+    if (req) await catatAkses(req, email, "ditolak: email tidak diundang");
     return res.status(403).json({ ok: false, pesan: `Email ${email} belum punya akses ke halaman ini. Kalau ini keliru, kabari Panji.` });
   }
   const isi = b64(JSON.stringify({ e: email, x: Math.floor(Date.now() / 1000) + UMUR_SESI }));
   pasangKuki(res, `${isi}.${tanda(isi)}`, UMUR_SESI);
+  if (req) await catatAkses(req, email, "masuk");
   return res.status(200).json({ ok: true, email, nama: String(data.given_name || data.name || "") });
 }
 
@@ -88,13 +113,13 @@ function balikKeHalaman(res, hasil) {
 async function dariGoogle(req, body, res) {
   const [state, nonce] = String(bacaKuki(req)[KUKI_OAUTH] || "").split(".");
   const kukiOauth = `${KUKI_OAUTH}=; Path=/api/sml-assessment; HttpOnly; Secure; SameSite=None; Max-Age=0`;
-  if (body.error) { res.setHeader("Set-Cookie", kukiOauth); return balikKeHalaman(res, body.error === "access_denied" ? "" : "gagal"); }
-  if (!state || state !== body.state) { res.setHeader("Set-Cookie", kukiOauth); return balikKeHalaman(res, "gagal"); }
+  if (body.error) { res.setHeader("Set-Cookie", kukiOauth); await catatAkses(req, null, `batal di Google: ${String(body.error).slice(0, 40)}`); return balikKeHalaman(res, body.error === "access_denied" ? "" : "gagal"); }
+  if (!state || state !== body.state) { res.setHeader("Set-Cookie", kukiOauth); await catatAkses(req, null, "gagal: sesi login kedaluwarsa"); return balikKeHalaman(res, "gagal"); }
   const kuki = [kukiOauth];
   const kode = await masuk({ credential: body.id_token, nonce }, {
     setHeader: (_n, v) => kuki.push(v),
     status: (k) => ({ json: () => k })
-  });
+  }, req);
   res.setHeader("Set-Cookie", kuki);
   return balikKeHalaman(res, { 200: "", 403: "ditolak", 503: "belum" }[kode] ?? "gagal");
 }
@@ -285,12 +310,18 @@ export default async function handler(req, res) {
   if (!body.aksi && (body.id_token || body.error)) return await dariGoogle(req, body, res);
   if (JSON.stringify(body).length > 400000) return res.status(413).json({ ok: false, pesan: "Jawaban terlalu panjang." });
   try {
-    if (body.aksi === "saya") return res.status(200).json({ ok: true, clientId: process.env.SML_GOOGLE_CLIENT_ID || null, email: bacaSesi(req) });
+    if (body.aksi === "saya") {
+      const saya = bacaSesi(req);
+      // Link dibuka tapi belum login (pratinjau link WhatsApp tidak menjalankan skrip, jadi tidak ikut tercatat).
+      if (!saya) await catatAkses(req, null, "buka link, belum login");
+      return res.status(200).json({ ok: true, clientId: process.env.SML_GOOGLE_CLIENT_ID || null, email: saya });
+    }
     if (body.aksi === "masuk") return await masuk(body, res);
     if (body.aksi === "keluar") { pasangKuki(res, "", 0); return res.status(200).json({ ok: true }); }
     const email = bacaSesi(req);
     if (!email) return res.status(401).json({ ok: false, sesi: false, pesan: "Sesi berakhir. Silakan masuk lagi dengan Google." });
-    if (body.aksi === "muat") return await muat(email, res);
+    if (body.aksi === "muat") { await catatAkses(req, email, "buka halaman"); return await muat(email, res); }
+    if (body.aksi === "akses") return email === PENERIMA ? res.status(200).json({ ok: true, akses: await bacaAkses() }) : res.status(403).json({ ok: false });
     if (body.aksi === "simpan") return await simpanProgres(email, body, res);
     if (body.aksi === "chat") return await chat(body, res);
     if (body.aksi === "kirim") return await kirim(body, res, email);
