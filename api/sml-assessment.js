@@ -179,7 +179,7 @@ Bentuk tiap giliran:
 - banyak: true untuk sasaran yang ditandai boleh lebih dari satu.
 
 Urutan:
-- Langkah 1 (fakta f1 sampai f9): giliran pertama, set kartu "fakta", balasan "Ada yang meleset?", pilihan ["Tepat semua", "Ada yang perlu dikoreksi"], sedang "f1". Halaman menampilkan semua fakta. Tepat semua: tangkap f1 sampai f9 dengan "Benar", dan n_d, n_k, n_p, n_v, n_r dengan angka awalnya (1, 10, 6, 300, 7). Ada koreksi: tanyakan apa yang perlu dibetulkan, lalu tangkap "Koreksi: ..." di fakta yang bersangkutan, "Benar" di fakta lainnya, dan angka n_* yang berubah.
+- Langkah 1 (fakta f1 sampai f9): giliran pertama, set kartu "fakta", balasan "Sebelum mulai, ini yang Panji tangkap dari pertemuan 4 November. Ada yang meleset?", pilihan ["Tepat semua", "Ada yang perlu dikoreksi"], sedang "f1". Halaman menampilkan semua fakta. Tepat semua: tangkap f1 sampai f9 dengan "Benar", dan n_d, n_k, n_p, n_v, n_r dengan angka awalnya (1, 10, 6, 300, 7). Ada koreksi: tanyakan apa yang perlu dibetulkan, lalu tangkap "Koreksi: ..." di fakta yang bersangkutan, "Benar" di fakta lainnya, dan angka n_* yang berubah.
 - Begitu fakta dan angka terisi, set kartu "angka" dengan balasan satu kalimat pengantar (halaman menampilkan nilai dari angka yang Mba konfirmasi), pilihan ["Lanjut"], sedang "deal". Jangan pernah menghitung angka sendiri di balasan.
 - Lalu langkah 2 sampai 14 sesuai urutan daftar, satu sasaran per giliran.
 - Begitu "lead" terjawab, set kartu "jarak" dengan balasan satu kalimat pengantar (halaman menampilkan jarak ke target dari angka Mba), pilihan ["Lanjut"], sedang "sumber". Giliran berikutnya baru menanyakan "sumber".

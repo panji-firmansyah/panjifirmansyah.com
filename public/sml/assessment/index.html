@@ -398,7 +398,7 @@ const opsiChip = (nama, o, kotak) => `<label class="opsi-chip"><input type="radi
 function rKartu(jenis, i) {
   const selesai = S.kartu[jenis + i] ? " data-selesai" : "";
   if (jenis === "fakta") {
-    return `<div class="kartu"><div class="teks-kartu"><span class="kartu__judul">Yang Panji tangkap dari 4 November</span><span class="kartu__isi">Disusun dalam tiga bagian.</span></div>
+    return `<div class="kartu"><div class="teks-kartu"><span class="kartu__judul">Catatan 4 November</span><span class="kartu__isi">Disusun dalam tiga bagian.</span></div>
       ${GRUP_FAKTA.map((g) => `<div class="ubin"><span class="kartu__sub">${esc(g)}</span><ul class="fakta">${SASARAN.filter((s) => s.grup === g).map((s) => `<li>${esc(s.q)}</li>`).join("")}</ul></div>`).join("")}</div>`;
   }
   if (jenis === "angka") {
@@ -421,7 +421,7 @@ function rKartu(jenis, i) {
   }
   if (jenis === "izin") {
     return `<div class="kartu"${selesai} data-kartu="izin" data-i="${i}"><div class="teks-kartu"><span class="kartu__judul">Yang boleh langsung dikerjakan</span><span class="kartu__isi">Yang tidak dicentang akan Panji usulkan dulu ke Mba.</span></div>
-      <div class="centang">${IZIN_BARIS.map((r) => `<label><input type="checkbox" name="izin.${r.id}" value="${IZIN_BOLEH}"><span><b>${esc(r.area)}</b><span>${esc(r.ket)}</span></span></label>`).join("")}</div>
+      <div class="centang">${IZIN_BARIS.map((r) => `<label><input type="checkbox" name="izin.${r.id}" value="${IZIN_BOLEH}" aria-label="${esc(r.area)}"><span><b>${esc(r.area)}</b><span>${esc(r.ket)}</span></span></label>`).join("")}</div>
       <div class="aksi-kartu"><button type="button" class="tombol" data-simpan-kartu="izin" data-i="${i}">Simpan</button></div></div>`;
   }
   if (jenis === "penutup") {
@@ -433,7 +433,7 @@ function rKartu(jenis, i) {
         <div class="ubin"><span class="kartu__isi">Seperti apa menang</span><b>${fmt(h.target)} deal per bulan</b><span class="kartu__isi">Dihitung saat ${atau("deal", "titik deal disepakati").toLowerCase()}. Kapasitas tim: ${atau("kapasitas", "belum tahu").toLowerCase()} proyek baru per bulan.</span></div>
         <div class="ubin"><span class="kartu__isi">Siapa yang harus yakin</span><b style="font-size:24px;line-height:28px">${atau("segmen")}</b><span class="kartu__isi">Keputusan akhir: ${atau("penentu")}. Alasan memilih Everchill: ${atau("alasan")}.</span></div>
         <div class="ubin"><span class="kartu__isi">Mesin hari ini</span><b>${atau("lead", "Belum tahu")} lead</b><span class="kartu__isi">Per bulan. Untuk ${fmt(h.target)} deal butuh sekitar ${fmt(leadPerlu())} lead. Sumber: ${atau("sumber")}.</span></div>
-        <div class="ubin"><span class="kartu__isi">Cara kita bekerja</span><b style="font-size:24px;line-height:28px">${atau("lingkup")}</b><span class="kartu__isi">Model: ${atau("model")}. Boleh langsung: ${boleh.length ? esc(boleh.join(", ")) : "semua diusulkan dulu"}.</span></div>
+        <div class="ubin"><span class="kartu__isi">Cara kita bekerja</span><b style="font-size:24px;line-height:28px">${atau("lingkup").replace(/^Masih sama, r/, "R")}</b><span class="kartu__isi">Model: ${atau("model")}. Boleh langsung: ${boleh.length ? esc(boleh.join(", ")) : "semua diusulkan dulu"}.</span></div>
         <div class="ubin sorot"><span class="kartu__isi">Nilai celah</span><b>${rp(h.selisih)}</b><span class="kartu__isi">Nilai kontrak per tahun yang belum terambil setiap bulan.</span></div>
       </div>
       <div class="teks-kartu" style="gap:var(--j3)"><span class="kartu__sub">Tiga celah terbesar</span><ol class="celah">${tigaCelah().map((c, k) => `<li><span class="no">${k + 1}</span><span>${esc(c)}</span></li>`).join("")}</ol><p class="ket">Cara menutupnya ada di proposal.</p></div>
@@ -597,7 +597,7 @@ function susunLaporan() {
     const item = [];
     SASARAN.filter((s) => s.bagian === b.no).forEach((s) => {
       if (s.kartu === "izin") IZIN_BARIS.forEach((r) => item.push([`Izin: ${r.area} (${r.ket})`, t("izin." + r.id) || kosong]));
-      else item.push([s.q, t(s.id) || kosong]);
+      else item.push([s.label || s.q, t(s.id) || kosong]);
     });
     bagian.push({ judul: `Bab ${b.no + 1}. ${b.judul} (mengisi proposal: ${b.proposal})`, item });
   });

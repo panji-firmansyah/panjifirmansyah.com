@@ -81,7 +81,7 @@ export const SASARAN = [
     q: "Centang yang boleh langsung Panji kerjakan. Yang tidak dicentang akan Panji usulkan dulu ke Mba.", tujuan: "Diisi lewat kartu izin. Jangan ditanyakan satu per satu." },
   { id: "lingkup", bagian: 4, langkah: 10,
     konteks: "Di pertemuan, Mba menyebut ingin rencana 6 bulan ala account planning, plus implementasinya.",
-    q: "Apakah masih sama?", tujuan: "Lingkup kerja.", opsi: ["Masih sama, rencana plus implementasi", "Rencana 6 bulan saja", "Rencana dulu, implementasi diputuskan nanti"] },
+    label: "Lingkup kerja (rencana 6 bulan plus implementasi, apakah masih sama?)", q: "Apakah masih sama?", tujuan: "Lingkup kerja.", opsi: ["Masih sama, rencana plus implementasi", "Rencana 6 bulan saja", "Rencana dulu, implementasi diputuskan nanti"] },
   { id: "model", bagian: 4, langkah: 11,
     konteks: "Ada tiga cara membagi risiko. Retainer: biaya bulanan tetap. Hybrid: retainer lebih kecil, plus bonus saat target tercapai. Performance-based: sebagian besar dibayar per hasil. Angkanya ada di proposal.",
     q: "Mana yang paling terasa adil untuk Mba?", tujuan: "Satu model, atau ingin melihat ketiganya. Tanpa angka harga.", opsi: ["Retainer", "Hybrid", "Performance-based", "Lihat ketiganya di proposal"] },
