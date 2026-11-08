@@ -437,12 +437,8 @@ function rKartu(jenis, i) {
         <div class="ubin sorot"><span class="kartu__isi">Nilai celah</span><b>${rp(h.selisih)}</b><span class="kartu__isi">Nilai kontrak per tahun yang belum terambil setiap bulan.</span></div>
       </div>
       <div class="teks-kartu" style="gap:var(--j3)"><span class="kartu__sub">Tiga celah terbesar</span><ol class="celah">${tigaCelah().map((c, k) => `<li><span class="no">${k + 1}</span><span>${esc(c)}</span></li>`).join("")}</ol><p class="ket">Cara menutupnya ada di proposal.</p></div>
-      <div class="teks-kartu" style="gap:var(--j2)"><span class="kartu__sub">Proposal datang Rabu, 11 November 2026</span><ul class="isi-proposal">${BAGIAN.slice(1).map((b) => `<li>${esc(b.proposal)}</li>`).join("")}</ul></div>
-      <div class="teks-kartu" style="gap:var(--j3)"><span class="kartu__sub">Pilih jadwal presentasi proposal</span><p class="kartu__isi">Sekitar 60 menit, setelah proposal datang. Jadwal ini ikut terkirim ke Panji.</p>
-        <div class="dua-kolom"><label class="label-isian">Tanggal<input class="isian" type="date" name="jadwal.tanggal" min="2026-11-11"></label><label class="label-isian">Jam<input class="isian" type="time" name="jadwal.jam" step="1800"></label></div>
-        <label class="label-isian">Atau tulis waktu yang enak<input class="isian" name="jadwal.catatan" placeholder="Misalnya Jumat 13 November, setelah makan siang"></label></div>
-      <div class="aksi-kartu"><button type="button" class="tombol kirim-besar boleh${S.terkirim ? " beres" : ""}" data-kirim-email>${S.terkirim ? "Kirim lagi ke Panji" : "Kirim ke Panji"}</button>
-      <div id="status-kirim" style="width:100%">${S.terkirim ? statusBerhasil() : ""}</div></div></div>`;
+      <div class="teks-kartu" style="gap:var(--j2)"><span class="kartu__sub">Berikutnya</span><p class="kartu__isi">Panji memproses jawaban Mba menjadi proposal yang datang Rabu, 11 November 2026. Isinya:</p><ul class="isi-proposal">${BAGIAN.slice(1).map((b) => `<li>${esc(b.proposal)}</li>`).join("")}</ul></div>
+      <div class="aksi-kartu"><div id="status-kirim" style="width:100%">${sudahTerkirim() ? statusBerhasil() : statusMengirim()}</div></div></div>`;
   }
   return "";
 }
@@ -464,12 +460,12 @@ function perbaruiKepala() {
   document.getElementById("bar").setAttribute("aria-valuenow", persen);
   const s = sasaranDari(S.sedang);
   const nomor = s ? s.bagian : S.sedang === "selesai" ? 5 : -1;
-  document.getElementById("judul-tahap").textContent = nomor < 0 ? "Halo, Mba Yola" : nomor === 5 ? "Tinggal kirim ke Panji" : BAGIAN[nomor].judul;
+  document.getElementById("judul-tahap").textContent = nomor < 0 ? "Halo, Mba Yola" : nomor === 5 ? "Terima kasih, Mba" : BAGIAN[nomor].judul;
   document.getElementById("tahap").textContent = nomor < 0 ? "Sekitar 5 menit" : nomor === 5 ? "Ringkasan" : `Bab ${nomor + 1} dari 5 · Langkah ${s.langkah || 1} dari 14`;
   const tahap = BAGIAN.map((b) => ({ label: b.label, no: b.no })).concat([{ label: "Kirim", no: 5 }]);
   document.getElementById("stepper").innerHTML = tahap.map((x) => `<li class="${x.no === nomor ? "kini" : x.no < nomor ? "lewat" : ""}"${x.no === nomor ? ' aria-current="step"' : ""}><span class="simpul">${x.no === 5 ? "" : x.no + 1}</span><span class="label">${x.label}</span></li>`).join("");
   // "Selesai dan kirim" muncul begitu obrolan masuk bab 2, supaya Mba bisa berhenti dan mengirim kapan saja.
-  document.getElementById("btn-ringkas").hidden = !SASARAN.some((x) => x.bagian >= 1 && t(x.id)) && nomor < 1;
+  document.getElementById("btn-ringkas").hidden = nomor === 5 || (!SASARAN.some((x) => x.bagian >= 1 && t(x.id)) && nomor < 1);
 }
 
 // ---------- Giliran (satu kali coba ulang otomatis kalau jaringan putus) ----------
@@ -497,7 +493,7 @@ async function giliran() {
   } catch (e) {
     galat = `Asisten belum bisa menjawab. ${e.message || ""} Jawaban Mba tetap tersimpan.`.trim();
     wajah("netral"); agen.gagal?.();
-  } finally { menunggu = false; render(); }
+  } finally { menunggu = false; render(); kirimOtomatis(); }
 }
 
 function kirimJawaban(teks) {
@@ -534,7 +530,7 @@ document.addEventListener("click", (e) => {
     kirimJawaban(s && s.urut ? pilihBanyak.map((o, k) => `${k + 1}. ${o}`).join("\n") : pilihBanyak.join(", "));
   } else if (b.hasAttribute("data-simpan-kartu")) simpanKartu(b.getAttribute("data-simpan-kartu"), b.getAttribute("data-i"));
   else if (b.hasAttribute("data-ulang")) giliran();
-  else if (b.hasAttribute("data-kirim-email")) kirimEmail(b);
+  else if (b.hasAttribute("data-kirim-email")) kirimEmail();
   else if (b.hasAttribute("data-salin")) salin(b);
   else if (b.id === "btn-ringkas") bukaPenutup();
 });
@@ -552,14 +548,14 @@ function bukaPenutup() {
   if (akhir && akhir.kartu === "penutup") return window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
   S.pesan.push({ role: "assistant", content: "Tentu, Mba. Ini ringkasan dari yang sudah Mba jawab. Bagian yang belum terjawab bisa dibahas langsung dengan Panji.", kartu: "penutup", pilihan: [] });
   S.sedang = "selesai"; lanjut = false;
-  simpan(); render();
+  simpan(); render(); kirimOtomatis();
 }
 
 // ---------- Membaca jawaban ----------
 function tigaCelah() {
   const h = hitung(), c = [];
   const kap = batasAtas(t("kapasitas"));
-  if (isFinite(kap) && kap < h.target) c.push(`Kapasitas engineering sekitar ${t("kapasitas").toLowerCase()} proyek baru per bulan masih di bawah target ${fmt(h.target)} deal per bulan.`);
+  if (isFinite(kap) && kap < h.target) c.push(`Kapasitas engineering (${t("kapasitas").toLowerCase()} proyek baru per bulan) masih di bawah target ${fmt(h.target)} deal per bulan.`);
   const lead = batasAtas(t("lead"));
   if (isFinite(lead) && lead < leadPerlu()) c.push(`Lead hari ini ${t("lead").toLowerCase()} per bulan, sementara ${fmt(h.target)} deal butuh sekitar ${fmt(leadPerlu())} lead.`);
   const sumber = t("sumber").split(/,|\n/).map((x) => x.trim()).filter(Boolean);
@@ -582,7 +578,6 @@ function tandaBahaya() {
 
 function susunLaporan() {
   const h = hitung(), kosong = "(belum dijawab)";
-  const jadwal = [t("jadwal.tanggal"), t("jadwal.jam") && "jam " + t("jadwal.jam"), t("jadwal.catatan")].filter(Boolean).join(", ") || "(belum dipilih)";
   const isiLangkah = SASARAN.filter((s) => s.langkah);
   const bagian = [{ judul: "Ringkasan untuk Panji", item: [
     ["Target yang dikonfirmasi", `${fmt(h.d)} deal per bulan menjadi ${fmt(h.target)} deal per bulan (${fmt(h.k)}x) dalam ${fmt(h.p)} bulan. Nilai deal ${rp(h.v)} per tahun. Rasio ${fmt(n("r"))} lead untuk 1 deal, jadi butuh sekitar ${fmt(leadPerlu())} lead per bulan.`],
@@ -590,7 +585,6 @@ function susunLaporan() {
     ["Tiga celah terbesar (yang dilihat Mba Yola)", tigaCelah().map((c, k) => `${k + 1}. ${c}`).join("\n")],
     ["Tanda bahaya", tandaBahaya().map((x) => "- " + x).join("\n") || "Tidak ada"],
     ["Boleh langsung dikerjakan", daftarBoleh().join(", ") || "Belum ada, semua diusulkan dulu"],
-    ["Jadwal presentasi", jadwal],
     ["Kelengkapan", `${isiLangkah.filter((s) => t(s.id)).length} dari ${isiLangkah.length} langkah 2 sampai 14 berisi. Fakta meeting: ${SASARAN.filter((s) => s.grup && t(s.id)).length} dari 9 dikonfirmasi.`]
   ] }];
   BAGIAN.forEach((b) => {
@@ -605,25 +599,33 @@ function susunLaporan() {
 }
 
 const teksLaporan = (bagian) => bagian.map((b) => `${b.judul.toUpperCase()}\n${b.item.map(([q, a]) => `${q}\n${a}`).join("\n\n")}`).join("\n\n\n");
-const statusBerhasil = () => `<div class="status berhasil" role="status"><b>Jawaban sudah sampai ke Panji.</b><span>Terima kasih, Mba. Proposal datang Rabu, 11 November 2026. Kalau ada yang ingin ditambah, tulis saja di kolom bawah lalu kirim lagi.</span></div>`;
+const statusBerhasil = () => `<div class="status berhasil" role="status"><b>Terima kasih, Mba.</b><span>Jawaban Mba sudah sampai ke Panji. Kalau ada yang ingin ditambahkan, tulis saja di kolom bawah.</span></div>`;
+const statusMengirim = () => `<div class="status" role="status"><span>Mengirim jawaban ke Panji...</span></div>`;
+// Jawaban terkirim otomatis begitu ringkasan tampil; dikirim ulang hanya kalau obrolan bertambah sesudahnya.
+const sudahTerkirim = () => Boolean(S.terkirim) && (S.terkirimPesan || 0) >= S.pesan.length;
+let sedangKirim = false;
+function kirimOtomatis() {
+  const akhir = S.pesan[S.pesan.length - 1];
+  if (sedangKirim || !akhir || akhir.kartu !== "penutup" || sudahTerkirim()) return;
+  kirimEmail();
+}
 
-async function kirimEmail(tombol) {
+async function kirimEmail() {
   const statusEl = document.getElementById("status-kirim");
-  tombol.disabled = true; tombol.textContent = "Mengirim...";
+  if (!statusEl || sedangKirim) return;
+  sedangKirim = true; statusEl.innerHTML = statusMengirim();
   const ctrl = new AbortController(), batas = setTimeout(() => ctrl.abort(), 20000);
   try {
     const b = await api({ aksi: "kirim", uji: UJI, bagian: susunLaporan(), mentah: S.tangkap, transkrip: S.pesan.map(({ role, content }) => ({ role, content })) }, ctrl.signal);
     if (!b.ok) throw new Error(b.pesan || `Server menjawab ${b.status}.`);
-    S.terkirim = new Date().toISOString(); simpan();
+    S.terkirim = new Date().toISOString(); S.terkirimPesan = S.pesan.length; simpan();
     statusEl.innerHTML = statusBerhasil();
-    tombol.textContent = "Kirim lagi ke Panji"; tombol.classList.add("beres");
     agen.selesai?.();
   } catch (e) {
     const pesan = e.name === "AbortError" ? "Koneksi terlalu lama menjawab." : e.message || "Koneksi terputus.";
-    statusEl.innerHTML = `<div class="status gagal" role="alert"><b>Jawaban belum terkirim.</b><span>${esc(pesan)} Jawaban Mba tetap tersimpan di perangkat ini. Coba kirim lagi, atau salin jawaban lalu kirim ke Panji lewat WhatsApp atau email.</span><button type="button" class="tombol kedua boleh" data-salin style="align-self:flex-start">Salin jawaban</button><textarea class="isian salin-teks" readonly aria-label="Jawaban dalam bentuk teks" hidden></textarea></div>`;
-    tombol.textContent = S.terkirim ? "Kirim lagi ke Panji" : "Kirim ke Panji";
+    statusEl.innerHTML = `<div class="status gagal" role="alert"><b>Jawaban belum terkirim.</b><span>${esc(pesan)} Jawaban Mba tetap tersimpan di perangkat ini. Coba kirim lagi, atau salin jawaban lalu kirim ke Panji lewat WhatsApp atau email.</span><button type="button" class="tombol boleh" data-kirim-email style="align-self:flex-start">Coba kirim lagi</button><button type="button" class="tombol kedua boleh" data-salin style="align-self:flex-start">Salin jawaban</button><textarea class="isian salin-teks" readonly aria-label="Jawaban dalam bentuk teks" hidden></textarea></div>`;
     agen.gagal?.();
-  } finally { clearTimeout(batas); tombol.disabled = false; statusEl.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  } finally { clearTimeout(batas); sedangKirim = false; }
 }
 
 function salin(b) {
@@ -671,7 +673,7 @@ async function mulaiObrolan(email) {
   baru = S.pesan.length;
   render();
   // Terputus saat asisten sedang menjawab (halaman ditutup, sinyal hilang): jawaban Mba sudah tersimpan, giliran itu diulang.
-  if (S.pesan[S.pesan.length - 1]?.role === "user") giliran();
+  if (S.pesan[S.pesan.length - 1]?.role === "user") giliran(); else kirimOtomatis();
 }
 (async () => {
   try {

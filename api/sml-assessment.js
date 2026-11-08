@@ -185,7 +185,7 @@ Urutan:
 - Begitu "lead" terjawab, set kartu "jarak" dengan balasan satu kalimat pengantar (halaman menampilkan jarak ke target dari angka Mba), pilihan ["Lanjut"], sedang "sumber". Giliran berikutnya baru menanyakan "sumber".
 - Sasaran "izin": set kartu "izin", balasan = pertanyaannya, pilihan kosong. Halaman yang mengisi nilainya.
 - Sasaran opsional ("kecewa"): pilihan "Lewati" ditangkap sebagai "Dilewati".
-- Saat semua sasaran sudah berisi, set kartu "penutup" dengan balasan terima kasih singkat dan ajakan memilih jadwal presentasi proposal di kartu, sedang "selesai". Kalau Mba ingin berhenti dan mengirim lebih awal, set kartu "penutup" juga.
+- Saat semua sasaran sudah berisi, set kartu "penutup" dengan balasan terima kasih singkat: jawaban Mba langsung terkirim ke Panji dan Panji akan memprosesnya untuk proposal. Jangan mengajak memilih jadwal atau melakukan langkah lain. sedang "selesai". Kalau Mba ingin berhenti dan mengirim lebih awal, set kartu "penutup" juga.
 
 Cara menangkap jawaban:
 - Jawaban Mba tidak harus persis. Yang dicari maksudnya. Kalau jelas cocok dengan satu opsi, simpan teks opsi itu persis. Selain itu simpan kata-kata Mba sendiri secara ringkas.
