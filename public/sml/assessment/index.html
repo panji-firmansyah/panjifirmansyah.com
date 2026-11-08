@@ -416,7 +416,7 @@ function rKartu(jenis, i) {
     return `<div class="kartu"><div class="teks-kartu"><span class="kartu__judul">Jarak ke ${fmt(h.k)}x</span><span class="kartu__isi">Dihitung dari angka yang Mba sebut.</span></div><div class="ubin-grid">
       <div class="ubin sorot"><b>±${fmt(leadPerlu())} lead</b><span class="kartu__isi">Per bulan, untuk ${fmt(h.target)} deal dengan rasio ${fmt(n("r"))} lead jadi 1 deal.</span></div>
       <div class="ubin"><b>${esc(lead || "Belum tahu")}</b><span class="kartu__isi">Lead per bulan hari ini, dari jawaban Mba.</span></div>
-    </div>${kap ? `<p class="kartu__isi" style="padding:0 var(--j2)">Kapasitas tim engineering: ${esc(kap)} proyek baru per bulan.</p>` : ""}
+    </div>${kap ? `<p class="kartu__isi" style="padding:0 var(--j2)">Kapasitas tim engineering: ${esc(kap.toLowerCase())} proyek baru per bulan.</p>` : ""}
     <p class="janji">Peta jalan untuk menutup jarak ini ada di proposal. Ini peluang yang ingin dikejar, bukan hasil yang dijanjikan.</p></div>`;
   }
   if (jenis === "izin") {
