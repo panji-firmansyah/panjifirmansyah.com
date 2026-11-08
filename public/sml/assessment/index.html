@@ -142,6 +142,19 @@ main { padding-block: var(--j8) calc(var(--tinggi-tulis, 96px) + var(--j6) + var
 .ubin.sorot .kartu__isi { color: var(--tinta); }
 .janji { margin: 0 var(--j2); padding-left: var(--j3); border-left: 4px solid var(--secang); font: 600 15px/20px var(--f-teks); }
 
+/* Konteks dan tanggapan di gelembung asisten (Peta 5 menit) */
+.gelembung .tanggap { display: block; margin-bottom: var(--j2); }
+.gelembung .konteks { display: block; margin-bottom: var(--j2); font: 400 15px/20px var(--f-teks); color: var(--asap); }
+/* Kartu fakta: tiga kelompok */
+.fakta { margin: 0; padding-left: var(--j5); display: flex; flex-direction: column; gap: var(--j1); font: 400 15px/20px var(--f-teks); }
+/* Checklist izin: satu baris per area */
+.centang { display: flex; flex-direction: column; gap: var(--j2); }
+.centang label { display: flex; gap: var(--j3); align-items: flex-start; background: var(--awan); border-radius: var(--r-isian); padding: var(--j3) var(--j4); cursor: pointer; }
+.centang input { flex: none; width: 24px; height: 24px; margin: 0; accent-color: var(--tinta); cursor: pointer; }
+.centang b { display: block; font: 700 15px/20px var(--f-teks); }
+.centang span { display: block; font: 400 13px/16px var(--f-teks); color: var(--asap); }
+.centang label:has(input:focus-visible) { outline: var(--g-aktif) solid var(--telang); outline-offset: 2px; }
+
 /* Tabel izin: kartu per baris di HP, tabel di desktop */
 .izin { display: flex; flex-direction: column; gap: var(--j3); }
 .izin__kepala { display: none; }
@@ -235,7 +248,7 @@ body[data-masuk="belum"] main { padding-bottom: var(--j8); }
   <div class="wadah">
     <div class="pulau">
       <div class="pulau__baris">
-        <div class="pulau__judul"><b id="judul-tahap">Halo, Mba Yola</b><span id="tahap">Sekitar 15 sampai 20 menit</span></div>
+        <div class="pulau__judul"><b id="judul-tahap">Halo, Mba Yola</b><span id="tahap">Sekitar 5 menit</span></div>
         <span class="persen" id="bar-angka" aria-hidden="true">0<small>%</small></span>
       </div>
       <div class="kemajuan"><div class="pasang" role="progressbar" aria-label="Kemajuan" aria-valuemin="0" aria-valuemax="100" id="bar"><span id="bar-isi" style="width:0%"></span></div></div>
@@ -246,8 +259,9 @@ body[data-masuk="belum"] main { padding-bottom: var(--j8); }
 
 <main class="wadah">
   <section class="gerbang" id="gerbang" aria-labelledby="judul-gerbang">
-    <h1 class="kartu__judul" id="judul-gerbang">Masuk dulu, Mba</h1>
-    <p>Masuk dengan akun Gmail Mba yang dipakai untuk undangan pertemuan 4 November. Progres tersimpan di akun itu, jadi bisa dilanjutkan dari HP atau laptop kapan saja.</p>
+    <h1 class="kartu__judul" id="judul-gerbang">Peta 10x Everchill</h1>
+    <p>Lima menit untuk memetakan jalan Everchill dari 1 ke 10 deal per bulan. Ada 14 langkah, dan kebanyakan tinggal pilih. Di akhir, Mba mendapat ringkasan satu halaman: posisi Everchill hari ini dan jaraknya ke target.</p>
+      <p>Masuk dengan akun Gmail yang Mba pakai untuk undangan pertemuan 4 November, supaya progres tersimpan dan bisa dilanjutkan dari HP atau laptop.</p>
     <a class="tombol tombol-google" id="tombol-google" href="/api/sml-assessment?masuk=google"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.6 13.2l7.9 6.2C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 7l7.4 5.7c4.3-4 6.9-9.9 6.9-17.2z"/><path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-2.9-.8-4.6s.3-3.2.8-4.6l-7.9-6.2C1 16.5 0 20.1 0 24s1 7.5 2.6 10.8l7.9-6.2z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.7c-2.1 1.4-4.8 2.3-8.5 2.3-6.3 0-11.6-4.1-13.5-9.7l-7.9 6.2C6.6 42.6 14.6 48 24 48z"/></svg><span>Masuk dengan Google</span></a>
     <p class="pesan-masuk" id="pesan-masuk" role="alert"></p>
     <p class="ket">Halaman ini hanya bisa dibuka email yang diundang Panji. Jawaban hanya dibaca Panji.</p>
@@ -270,20 +284,20 @@ body[data-masuk="belum"] main { padding-bottom: var(--j8); }
 
 <script type="module">
 import "./aj/dsq/dsq.mjs";
-import { ANGKA_AWAL, BAGIAN, IZIN_BARIS, IZIN_OPSI, MODEL, MODEL_OPSI, SASARAN } from "./sasaran.js";
+import { ANGKA_AWAL, BAGIAN, GRUP_FAKTA, IZIN_BARIS, IZIN_BOLEH, IZIN_USUL, SASARAN, VERSI } from "./sasaran.js";
 
-const KUNCI = "peta10x-everchill-chat-v1";
+const KUNCI = "peta10x-everchill-chat-v2";
 const UJI = /[?&]uji=1\b/.test(location.search);
 const API = "/api/sml-assessment";
 const SAPAAN = [
-  "Halo Mba Yola. Saya Asisten Panji, asisten AI yang membantu Panji menyiapkan proposal Everchill.",
-  "Sekitar 15 sampai 20 menit, kebanyakan tinggal pilih, dan Mba boleh menjawab dengan kata-kata sendiri. Jawaban hanya dibaca Panji dan tersimpan otomatis, jadi bisa dilanjutkan kapan saja."
+  "Halo Mba Yola. Saya Asisten Panji, asisten AI yang membantu Panji menyiapkan proposal Everchill. Sebelum menulis, Panji ingin memastikan petanya tepat dulu.",
+  "Ada 14 langkah, sekitar 5 menit, dan kebanyakan tinggal pilih. Mba juga boleh menjawab dengan kata-kata sendiri. Jawaban hanya dibaca Panji dan tersimpan otomatis."
 ];
 
 // ---------- State (tersimpan tiap perubahan; obrolan, jawaban, draf ketikan) ----------
 // Sumber utama = akun (server, per email login Google); localStorage per email = cadangan kalau sinyal putus.
 let EMAIL = null, kunciLokal = KUNCI;
-const awal = () => ({ pesan: SAPAAN.map((t, i) => ({ role: "assistant", content: t, pilihan: i === SAPAAN.length - 1 ? ["Mulai"] : [] })), tangkap: {}, sedang: "", kartu: {}, diubah: 0 });
+const awal = () => ({ pesan: SAPAAN.map((t, i) => ({ role: "assistant", content: t, pilihan: i === SAPAAN.length - 1 ? ["Mulai"] : [] })), tangkap: {}, sedang: "", kartu: {}, diubah: 0, versi: VERSI });
 function baca() { try { const x = localStorage.getItem(kunciLokal); return x ? JSON.parse(x) : null; } catch { return null; } }
 let S = awal();
 let lanjut = false, menunggu = false, galat = null, pilihBanyak = [], baru = 0;
@@ -321,6 +335,11 @@ function n(k) { const x = parseFloat(String(t("n_" + k)).replace(",", ".").repla
 const fmt = (x) => x.toLocaleString("id-ID", { maximumFractionDigits: 1 });
 const rp = (juta) => juta >= 1000 ? `Rp${fmt(Math.round(juta / 100) / 10)} miliar` : `Rp${fmt(Math.round(juta * 10) / 10)} juta`;
 function hitung() { const d = n("d"), k = n("k"), p = n("p"), v = n("v"); return { d, k, p, v, target: d * k, sekarang: d * p * v, tujuan: d * k * p * v, selisihDeal: d * k - d, selisih: (d * k - d) * v }; }
+// Angka dari jawaban berupa kisaran: "Di bawah 5" -> 5, "10 sampai 30" -> 30, "Lebih dari 60" -> Infinity.
+function batasAtas(teks) { if (/lebih dari|di atas/i.test(teks)) return Infinity; const a = String(teks).match(/\d+([.,]\d+)?/g); return a ? Math.max(...a.map((x) => parseFloat(x.replace(",", ".")))) : NaN; }
+const leadPerlu = () => Math.round(hitung().target * n("r"));
+const isiKonteks = (k) => String(k).replace("{r}", fmt(n("r"))).replace("{target}", fmt(hitung().target));
+const daftarBoleh = () => IZIN_BARIS.filter((r) => t("izin." + r.id) === IZIN_BOLEH).map((r) => r.area);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const sasaranDari = (id) => SASARAN.find((s) => s.id === id);
 
@@ -349,9 +368,9 @@ function render() {
     if (g.role === "user") g.isi.forEach(([p]) => { h += `<div class="gelembung gelembung-mba">${esc(p.content)}</div>`; });
     else g.isi.forEach(([p, i]) => {
       const aktif = i === terakhir && !menunggu;
-      h += `<div class="gelembung gelembung-asisten" data-agen>${esc(p.content)}</div>`;
+      h += `<div class="gelembung gelembung-asisten" data-agen>${p.tanggapan ? `<span class="tanggap">${esc(p.tanggapan)}</span>` : ""}${p.konteks ? `<span class="konteks">${esc(isiKonteks(p.konteks))}</span>` : ""}${esc(p.content)}</div>`;
       if (p.kartu && p.kartu !== "tidak") h += `<div class="isi-asisten lebar">${rKartu(p.kartu, i)}</div>`;
-      if (aktif && p.pilihan && p.pilihan.length && !(p.kartu && p.kartu !== "tidak" && p.kartu !== "angka")) h += `<div class="isi-asisten">${rPilihan(p)}</div>`;
+      if (aktif && p.pilihan && p.pilihan.length && !(p.kartu && !["tidak", "fakta", "angka", "jarak"].includes(p.kartu))) h += `<div class="isi-asisten">${rPilihan(p)}</div>`;
     });
     h += "</div>";
   });
@@ -378,35 +397,45 @@ const opsiChip = (nama, o, kotak) => `<label class="opsi-chip"><input type="radi
 
 function rKartu(jenis, i) {
   const selesai = S.kartu[jenis + i] ? " data-selesai" : "";
+  if (jenis === "fakta") {
+    return `<div class="kartu"><div class="teks-kartu"><span class="kartu__judul">Yang Panji tangkap dari 4 November</span><span class="kartu__isi">Disusun dalam tiga bagian.</span></div>
+      ${GRUP_FAKTA.map((g) => `<div class="ubin"><span class="kartu__sub">${esc(g)}</span><ul class="fakta">${SASARAN.filter((s) => s.grup === g).map((s) => `<li>${esc(s.q)}</li>`).join("")}</ul></div>`).join("")}</div>`;
+  }
   if (jenis === "angka") {
     const h = hitung();
     return `<div class="kartu"><div class="teks-kartu"><span class="kartu__judul">Angka yang Mba sebut sendiri</span><span class="kartu__isi">Dihitung dari angka yang Mba konfirmasi.</span></div><div class="ubin-grid">
       <div class="ubin"><b>${rp(h.sekarang)}</b><span class="kartu__isi">Nilai kontrak per tahun dari ${fmt(h.d * h.p)} deal dalam ${fmt(h.p)} bulan, kalau kondisi tetap seperti sekarang.</span></div>
       <div class="ubin"><b>${rp(h.tujuan)}</b><span class="kartu__isi">Nilai kontrak per tahun dari ${fmt(h.target * h.p)} deal dalam ${fmt(h.p)} bulan, kalau target ${fmt(h.k)}x tercapai.</span></div>
-      <div class="ubin sorot"><b>${rp(h.selisih)}</b><span class="kartu__isi">Nilai kontrak yang belum terambil setiap bulan selama mesin pipeline belum jalan (${fmt(h.selisihDeal)} deal per bulan).</span></div>
-      <div class="ubin"><b>x lama kontrak</b><span class="kartu__isi">Semua angka di atas masih dikali rata-rata berapa tahun klien bertahan. Ini ditanyakan sebentar lagi.</span></div>
+      <div class="ubin sorot"><b>${rp(h.selisih)}</b><span class="kartu__isi">Nilai kontrak per tahun yang belum terambil setiap bulan selama mesin pipeline belum jalan (${fmt(h.selisihDeal)} deal per bulan).</span></div>
+      <div class="ubin"><b>Per tahun</b><span class="kartu__isi">Angka di atas baru untuk satu tahun kontrak. Setiap tahun klien bertahan menambah nilai yang sama.</span></div>
     </div><p class="janji">Ini peluang yang ingin dikejar, bukan hasil yang dijanjikan. Seperti Mba bilang, marketing tidak sama dengan sales.</p>
     <p class="ket" style="padding:0 var(--j2) var(--j2)">Rumus: deal per bulan x ${fmt(h.p)} bulan x nilai deal ${rp(h.v)} per tahun. Selisih per bulan: (${fmt(h.target)} dikurangi ${fmt(h.d)} deal) x ${rp(h.v)}.</p></div>`;
   }
-  if (jenis === "izin") {
-    return `<div class="kartu"${selesai} data-kartu="izin" data-i="${i}"><div class="teks-kartu"><span class="kartu__judul">Akses dan izin</span><span class="kartu__isi">Tiap area cukup pilih satu. Isi siapa yang pegang sekarang kalau ada.</span></div>
-      <div class="izin"><div class="izin__kepala" aria-hidden="true"><span>Area</span>${IZIN_OPSI.map((o) => `<span>${esc(o)}</span>`).join("")}</div>
-      ${IZIN_BARIS.map((r) => `<div class="izin__baris"><div class="izin__area"><b id="izin-${r.id}">${esc(r.area)}</b>${r.ket ? `<span>${esc(r.ket)}</span>` : ""}</div>
-        <fieldset class="izin__opsi" aria-labelledby="izin-${r.id}">${IZIN_OPSI.map((o) => opsiChip(`izin.${r.id}`, o, true)).join("")}</fieldset>
-        <input class="isian izin__siapa" name="izin.${r.id}.siapa" placeholder="Siapa yang pegang sekarang" aria-label="Siapa yang pegang ${esc(r.area)} sekarang"></div>`).join("")}</div>
-      <div class="aksi-kartu"><button type="button" class="tombol" data-simpan-kartu="izin" data-i="${i}">Simpan tabel izin</button></div></div>`;
+  if (jenis === "jarak") {
+    const h = hitung(), lead = t("lead"), kap = t("kapasitas");
+    return `<div class="kartu"><div class="teks-kartu"><span class="kartu__judul">Jarak ke ${fmt(h.k)}x</span><span class="kartu__isi">Dihitung dari angka yang Mba sebut.</span></div><div class="ubin-grid">
+      <div class="ubin sorot"><b>±${fmt(leadPerlu())} lead</b><span class="kartu__isi">Per bulan, untuk ${fmt(h.target)} deal dengan rasio ${fmt(n("r"))} lead jadi 1 deal.</span></div>
+      <div class="ubin"><b>${esc(lead || "Belum tahu")}</b><span class="kartu__isi">Lead per bulan hari ini, dari jawaban Mba.</span></div>
+    </div>${kap ? `<p class="kartu__isi" style="padding:0 var(--j2)">Kapasitas tim engineering: ${esc(kap)} proyek baru per bulan.</p>` : ""}
+    <p class="janji">Peta jalan untuk menutup jarak ini ada di proposal. Ini peluang yang ingin dikejar, bukan hasil yang dijanjikan.</p></div>`;
   }
-  if (jenis === "model") {
-    return `<div class="kartu"${selesai} data-kartu="model" data-i="${i}"><div class="teks-kartu"><span class="kartu__judul">What feels good for you?</span><span class="kartu__isi">Nilai masing-masing sesuai rasa Mba. Angkanya ada di proposal.</span></div><div class="model">
-      ${MODEL.map((m) => `<div><div><span class="kartu__sub">${esc(m.nama)}</span><p class="kartu__isi">${esc(m.isi)}</p></div><div class="butuh"><span>Yang dibutuhkan dari Mba</span><p>${esc(m.butuh)}</p></div>
-        <fieldset class="nilai-opsi"><legend class="sr">Penilaian ${esc(m.nama)}</legend>${MODEL_OPSI.map((o) => opsiChip(`model.${m.id}`, o)).join("")}</fieldset></div>`).join("")}
-      </div><div class="aksi-kartu"><button type="button" class="tombol" data-simpan-kartu="model" data-i="${i}">Simpan penilaian</button></div></div>`;
+  if (jenis === "izin") {
+    return `<div class="kartu"${selesai} data-kartu="izin" data-i="${i}"><div class="teks-kartu"><span class="kartu__judul">Yang boleh langsung dikerjakan</span><span class="kartu__isi">Yang tidak dicentang akan Panji usulkan dulu ke Mba.</span></div>
+      <div class="centang">${IZIN_BARIS.map((r) => `<label><input type="checkbox" name="izin.${r.id}" value="${IZIN_BOLEH}"><span><b>${esc(r.area)}</b><span>${esc(r.ket)}</span></span></label>`).join("")}</div>
+      <div class="aksi-kartu"><button type="button" class="tombol" data-simpan-kartu="izin" data-i="${i}">Simpan</button></div></div>`;
   }
   if (jenis === "penutup") {
     const h = hitung();
-    return `<div class="kartu" data-kartu="penutup"><div class="teks-kartu"><span class="kartu__judul">Ringkasan Peta 10x</span></div>
-      <div class="ubin-grid"><div class="ubin"><span class="kartu__isi">Target yang Mba konfirmasi</span><b>${fmt(h.target)} deal per bulan</b><span class="kartu__isi">Dari ${fmt(h.d)} deal per bulan sekarang, dalam ${fmt(h.p)} bulan.</span></div>
-      <div class="ubin sorot"><span class="kartu__isi">Nilai celah</span><b>${rp(h.selisih)}</b><span class="kartu__isi">Nilai kontrak per tahun yang belum terambil setiap bulan.</span></div></div>
+    const atau = (k, alt = "Belum dijawab") => esc(t(k) && t(k) !== "Dilewati" ? t(k) : alt);
+    const boleh = daftarBoleh();
+    return `<div class="kartu" data-kartu="penutup"><div class="teks-kartu"><span class="kartu__judul">Peta Everchill hari ini</span><span class="kartu__isi">Disusun dari jawaban Mba.</span></div>
+      <div class="ubin-grid">
+        <div class="ubin"><span class="kartu__isi">Seperti apa menang</span><b>${fmt(h.target)} deal per bulan</b><span class="kartu__isi">Dihitung saat ${atau("deal", "titik deal disepakati").toLowerCase()}. Kapasitas tim: ${atau("kapasitas", "belum tahu").toLowerCase()} proyek baru per bulan.</span></div>
+        <div class="ubin"><span class="kartu__isi">Siapa yang harus yakin</span><b style="font-size:24px;line-height:28px">${atau("segmen")}</b><span class="kartu__isi">Keputusan akhir: ${atau("penentu")}. Alasan memilih Everchill: ${atau("alasan")}.</span></div>
+        <div class="ubin"><span class="kartu__isi">Mesin hari ini</span><b>${atau("lead", "Belum tahu")} lead</b><span class="kartu__isi">Per bulan. Untuk ${fmt(h.target)} deal butuh sekitar ${fmt(leadPerlu())} lead. Sumber: ${atau("sumber")}.</span></div>
+        <div class="ubin"><span class="kartu__isi">Cara kita bekerja</span><b style="font-size:24px;line-height:28px">${atau("lingkup")}</b><span class="kartu__isi">Model: ${atau("model")}. Boleh langsung: ${boleh.length ? esc(boleh.join(", ")) : "semua diusulkan dulu"}.</span></div>
+        <div class="ubin sorot"><span class="kartu__isi">Nilai celah</span><b>${rp(h.selisih)}</b><span class="kartu__isi">Nilai kontrak per tahun yang belum terambil setiap bulan.</span></div>
+      </div>
       <div class="teks-kartu" style="gap:var(--j3)"><span class="kartu__sub">Tiga celah terbesar</span><ol class="celah">${tigaCelah().map((c, k) => `<li><span class="no">${k + 1}</span><span>${esc(c)}</span></li>`).join("")}</ol><p class="ket">Cara menutupnya ada di proposal.</p></div>
       <div class="teks-kartu" style="gap:var(--j2)"><span class="kartu__sub">Proposal datang Rabu, 11 November 2026</span><ul class="isi-proposal">${BAGIAN.slice(1).map((b) => `<li>${esc(b.proposal)}</li>`).join("")}</ul></div>
       <div class="teks-kartu" style="gap:var(--j3)"><span class="kartu__sub">Pilih jadwal presentasi proposal</span><p class="kartu__isi">Sekitar 60 menit, setelah proposal datang. Jadwal ini ikut terkirim ke Panji.</p>
@@ -421,30 +450,31 @@ function rKartu(jenis, i) {
 function isiNilaiKartu() {
   logEl.querySelectorAll(".kartu [name]").forEach((el) => {
     const v = S.tangkap[el.name];
-    if (el.type === "radio") el.checked = v === el.value; else if (v != null) el.value = v;
+    if (el.type === "radio" || el.type === "checkbox") el.checked = v === el.value; else if (v != null) el.value = v;
   });
 }
 
 function perbaruiKepala() {
-  const inti = SASARAN.filter((s) => !s.angka);
-  const persen = Math.round(inti.filter((s) => t(s.id)).length / inti.length * 100);
+  const fakta = SASARAN.filter((s) => s.bagian === 0 && !s.angka);
+  const langkah = SASARAN.filter((s) => s.langkah);
+  const isi = (fakta.every((s) => t(s.id)) ? 1 : 0) + langkah.filter((s) => t(s.id)).length;
+  const persen = Math.round(isi / (langkah.length + 1) * 100);
   document.getElementById("bar-isi").style.width = persen + "%";
   document.getElementById("bar-angka").innerHTML = `${persen}<small>%</small>`;
   document.getElementById("bar").setAttribute("aria-valuenow", persen);
   const s = sasaranDari(S.sedang);
-  const nomor = s ? s.bagian : S.sedang === "selesai" ? 9 : -1;
-  const JUDUL = ["Cek catatan meeting", "Target yang dikejar", "Siapa yang diincar", "Pipeline sekarang", "Apa yang boleh disentuh", "Event dan production", "Siapa yang dilibatkan", "Batas yang dijaga", "Bentuk kerja sama", "Tinggal kirim ke Panji"];
-  document.getElementById("judul-tahap").textContent = nomor < 0 ? "Halo, Mba Yola" : JUDUL[nomor];
-  document.getElementById("tahap").textContent = nomor < 0 ? "Sekitar 15 sampai 20 menit" : nomor === 0 ? "Sebelum bagian 1" : nomor === 9 ? "Ringkasan" : `Bagian ${nomor} dari 8`;
-  const tahap = [{ label: "Konfirmasi", no: 0 }].concat(BAGIAN.slice(1).map((b) => ({ label: ["Objective", "Audiens", "Pipeline", "Akses", "Channel", "Tim", "Rambu", "Kerja sama"][b.no - 1], no: b.no }))).concat([{ label: "Kirim", no: 9 }]);
-  document.getElementById("stepper").innerHTML = tahap.map((x) => `<li class="${x.no === nomor ? "kini" : x.no < nomor ? "lewat" : ""}"${x.no === nomor ? ' aria-current="step"' : ""}><span class="simpul">${x.no === 0 ? "K" : x.no === 9 ? "" : x.no}</span><span class="label">${x.label}</span></li>`).join("");
-  // "Selesai dan kirim" muncul begitu obrolan masuk bagian 1, supaya Mba bisa berhenti dan mengirim kapan saja.
+  const nomor = s ? s.bagian : S.sedang === "selesai" ? 5 : -1;
+  document.getElementById("judul-tahap").textContent = nomor < 0 ? "Halo, Mba Yola" : nomor === 5 ? "Tinggal kirim ke Panji" : BAGIAN[nomor].judul;
+  document.getElementById("tahap").textContent = nomor < 0 ? "Sekitar 5 menit" : nomor === 5 ? "Ringkasan" : `Bab ${nomor + 1} dari 5 · Langkah ${s.langkah || 1} dari 14`;
+  const tahap = BAGIAN.map((b) => ({ label: b.label, no: b.no })).concat([{ label: "Kirim", no: 5 }]);
+  document.getElementById("stepper").innerHTML = tahap.map((x) => `<li class="${x.no === nomor ? "kini" : x.no < nomor ? "lewat" : ""}"${x.no === nomor ? ' aria-current="step"' : ""}><span class="simpul">${x.no === 5 ? "" : x.no + 1}</span><span class="label">${x.label}</span></li>`).join("");
+  // "Selesai dan kirim" muncul begitu obrolan masuk bab 2, supaya Mba bisa berhenti dan mengirim kapan saja.
   document.getElementById("btn-ringkas").hidden = !SASARAN.some((x) => x.bagian >= 1 && t(x.id)) && nomor < 1;
 }
 
 // ---------- Giliran (satu kali coba ulang otomatis kalau jaringan putus) ----------
 async function mintaGiliran() {
-  const b = await api({ aksi: "chat", pesan: S.pesan.map(({ role, content }) => ({ role, content })), tangkap: S.tangkap });
+  const b = await api({ aksi: "chat", pesan: S.pesan.map(({ role, content, tanggapan }) => ({ role, content: tanggapan ? `${tanggapan} ${content}` : content })), tangkap: S.tangkap });
   if (!b.ok) { const e = new Error(b.pesan || `Server menjawab ${b.status}.`); e.ulang = b.status >= 500; throw e; }
   return b;
 }
@@ -455,8 +485,12 @@ async function giliran() {
     try { b = await mintaGiliran(); }
     catch (e) { if (e.ulang === false) throw e; await new Promise((r) => setTimeout(r, 1500)); b = await mintaGiliran(); }
     b.tangkap.forEach((x) => { S.tangkap[x.id] = x.nilai; });
+    const sebelumnya = [...S.pesan].reverse().find((p) => p.role === "assistant" && p.sedang);
+    const s = sasaranDari(b.sedang);
+    // Konteks tampil sekali, saat sasaran itu pertama kali ditanyakan (bukan di tanya lanjut atau kartu pengantar).
+    const konteks = s && s.konteks && !["angka", "jarak"].includes(b.kartu) && (!sebelumnya || sebelumnya.sedang !== b.sedang || ["angka", "jarak"].includes(sebelumnya.kartu)) ? s.konteks : "";
     S.sedang = b.sedang;
-    S.pesan.push({ role: "assistant", content: b.balasan, pilihan: b.pilihan, banyak: b.banyak, kartu: b.kartu });
+    S.pesan.push({ role: "assistant", tanggapan: b.tanggapan || "", konteks, content: b.balasan, pilihan: b.pilihan, banyak: b.banyak, kartu: b.kartu, sedang: b.sedang });
     pilihBanyak = [];
     simpan();
     wajah("netral"); agen.angguk?.();
@@ -484,8 +518,8 @@ btnKirim.addEventListener("mousedown", (e) => e.preventDefault());
 btnKirim.addEventListener("click", kirimDariKolom);
 function kirimDariKolom() { if (menunggu || !teksEl.value.trim()) return; const v = teksEl.value; teksEl.value = ""; ukurTeks(); kirimJawaban(v); }
 
-logEl.addEventListener("input", (e) => { if (e.target.name) { S.tangkap[e.target.name] = e.target.value; simpan(); } });
-logEl.addEventListener("change", (e) => { if (e.target.name) { S.tangkap[e.target.name] = e.target.value; simpan(); } });
+logEl.addEventListener("input", (e) => { if (e.target.name && e.target.type !== "checkbox") { S.tangkap[e.target.name] = e.target.value; simpan(); } });
+logEl.addEventListener("change", (e) => { if (e.target.name) { S.tangkap[e.target.name] = e.target.type === "checkbox" ? (e.target.checked ? e.target.value : IZIN_USUL) : e.target.value; simpan(); } });
 
 document.addEventListener("click", (e) => {
   const b = e.target.closest("button");
@@ -507,17 +541,10 @@ document.addEventListener("click", (e) => {
 
 function simpanKartu(jenis, i) {
   S.kartu[jenis + i] = true;
-  let ringkas;
-  if (jenis === "izin") {
-    const isi = IZIN_BARIS.map((r) => `${r.area}: ${t("izin." + r.id) || "belum dipilih"}${t("izin." + r.id + ".siapa") ? ` (dipegang ${t("izin." + r.id + ".siapa")})` : ""}`);
-    S.tangkap.izin = isi.join("; ");
-    ringkas = "Tabel izin sudah saya isi.\n" + isi.join("\n");
-  } else {
-    const isi = MODEL.map((m) => `${m.nama}: ${t("model." + m.id) || "belum dinilai"}`);
-    S.tangkap.model = isi.join("; ");
-    ringkas = "Penilaian model sudah saya isi.\n" + isi.join("\n");
-  }
-  kirimJawaban(ringkas);
+  IZIN_BARIS.forEach((r) => { if (t("izin." + r.id) !== IZIN_BOLEH) S.tangkap["izin." + r.id] = IZIN_USUL; });
+  const boleh = daftarBoleh(), usul = IZIN_BARIS.filter((r) => t("izin." + r.id) !== IZIN_BOLEH).map((r) => r.area);
+  S.tangkap.izin = `Boleh langsung: ${boleh.join(", ") || "tidak ada"}. Usul dulu: ${usul.join(", ") || "tidak ada"}.`;
+  kirimJawaban(boleh.length ? `Yang boleh langsung: ${boleh.join(", ")}.` : "Semua diusulkan dulu ke saya.");
 }
 
 function bukaPenutup() {
@@ -531,62 +558,48 @@ function bukaPenutup() {
 // ---------- Membaca jawaban ----------
 function tigaCelah() {
   const h = hitung(), c = [];
-  const ada = (k, ...kata) => kata.some((x) => t(k).toLowerCase().includes(x.toLowerCase()));
-  const kosong = (k) => !t(k) || ada(k, "Dilewati");
-  if (ada("q3_3", "WhatsApp", "Belum dicatat", "belum dicatat")) c.push("Lead dan deal belum tercatat rapi, jadi asal setiap deal belum bisa dilacak.");
-  if (kosong("q6_1") || ada("q6_1", "Belum ada", "Perlu ditanya")) c.push("Belum ada representative yang siap tampil di event dan content.");
-  if (ada("q4_1", "Tidak sama sekali")) c.push("Harga tidak boleh tampil, jadi website butuh cara lain untuk meyakinkan calon klien sebelum mereka menghubungi sales.");
-  const kap = parseFloat(t("q1_4").replace(",", "."));
-  if (isFinite(kap) && kap > 0 && kap < h.target) c.push(`Kapasitas engineering ${fmt(kap)} proyek per bulan masih di bawah target ${fmt(h.target)} deal per bulan.`);
-  if (["Jangan disentuh", "Belum tahu"].includes(t("izin.track"))) c.push("Tracking dan conversion API belum bisa disentuh, jadi hasil iklan belum bisa diukur sampai ke deal.");
-  if (/^belum/i.test(t("q2_3"))) c.push("Belum ada daftar target account, jadi outreach sales belum punya sasaran bersama.");
-  if (/^tidak/i.test(t("q3_4"))) c.push("Data pipeline 6 bulan terakhir belum bisa dibagi, jadi baseline perlu dibangun dari nol.");
-  const g = t("q3_2").match(/google ads\D{0,6}(\d{1,3})/i);
-  if (g && +g[1] >= 60) c.push(`Sekitar ${g[1]}% lead bergantung pada satu channel, Google Ads, yang dikelola pihak lain.`);
-  if (kosong("q5_1") || /^(belum|tidak) (ada|pernah)/i.test(t("q5_1"))) c.push("Belum ada event atau forum yang menjadi panggung Everchill.");
+  const kap = batasAtas(t("kapasitas"));
+  if (isFinite(kap) && kap < h.target) c.push(`Kapasitas engineering sekitar ${t("kapasitas").toLowerCase()} proyek baru per bulan masih di bawah target ${fmt(h.target)} deal per bulan.`);
+  const lead = batasAtas(t("lead"));
+  if (isFinite(lead) && lead < leadPerlu()) c.push(`Lead hari ini ${t("lead").toLowerCase()} per bulan, sementara ${fmt(h.target)} deal butuh sekitar ${fmt(leadPerlu())} lead.`);
+  const sumber = t("sumber").split(/,|\n/).map((x) => x.trim()).filter(Boolean);
+  if (sumber.length === 1 && /google ads/i.test(sumber[0])) c.push("Lead bergantung pada satu channel, Google Ads, yang dikelola pihak lain.");
   c.push("Pesan pionir cooling as a service belum terlihat di website.");
+  c.push("Belum ada event atau forum yang menjadi panggung Everchill.");
   return c.slice(0, 3);
 }
 
 function tandaBahaya() {
   const h = hitung(), x = [];
-  const kap = parseFloat(t("q1_4").replace(",", "."));
-  if (isFinite(kap) && kap > 0 && kap < h.target) x.push(`Target ${fmt(h.target)} deal per bulan melebihi kapasitas engineering ${fmt(kap)} proyek per bulan.`);
-  const condongPerf = /performance/i.test(t("q8_7")) || t("model.perf") === "Nyaman";
-  if (condongPerf && (/whatsapp|belum/i.test(t("q3_3")) || /^tidak/i.test(t("q3_4")))) x.push("Condong ke performance-based, tetapi data lead dan deal belum tercatat atau belum boleh dibagi.");
-  if (/di bawah/i.test(t("q8_10")) && /implementasi penuh/i.test(t("q8_5"))) x.push("Anggaran kerja (iklan, produksi konten, event) di bawah Rp50 juta per bulan untuk implementasi penuh.");
-  if (/seminggu/i.test(t("q7_3"))) x.push("Approval seminggu akan memperlambat content production dan event.");
-  if (/belum boleh/i.test(t("q5_3"))) x.push("Content production di workshop dan lokasi klien belum boleh.");
+  const kap = batasAtas(t("kapasitas"));
+  if (isFinite(kap) && kap < h.target) x.push(`Target ${fmt(h.target)} deal per bulan melebihi kapasitas engineering (${t("kapasitas")} proyek baru per bulan).`);
+  if (/performance/i.test(t("model")) && !daftarBoleh().includes("Tracking")) x.push("Condong ke performance-based, tetapi tracking belum boleh langsung disentuh.");
+  if (/di bawah/i.test(t("anggaran")) && /implementasi/i.test(t("lingkup")) && !/diputuskan nanti/i.test(t("lingkup"))) x.push("Marketing budget di bawah Rp50 juta per bulan untuk rencana plus implementasi.");
   const koreksi = SASARAN.filter((s) => /^koreksi/i.test(t(s.id))).map((s) => `${s.id}: ${t(s.id)}`);
   if (koreksi.length) x.push("Ada fakta yang dikoreksi: " + koreksi.join("; "));
   return x;
 }
 
-function aksesMingguPertama() {
-  return IZIN_BARIS.filter((r) => ["Boleh langsung", "Usul dulu"].includes(t("izin." + r.id)))
-    .map((r) => `${r.area} (${t("izin." + r.id)})${t("izin." + r.id + ".siapa") ? `, dipegang ${t("izin." + r.id + ".siapa")}` : ""}`);
-}
-
 function susunLaporan() {
   const h = hitung(), kosong = "(belum dijawab)";
   const jadwal = [t("jadwal.tanggal"), t("jadwal.jam") && "jam " + t("jadwal.jam"), t("jadwal.catatan")].filter(Boolean).join(", ") || "(belum dipilih)";
+  const isiLangkah = SASARAN.filter((s) => s.langkah);
   const bagian = [{ judul: "Ringkasan untuk Panji", item: [
-    ["Target yang dikonfirmasi", `${fmt(h.d)} deal per bulan menjadi ${fmt(h.target)} deal per bulan (${fmt(h.k)}x) dalam ${fmt(h.p)} bulan. Nilai deal ${rp(h.v)} per tahun. Rasio ${fmt(n("r"))} lead untuk 1 deal.`],
+    ["Target yang dikonfirmasi", `${fmt(h.d)} deal per bulan menjadi ${fmt(h.target)} deal per bulan (${fmt(h.k)}x) dalam ${fmt(h.p)} bulan. Nilai deal ${rp(h.v)} per tahun. Rasio ${fmt(n("r"))} lead untuk 1 deal, jadi butuh sekitar ${fmt(leadPerlu())} lead per bulan.`],
     ["Nilai", `Sekarang ${rp(h.sekarang)}, target ${rp(h.tujuan)}, celah ${rp(h.selisih)} per bulan.`],
     ["Tiga celah terbesar (yang dilihat Mba Yola)", tigaCelah().map((c, k) => `${k + 1}. ${c}`).join("\n")],
     ["Tanda bahaya", tandaBahaya().map((x) => "- " + x).join("\n") || "Tidak ada"],
-    ["Akses yang perlu diminta minggu pertama", aksesMingguPertama().map((x) => "- " + x).join("\n") || "Belum ada yang diizinkan"],
+    ["Boleh langsung dikerjakan", daftarBoleh().join(", ") || "Belum ada, semua diusulkan dulu"],
     ["Jadwal presentasi", jadwal],
-    ["Kelengkapan", `${SASARAN.filter((s) => t(s.id)).length} dari ${SASARAN.length} sasaran berisi.`]
+    ["Kelengkapan", `${isiLangkah.filter((s) => t(s.id)).length} dari ${isiLangkah.length} langkah 2 sampai 14 berisi. Fakta meeting: ${SASARAN.filter((s) => s.grup && t(s.id)).length} dari 9 dikonfirmasi.`]
   ] }];
   BAGIAN.forEach((b) => {
     const item = [];
     SASARAN.filter((s) => s.bagian === b.no).forEach((s) => {
-      if (s.kartu === "izin") IZIN_BARIS.forEach((r) => item.push([`Izin: ${r.area}`, (t("izin." + r.id) || kosong) + (t("izin." + r.id + ".siapa") ? `. Dipegang sekarang: ${t("izin." + r.id + ".siapa")}` : "")]));
-      else if (s.kartu === "model") MODEL.forEach((m) => item.push([`What feels good: ${m.nama}`, t("model." + m.id) || kosong]));
+      if (s.kartu === "izin") IZIN_BARIS.forEach((r) => item.push([`Izin: ${r.area} (${r.ket})`, t("izin." + r.id) || kosong]));
       else item.push([s.q, t(s.id) || kosong]);
     });
-    bagian.push({ judul: b.no === 0 ? `Konfirmasi meeting (${b.proposal})` : `Bagian ${b.no}. ${b.judul} (mengisi proposal: ${b.proposal})`, item });
+    bagian.push({ judul: `Bab ${b.no + 1}. ${b.judul} (mengisi proposal: ${b.proposal})`, item });
   });
   return bagian;
 }
@@ -633,7 +646,7 @@ function tampilGerbang(pesan = "") {
   gerbang.hidden = false; logEl.innerHTML = "";
   document.getElementById("pesan-masuk").textContent = pesan;
   document.getElementById("judul-tahap").textContent = "Halo, Mba Yola";
-  document.getElementById("tahap").textContent = "Masuk dulu dengan Google";
+  document.getElementById("tahap").textContent = "Sekitar 5 menit";
 }
 // Hasil masuk dikembalikan server lewat ?masuk=... sesudah kembali dari Google.
 const HASIL_MASUK = {
@@ -649,10 +662,10 @@ async function mulaiObrolan(email) {
   let akun = null;
   try { const b = await api({ aksi: "muat" }); if (b.ok) akun = b.progres; } catch { /* pakai cadangan perangkat */ }
   // Ambil yang paling baru: akun (perangkat lain) atau cadangan perangkat ini (kalau sempat terputus sebelum tersimpan).
-  const pilih = [akun, lokal].filter((x) => x && Array.isArray(x.pesan)).sort((a, b) => (b.diubah || 0) - (a.diubah || 0))[0];
+  const pilih = [akun, lokal].filter((x) => x && Array.isArray(x.pesan) && x.versi === VERSI).sort((a, b) => (b.diubah || 0) - (a.diubah || 0))[0];
   S = pilih || awal(); S.kartu ||= {};
   lanjut = Boolean(pilih && pilih.pesan.length > SAPAAN.length);
-  if (pilih && pilih !== akun) simpan();
+  if ((pilih && pilih !== akun) || (akun && !pilih)) simpan();
   document.body.dataset.masuk = "sudah"; gerbang.hidden = true;
   teksEl.value = S.draf || ""; ukurTeks();
   baru = S.pesan.length;
