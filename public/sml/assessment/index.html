@@ -558,7 +558,7 @@ function tigaCelah() {
   if (isFinite(kap) && kap < h.target) c.push(`Kapasitas engineering (${t("kapasitas").toLowerCase()} proyek baru per bulan) masih di bawah target ${fmt(h.target)} deal per bulan.`);
   const lead = batasAtas(t("lead"));
   if (isFinite(lead) && lead < leadPerlu()) c.push(`Lead hari ini ${t("lead").toLowerCase()} per bulan, sementara ${fmt(h.target)} deal butuh sekitar ${fmt(leadPerlu())} lead.`);
-  const sumber = t("sumber").split(/,|\n/).map((x) => x.trim()).filter(Boolean);
+  const sumber = t("sumber").split(/[,;\n]/).map((x) => x.trim()).filter(Boolean);
   if (sumber.length === 1 && /google ads/i.test(sumber[0])) c.push("Lead bergantung pada satu channel, Google Ads, yang dikelola pihak lain.");
   c.push("Pesan pionir cooling as a service belum terlihat di website.");
   c.push("Belum ada event atau forum yang menjadi panggung Everchill.");
