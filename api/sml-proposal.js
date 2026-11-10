@@ -1,4 +1,4 @@
-// Proposal Everchill "Dari 1 ke 10" di /sml/proposal/ (rewrite di vercel.json).
+// Proposal "Everchill 10x Marketing Plan" di /sml/proposal/ (rewrite di vercel.json).
 // Akses sama dengan assessment: masuk dengan Google, hanya email di SML_ASSESSMENT_EMAILS, kuki sesi sml_sesi.
 // Isi proposal (angka klien dan harga) tidak boleh terbaca di repo ini karena repo publik. Halaman dan PDF disimpan
 // terenkripsi (AES-256-GCM) di api/_proposal/*.enc; kuncinya env SML_PROPOSAL_KEY (salinan lokal Panji:
@@ -67,22 +67,22 @@ function halamanMasuk(status) {
     gagal: "Masuk belum berhasil. Silakan coba lagi.",
     belum: "Halaman ini sedang disiapkan. Coba lagi sebentar lagi.",
   }[status] || "";
-  return `<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow"><title>Dari 1 ke 10</title>
+  return `<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow"><title>Everchill 10x Marketing Plan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@800&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--tinta:#1D1D1F;--abu:#555B66;--biru:#006BC7;--siaga-tua:#8A5A00;--siaga-lembut:#FFF4D6}
+:root{--tinta:#0B1F3F;--abu:#3F4F69;--biru:#025CBC;--siaga-tua:#8A5A00;--siaga-lembut:#FFF4D6}
 *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#fff;color:var(--tinta);font:400 17px/26px "IBM Plex Sans",-apple-system,Arial,sans-serif;padding:24px 16px}
 main{width:100%;max-width:440px}
 p.untuk{margin:0;font-size:15px;line-height:22px;color:var(--abu)}
-h1{margin:24px 0 0;font:800 64px/60px Archivo,Arial,sans-serif;letter-spacing:-0.045em}h1 span{color:var(--biru)}
+h1{margin:24px 0 0;font:800 52px/52px Archivo,Arial,sans-serif;letter-spacing:-0.04em}h1 span{color:var(--biru)}
 p.isi{margin:20px 0 0;color:var(--abu)}
 a.masuk{display:flex;align-items:center;justify-content:center;height:52px;margin-top:32px;border-radius:8px;background:var(--tinta);color:#fff;text-decoration:none;font-weight:600;font-size:16px}
 a.masuk:hover{background:#000}a.masuk:focus-visible{outline:2px solid var(--biru);outline-offset:2px}
 .galat{margin:20px 0 0;padding:12px 16px;border-radius:8px;background:var(--siaga-lembut);color:var(--siaga-tua);font-size:15px;line-height:22px}
 </style></head><body><main>
 <p class="untuk">Untuk Mba Yola, PT Surya Marga Luhur</p>
-<h1>Dari 1 ke <span>10</span></h1>
+<h1>Everchill <span>10x</span> Marketing Plan</h1>
 <p class="isi">Rencana 6 bulan untuk Everchill dari Panji Firmansyah. Masuk dengan akun Google yang sama seperti saat mengisi assessment.</p>
 ${pesan ? `<p class="galat" role="alert">${pesan}</p>` : ""}
 <a class="masuk" href="/api/sml-assessment?masuk=google&amp;ke=proposal">Masuk dengan Google</a>
