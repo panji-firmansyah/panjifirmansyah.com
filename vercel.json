@@ -2,11 +2,36 @@
   "headers": [
     {
       "source": "/sml/(.*)",
-      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     },
     {
       "source": "/sml",
-      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     }
-  ]
+  ],
+  "rewrites": [
+    {
+      "source": "/sml/proposal",
+      "destination": "/api/sml-proposal"
+    },
+    {
+      "source": "/sml/proposal/",
+      "destination": "/api/sml-proposal"
+    }
+  ],
+  "functions": {
+    "api/sml-proposal.js": {
+      "includeFiles": "api/_proposal/**"
+    }
+  }
 }

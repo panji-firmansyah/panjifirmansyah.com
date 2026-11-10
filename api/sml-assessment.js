@@ -99,29 +99,32 @@ const KUKI_OAUTH = "sml_oauth";
 const bacaKuki = (req) => Object.fromEntries((req.headers.cookie || "").split(";").map((k) => k.trim().split("=")).filter((k) => k[0]));
 const asal = (req) => `https://${req.headers["x-forwarded-host"] || req.headers.host}`;
 
+// ke=proposal: sesi yang sama dipakai halaman proposal (api/sml-proposal.js); sesudah login kembali ke sana.
 function keGoogle(req, res) {
   const klien = process.env.SML_GOOGLE_CLIENT_ID;
-  if (!klien || !process.env.SML_SESSION_SECRET) return balikKeHalaman(res, "belum");
+  const ke = req.query?.ke === "proposal" ? "proposal" : "assessment";
+  if (!klien || !process.env.SML_SESSION_SECRET) return balikKeHalaman(res, "belum", ke);
   const state = randomBytes(16).toString("base64url"), nonce = randomBytes(16).toString("base64url");
-  res.setHeader("Set-Cookie", `${KUKI_OAUTH}=${state}.${nonce}; Path=/api/sml-assessment; HttpOnly; Secure; SameSite=None; Max-Age=600`);
+  res.setHeader("Set-Cookie", `${KUKI_OAUTH}=${state}.${nonce}.${ke}; Path=/api/sml-assessment; HttpOnly; Secure; SameSite=None; Max-Age=600`);
   const q = new URLSearchParams({ client_id: klien, redirect_uri: `${asal(req)}/api/sml-assessment`, response_type: "id_token", response_mode: "form_post", scope: "openid email profile", prompt: "select_account", state, nonce });
   res.statusCode = 302; res.setHeader("Location", `https://accounts.google.com/o/oauth2/v2/auth?${q}`); res.end();
 }
-function balikKeHalaman(res, hasil) {
-  res.statusCode = 303; res.setHeader("Location", `/sml/assessment/${hasil ? `?masuk=${hasil}` : ""}`); res.end();
+function balikKeHalaman(res, hasil, ke = "assessment") {
+  const halaman = ke === "proposal" ? "proposal" : "assessment";
+  res.statusCode = 303; res.setHeader("Location", `/sml/${halaman}/${hasil ? `?masuk=${hasil}` : ""}`); res.end();
 }
 async function dariGoogle(req, body, res) {
-  const [state, nonce] = String(bacaKuki(req)[KUKI_OAUTH] || "").split(".");
+  const [state, nonce, ke] = String(bacaKuki(req)[KUKI_OAUTH] || "").split(".");
   const kukiOauth = `${KUKI_OAUTH}=; Path=/api/sml-assessment; HttpOnly; Secure; SameSite=None; Max-Age=0`;
-  if (body.error) { res.setHeader("Set-Cookie", kukiOauth); await catatAkses(req, null, `batal di Google: ${String(body.error).slice(0, 40)}`); return balikKeHalaman(res, body.error === "access_denied" ? "" : "gagal"); }
-  if (!state || state !== body.state) { res.setHeader("Set-Cookie", kukiOauth); await catatAkses(req, null, "gagal: sesi login kedaluwarsa"); return balikKeHalaman(res, "gagal"); }
+  if (body.error) { res.setHeader("Set-Cookie", kukiOauth); await catatAkses(req, null, `batal di Google: ${String(body.error).slice(0, 40)}`); return balikKeHalaman(res, body.error === "access_denied" ? "" : "gagal", ke); }
+  if (!state || state !== body.state) { res.setHeader("Set-Cookie", kukiOauth); await catatAkses(req, null, "gagal: sesi login kedaluwarsa"); return balikKeHalaman(res, "gagal", ke); }
   const kuki = [kukiOauth];
   const kode = await masuk({ credential: body.id_token, nonce }, {
     setHeader: (_n, v) => kuki.push(v),
     status: (k) => ({ json: () => k })
   }, req);
   res.setHeader("Set-Cookie", kuki);
-  return balikKeHalaman(res, { 200: "", 403: "ditolak", 503: "belum" }[kode] ?? "gagal");
+  return balikKeHalaman(res, { 200: "", 403: "ditolak", 503: "belum" }[kode] ?? "gagal", ke);
 }
 
 // ---------- Progres per akun ----------
