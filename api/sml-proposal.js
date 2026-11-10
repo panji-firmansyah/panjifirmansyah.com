@@ -19,7 +19,7 @@ const PANJI = "panjifrmansyah@gmail.com";
 const JALUR_AKSES = "akses/log.json";
 const BERKAS = {
   halaman: { tipe: "text/html; charset=utf-8" },
-  deck: { tipe: "application/pdf", nama: "Dari 1 ke 10 - Everchill.pdf" },
+  deck: { tipe: "application/pdf", nama: "Everchill 10x Marketing Plan.pdf" },
   penawaran: { tipe: "application/pdf", nama: "Penawaran Everchill.pdf" },
 };
 
