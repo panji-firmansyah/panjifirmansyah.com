@@ -134,7 +134,7 @@ body.lanskap .koin .kecil { display: none; }
     <div class="layar" id="layar">
       <div class="panggung" id="panggung">
 <section class="slide" data-track="signature" id="s-cover" data-transition="fade" style="background:#070b3a">
-  <img src="a/394e03aee22b.png" alt="Lapangan softball malam dari belakang home plate, diamond lengkap, stadion melengkung, dua lampu sorot bersinar" style="position:absolute; top:0; left:0; width:1920px; height:1080px">
+  <img src="a/394e03aee22b.svg" alt="Lapangan softball malam dari belakang home plate, diamond lengkap, stadion melengkung, dua lampu sorot bersinar" style="position:absolute; top:0; left:0; width:1920px; height:1080px">
   
   <iframe class="emb" aria-hidden="true" tabindex="-1" sandbox="allow-scripts" style="position:absolute; left:0; top:0; width:1920px; height:600px; border:0; background:transparent" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;style&gt;html,body{margin:0;background:transparent;overflow:hidden;width:100%;height:100%}canvas{width:100%;height:100%;image-rendering:pixelated;display:block}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;canvas id=&quot;c&quot; width=&quot;320&quot; height=&quot;100&quot;&gt;&lt;/canvas&gt;&lt;script&gt;
 var c=document.getElementById(&quot;c&quot;),g=c.getContext(&quot;2d&quot;);
@@ -425,7 +425,7 @@ if(!reduce){frame();setInterval(frame,80);}
 
 <script>
 (function () {
-  var TRACKS = {"signature": {"src": "m/signature.mp3", "title": "Signature, lagu tema CDJ 2026", "loop": true}, "instrumental": {"src": "m/instrumental.mp3", "title": "Instrumental lagu tema", "loop": true}, "mars": {"src": "m/mars.mp3", "title": "Mars pembuka", "loop": true}, "north": {"src": "m/north.mp3", "title": "Mars pool North", "loop": true}, "inning": {"src": "m/inning.mp3", "title": "Musik jeda inning", "loop": true}, "grandfinal": {"src": "m/grandfinal.mp3", "title": "The Grand Final", "loop": true}, "nameentry": {"src": "m/nameentry.mp3", "title": "Name entry", "loop": true}, "coin": {"src": "m/coin.mp3", "title": "Game start", "loop": false}};
+  var TRACKS = {"signature": {"src": "m/signature.mp3", "title": "Signature, lagu tema CDJ 2026", "loop": true}, "instrumental": {"src": "m/instrumental.mp3", "title": "Instrumental lagu tema", "loop": true}, "mars": {"src": "m/mars.mp3", "title": "Mars pembuka", "loop": true}, "north": {"src": "m/north.mp3", "title": "Mars pool North", "loop": true}, "inning": {"src": "m/inning.mp3", "title": "Musik jeda inning", "loop": true}, "grandfinal": {"src": "m/grandfinal.mp3", "title": "The Grand Final", "loop": true}, "nameentry": {"src": "m/nameentry.mp3", "title": "Name entry", "loop": true}};
   var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
   var panggung = document.getElementById("panggung"), layar = document.getElementById("layar"), koin = document.getElementById("koin");
   var stage = document.getElementById("stage"), lagu = document.getElementById("lagu"), umum = document.getElementById("umum"), joy = document.getElementById("joy");
@@ -465,20 +465,26 @@ if(!reduce){frame();setInterval(frame,80);}
     if (!audio[k]) { var a = new Audio(TRACKS[k].src); a.loop = TRACKS[k].loop; a.preload = "auto"; a.volume = 0.85; audio[k] = a; }
     return audio[k];
   }
-  function fadeOut(a) {
+  var fades = {};
+  function fadeOut(k) {                      // short fade so two songs never overlap for more than 240 ms
+    var a = audio[k]; if (!a || a.paused) return;
+    clearInterval(fades[k]);
     if (reduce) { a.pause(); return; }
-    var v = a.volume, id = setInterval(function () { v -= 0.1; if (v <= 0) { clearInterval(id); a.pause(); a.volume = 0.85; } else a.volume = v; }, 30);
+    var v = a.volume;
+    fades[k] = setInterval(function () { v -= 0.1; if (v <= 0) { clearInterval(fades[k]); a.pause(); a.volume = 0.85; } else a.volume = v; }, 30);
+  }
+  function hanya(k) {                        // exactly one song: everything else fades out
+    Object.keys(audio).forEach(function (o) { if (o !== k) fadeOut(o); });
   }
   function musik() {
     var k = slides[idx].getAttribute("data-track");
     lagu.textContent = musikOn ? "Lagu: " + TRACKS[k].title : "Musik mati";
     if (!mulai) return;
-    if (!musikOn) { if (kini) audio[kini].pause(); return; }
-    if (kini !== k) {
-      if (kini) fadeOut(audio[kini]);
-      var a = track(k); a.currentTime = 0; a.volume = 0.85; a.play().catch(function () {});
-      kini = k;
-    } else if (audio[k].paused) audio[k].play().catch(function () {});
+    if (!musikOn) { Object.keys(audio).forEach(function (o) { clearInterval(fades[o]); audio[o].pause(); }); return; }
+    hanya(k);
+    var a = track(k); clearInterval(fades[k]); a.volume = 0.85;
+    if (kini !== k) { a.currentTime = 0; kini = k; }
+    if (a.paused) a.play().catch(function () {});
   }
   function tampil(i, full) {
     slides[idx].classList.remove("aktif"); slides[idx].setAttribute("aria-hidden", "true");
@@ -497,7 +503,6 @@ if(!reduce){frame();setInterval(frame,80);}
   function start() {
     if (mulai) return true;
     mulai = true; koin.hidden = true;
-    var c = track("coin"); c.currentTime = 0; if (musikOn) c.play().catch(function () {});
     musik();
     return false;
   }
@@ -515,7 +520,7 @@ if(!reduce){frame();setInterval(frame,80);}
   }
   function toggleMusik() {
     musikOn = !musikOn; document.getElementById("b-musik").setAttribute("aria-pressed", String(musikOn));
-    if (!musikOn && kini) audio[kini].pause();
+    if (musikOn) kini = null;                // restart the current slide's song from the top
     musik();
   }
   function full() {
@@ -555,6 +560,11 @@ if(!reduce){frame();setInterval(frame,80);}
   window.addEventListener("hashchange", function () {
     var n = parseInt(location.hash.slice(1), 10) - 1;
     if (!isNaN(n) && n !== idx && n >= 0 && n < slides.length) tampil(n, true);
+  });
+  document.addEventListener("visibilitychange", function () {
+    if (!mulai || !musikOn) return;
+    if (document.hidden) Object.keys(audio).forEach(function (o) { audio[o].pause(); });
+    else musik();
   });
   var awal = parseInt((location.hash || "#1").slice(1), 10);
   idx = 0; tampil(isNaN(awal) ? 0 : Math.min(Math.max(awal - 1, 0), slides.length - 1), awal > 1);
