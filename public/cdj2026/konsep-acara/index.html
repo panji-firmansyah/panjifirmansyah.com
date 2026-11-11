@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>CDJ 2026 Konsep Acara</title>
+<meta name="description" content="Konsep acara Catalyst Dominates Jakarta 2026, Feel the game: opening, setiap game, The Grand Final, dan closing, dimainkan di kabinet arcade.">
+<meta property="og:title" content="CDJ 2026 Konsep Acara">
+<meta property="og:description" content="Feel the game. Konsep acara tiga hari di GBK, dimainkan di kabinet arcade.">
+<meta property="og:image" content="https://panjifirmansyah.com/cdj2026/konsep-acara/og.png">
+<meta name="theme-color" content="#05061a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Jersey+15&display=swap">
+<style>
+/* CDJ 2026 concept deck inside a pixel arcade cabinet. Palette from the deck: stadium night navy,
+   pink and electric blue. Spacing on a 4 grid; cabinet sizes follow the screen width (--s). */
+:root {
+  --malam: #05061a; --navy: #070b3a; --navy-2: #0c1150; --garis: #232a7a; --pink: #ff8af8; --pink-tua: #d660ce;
+  --biru: #4d55ff; --volt: #0202e6; --ungu: #7a2cf5; --kabut: #c9ccff; --redup: #a9aedb; --putih: #ffffff;
+  --j: "Jersey 15", "Arial", sans-serif; --i: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --s: 960px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; background: var(--malam); color: var(--putih); font-family: var(--i); }
+body { overflow: hidden; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; }
+body::before { /* the arcade room: a faint pixel floor grid fading up */
+  content: ""; position: fixed; inset: 55% 0 0 0; pointer-events: none; opacity: .35;
+  background-image: linear-gradient(var(--garis) 2px, transparent 2px), linear-gradient(90deg, var(--garis) 2px, transparent 2px);
+  background-size: 48px 48px; transform: perspective(400px) rotateX(60deg); transform-origin: top;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 60%); mask-image: linear-gradient(to bottom, transparent, #000 60%);
+}
+.kabinet { position: relative; width: calc(var(--s) + var(--s) * 0.08); display: flex; flex-direction: column; align-items: center; }
+/* marquee */
+.marquee { position: relative; width: 100%; height: calc(var(--s) * 0.12); background: var(--navy); border: 4px solid var(--pink);
+  border-bottom-width: 0; display: flex; align-items: center; justify-content: center; gap: calc(var(--s) * 0.025); overflow: hidden; }
+.marquee .judul { font-family: var(--j); font-size: calc(var(--s) * 0.064); line-height: 1; color: var(--pink); text-shadow: 0 calc(var(--s) * 0.005) 0 var(--volt); }
+.marquee .sub { font-family: var(--j); font-size: calc(var(--s) * 0.03); line-height: 1; color: var(--putih); }
+.lampu { position: absolute; left: calc(var(--s) * 0.012); right: calc(var(--s) * 0.012); height: max(3px, calc(var(--s) * 0.006)); display: flex; justify-content: space-between; }
+.lampu.atas { top: calc(var(--s) * 0.008); } .lampu.bawah { bottom: calc(var(--s) * 0.008); }
+.lampu i { width: max(3px, calc(var(--s) * 0.006)); height: 100%; background: var(--garis); }
+.lampu i.on { background: var(--pink); }
+/* screen */
+.bezel { width: 100%; background: #02030f; border: 4px solid var(--pink); border-top-color: var(--garis); padding: calc(var(--s) * 0.04); padding-bottom: calc(var(--s) * 0.03); }
+.layar { position: relative; width: var(--s); height: calc(var(--s) * 0.5625); overflow: hidden; border-radius: 12px; background: var(--navy); cursor: pointer; }
+.panggung { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+.slide { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; font-family: var(--i); color: var(--putih);
+  opacity: 0; visibility: hidden; transition: opacity 320ms ease, visibility 0s linear 320ms; }
+.slide.aktif { opacity: 1; visibility: visible; transition: opacity 320ms ease, visibility 0s; }
+.slide img { display: block; }
+.slide .bi { opacity: 0; }
+.slide .bi.muncul { opacity: 1; transition: opacity 360ms ease, scale 360ms cubic-bezier(.3,1.6,.5,1), translate 480ms cubic-bezier(.2,.8,.2,1); }
+.slide .bi.pop:not(.muncul) { scale: .6; }
+.slide .bi.rise:not(.muncul) { translate: 0 48px; }
+.crt { position: absolute; inset: 0; pointer-events: none; border-radius: 12px;
+  background: repeating-linear-gradient(to bottom, rgba(0,0,0,.18) 0 2px, transparent 2px 4px);
+  box-shadow: inset 0 0 calc(var(--s) * 0.06) rgba(0,0,0,.65); }
+/* start screen */
+.koin { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--s) * 0.016);
+  background: rgba(5, 6, 26, .72); text-align: center; z-index: 2; }
+.koin .besar { font-family: var(--j); font-size: calc(var(--s) * 0.08); line-height: 1; color: var(--pink); text-shadow: 0 calc(var(--s) * 0.006) 0 var(--volt); animation: kedip 1s steps(1) infinite; }
+.koin .kecil { font-size: calc(var(--s) * 0.018); line-height: 1.5; color: var(--kabut); }
+.koin[hidden] { display: none; }
+@keyframes kedip { 50% { opacity: 0; } }
+/* control panel */
+.panel { width: 100%; background: var(--navy-2); border: 4px solid var(--pink); border-top: 4px solid var(--garis);
+  padding: calc(var(--s) * 0.022) calc(var(--s) * 0.05); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: calc(var(--s) * 0.03);
+  clip-path: polygon(0 0, 100% 0, 97% 100%, 3% 100%); }
+.stik { display: flex; align-items: center; gap: calc(var(--s) * 0.016); }
+.joy { position: relative; width: calc(var(--s) * 0.075); height: calc(var(--s) * 0.075); border-radius: 50%; background: #02030f; border: 2px solid var(--garis); flex: none; }
+.joy::before { content: ""; position: absolute; left: 50%; top: 50%; width: 10%; height: 58%; background: var(--kabut); translate: -50% -88%; rotate: var(--miring, 0deg); transform-origin: 50% 100%; transition: rotate 120ms ease; }
+.joy::after { content: ""; position: absolute; left: 50%; top: 50%; width: 44%; height: 44%; border-radius: 50%; background: var(--pink); translate: -50% -50%; margin-top: calc(var(--s) * -0.03); rotate: 0deg; transition: translate 120ms ease; }
+.joy.kiri::after { translate: -90% -50%; } .joy.kanan::after { translate: -10% -50%; }
+.info { font-family: var(--j); text-align: left; }
+.info .stage { font-size: calc(var(--s) * 0.03); line-height: 1; color: var(--putih); }
+.info .lagu { font-size: calc(var(--s) * 0.019); line-height: 1.3; color: var(--kabut); max-width: calc(var(--s) * 0.26); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tombol { display: flex; align-items: flex-end; gap: calc(var(--s) * 0.024); }
+.tbl { display: flex; flex-direction: column; align-items: center; gap: 6px; background: none; border: 0; color: var(--kabut); cursor: pointer; font-family: var(--j); font-size: calc(var(--s) * 0.017); line-height: 1; }
+.tbl span.b { display: block; width: calc(var(--s) * 0.056); height: calc(var(--s) * 0.056); border-radius: 50%; background: var(--biru);
+  box-shadow: inset 0 calc(var(--s) * -0.006) 0 rgba(0,0,0,.35), 0 calc(var(--s) * 0.006) 0 #02030f; transition: translate 80ms ease, box-shadow 80ms ease; }
+.tbl.next span.b { width: calc(var(--s) * 0.072); height: calc(var(--s) * 0.072); background: var(--pink); }
+.tbl.musik span.b { background: var(--ungu); }
+.tbl.musik[aria-pressed="false"] span.b { background: var(--garis); }
+.tbl:active span.b, .tbl.tekan span.b { translate: 0 calc(var(--s) * 0.005); box-shadow: inset 0 calc(var(--s) * -0.003) 0 rgba(0,0,0,.35), 0 calc(var(--s) * 0.001) 0 #02030f; }
+.tbl:focus-visible { outline: 2px solid var(--putih); outline-offset: 4px; border-radius: 8px; }
+.kanan { display: flex; justify-content: flex-end; align-items: center; gap: calc(var(--s) * 0.02); }
+.slot { display: flex; align-items: center; gap: 8px; font-family: var(--j); font-size: calc(var(--s) * 0.018); color: var(--pink); background: none; border: 0; cursor: pointer; }
+.slot i { display: block; width: calc(var(--s) * 0.012); height: calc(var(--s) * 0.04); background: #02030f; border: 2px solid var(--pink); }
+.slot:focus-visible { outline: 2px solid var(--putih); outline-offset: 4px; }
+.kaki { width: 100%; height: calc(var(--s) * 0.03); background: var(--navy); border: 4px solid var(--pink); border-top: 0; clip-path: polygon(3% 0, 97% 0, 97% 100%, 3% 100%); }
+.putar { position: fixed; left: 16px; right: 16px; bottom: 16px; text-align: center; font-size: 13px; line-height: 20px; color: var(--redup); display: none; }
+@media (orientation: portrait) and (max-width: 700px) { .putar { display: block; } }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) {
+  .slide, .slide.aktif, .slide .bi.muncul { transition: none; }
+  .koin .besar { animation: none; }
+}
+</style>
+</head>
+<body>
+<main class="kabinet" aria-label="Kabinet arcade CDJ 2026: konsep acara">
+  <header class="marquee">
+    <div class="lampu atas" aria-hidden="true"></div>
+    <h1 class="judul">CDJ 2026</h1><p class="sub">KONSEP ACARA</p>
+    <div class="lampu bawah" aria-hidden="true"></div>
+  </header>
+  <div class="bezel">
+    <div class="layar" id="layar">
+      <div class="panggung" id="panggung">
+<section class="slide" data-track="signature" id="s-cover" data-transition="fade" style="background:#070b3a">
+  <img src="a/394e03aee22b.png" alt="Lapangan softball malam dari belakang home plate, diamond lengkap, stadion melengkung, dua lampu sorot bersinar" style="position:absolute; top:0; left:0; width:1920px; height:1080px">
+  
+  <iframe class="emb" aria-hidden="true" tabindex="-1" sandbox="allow-scripts" style="position:absolute; left:0; top:0; width:1920px; height:600px; border:0; background:transparent" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;style&gt;html,body{margin:0;background:transparent;overflow:hidden;width:100%;height:100%}canvas{width:100%;height:100%;image-rendering:pixelated;display:block}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;canvas id=&quot;c&quot; width=&quot;320&quot; height=&quot;100&quot;&gt;&lt;/canvas&gt;&lt;script&gt;
+var c=document.getElementById(&quot;c&quot;),g=c.getContext(&quot;2d&quot;);
+var T=[[28,50],[291,52]];
+var reduce=window.matchMedia(&quot;(prefers-reduced-motion: reduce)&quot;).matches;
+var R=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]];
+var K=[0,0.25,0.5,0.75,1,0.75,0.5,0.25,0,0,0,0];
+function rnd(i){var v=Math.sin(i*12.9898)*43758.5453;return v-Math.floor(v);}
+function px(x,y,col,a){if(a&gt;0){g.globalAlpha=a;g.fillStyle=col;g.fillRect(x,y,1,1);}}
+var stars=[];
+for(var i=0;40&gt;i;i++){var x=Math.floor(rnd(i+5)*320),y=Math.floor(rnd(i+77)*70);var inTitle=(x&gt;64)*(256&gt;x)*(y&gt;10)*(66&gt;y);if(!inTitle){stars.push([x,y]);}}
+var sp=[],step=0;
+function frame(){
+  g.clearRect(0,0,320,100);
+  T.forEach(function(t,ti){
+    var k=K[(step+ti*6)%12];
+    for(var dy=-4;4&gt;=dy;dy++){for(var dx=-5;5&gt;=dx;dx++){var d=Math.hypot(dx,dy*1.15);if(4.6&gt;d){px(t[0]+dx,t[1]+dy,&quot;#FFFFFF&quot;,Math.round(k*(1-d/5)*4)/4);}}}
+    for(var hy=-11;11&gt;=hy;hy++){for(var hx=-12;12&gt;=hx;hx++){var hd=Math.hypot(hx,hy*1.15);if(hd&gt;5.5){if(11&gt;hd){if((hx+hy+step)%2===0){px(t[0]+hx,t[1]+hy,&quot;#B8BCFF&quot;,Math.round(k*0.6*4)/4);}}}}}
+    R.forEach(function(r,ri){var len=(r[0]*r[1]!==0)?26:30;var ext=((step+ri*3+ti*2)%10);for(var s=len;len+ext&gt;s;s++){px(t[0]+r[0]*s,t[1]+r[1]*s,&quot;#C9CCFF&quot;,Math.round((1-(s-len)/10)*4)/4);}});
+    var pos=(step*3+ti*28)%57;var al=Math.round((1-pos/57)*4)/4;px(t[0]+pos,t[1],&quot;#FFFFFF&quot;,al);px(t[0]-pos,t[1],&quot;#FFFFFF&quot;,al);
+    if(rnd(step*7+ti*13)&gt;0.45){var a=rnd(step*3+ti)*6.283,rr=7+rnd(step*5+ti*2)*24;sp.push([t[0]+Math.round(Math.cos(a)*rr),t[1]+Math.round(Math.sin(a)*rr*0.87),4]);}
+  });
+  sp=sp.filter(function(s){if(s[2]&gt;0){var al=s[2]/4;px(s[0],s[1],&quot;#FFFFFF&quot;,al);if(s[2]&gt;2){px(s[0]-1,s[1],&quot;#C9CCFF&quot;,0.5);px(s[0]+1,s[1],&quot;#C9CCFF&quot;,0.5);px(s[0],s[1]-1,&quot;#C9CCFF&quot;,0.5);px(s[0],s[1]+1,&quot;#C9CCFF&quot;,0.5);}s[2]--;return true;}return false;});
+  stars.forEach(function(s,i){if(((step+i*7)%23)&gt;17){px(s[0],s[1],&quot;#FFFFFF&quot;,1);}});
+  step++;
+}
+if(!reduce){frame();setInterval(frame,80);}
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;"></iframe>
+  <img src="a/750388d666ac.gif" alt="Soundbar pixel besar naik dari rumput di kiri dan kanan bawah" style="position:absolute; top:480px; left:0; width:1920px; height:600px; object-fit:contain">
+  <img src="a/3ef6919b5073.gif" data-build-in="pop 4" alt="Capybara joget kepak di left field" style="position:absolute; top:601px; left:280px; width:101px; height:105px; object-fit:contain">
+  <img src="a/825654079aa0.gif" data-build-in="pop 4" alt="Capybara suporter bersorak di right field" style="position:absolute; top:601px; left:1539px; width:103px; height:105px; object-fit:contain">
+  <img src="a/de8c66aa359f.gif" data-build-in="pop 4" alt="Capybara joget floss di outfield kiri tengah" style="position:absolute; top:593px; left:664px; width:112px; height:125px; object-fit:contain">
+  <img src="a/6ba9c68957c3.gif" data-build-in="pop 4" alt="Capybara joget robot di outfield kanan tengah" style="position:absolute; top:593px; left:1149px; width:102px; height:125px; object-fit:contain">
+  <img src="a/7245c10eb242.gif" data-build-in="pop 4" alt="Capybara joget dab di base ketiga" style="position:absolute; top:648px; left:391px; width:158px; height:180px; object-fit:contain">
+  <img src="a/08d3631e169a.gif" data-build-in="pop 4" alt="Capybara joget disko di base pertama" style="position:absolute; top:648px; left:1368px; width:165px; height:180px; object-fit:contain">
+  <img src="a/3e32b3dd871e.svg" alt="CDJ 2026" data-build-in="pop 1" style="position:absolute; top:88px; left:425px; width:1070px; height:150px; object-fit:contain">
+  <h1 data-build-in="rise 2" style="position:absolute; top:262px; left:128px; width:1664px; font-family:'Jersey 15', Arial, sans-serif; font-size:112px; font-weight:400; line-height:1; text-align:center; color:#ffffff; text-shadow:0 6px 0 #0202e6">Konsep acara</h1>
+  <img src="a/699d2a168a4a.gif" alt="Maskot capybara CDJ berjoget di lingkar pitcher" data-build-in="pop 3" style="position:absolute; top:610.62px; left:calc(50% + 16px); width:213.07px; height:208.61px; object-fit:contain; transform:translateX(-50%)">
+  
+</section>
+<section class="slide" data-track="instrumental" id="s-konsep" data-transition="fade" style="background:#070b3a;color:#ffffff;font-family:Inter, Arial, sans-serif">
+  <img src="a/f3aa9d4fca24.png" alt="Satu stadion malam yang dibelah dua: kiri lapangan dengan tiang net outfield dan pita LED strip di pagar tribun, kanan tribun dari dekat dengan corong PA" style="position:absolute; top:0; left:0; width:1920px; height:1080px">
+  <img src="a/984f5c55bf24.gif" alt="Kiri: lampu stadion menyala satu per satu, LED strip di tiang net menyala lalu berombak warna, pita strip di pagar tribun menulis NOW BATTING 07, bendera lorong berkibar. Kanan: tribun bertepuk dug, dug, clap, corong PA memancarkan gelombang suara di tiap ketukan" style="position:absolute; top:48px; left:24px; width:1872px; height:828px; object-fit:contain">
+  <div style="position:absolute; left:0px; top:56px; width:1920px; display:flex; flex-direction:row; justify-content:center; gap:12px">
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#0b0d12; background:#ff8af8; padding:8px 16px">Konsep</p>
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:6px 16px">Satu game, tiga level</p>
+  </div>
+  <h2 style="position:absolute; left:0px; top:108px; width:1920px; font-family:'Jersey 15', Arial, sans-serif; font-size:112px; font-weight:400; line-height:112px; text-align:center; color:#ffffff; text-shadow:0 6px 0 #0202e6">Feel the game</h2>
+  <p style="position:absolute; left:560px; top:228px; width:800px; font-size:26px; line-height:34px; text-align:center; color:#c9ccff">Sebuah game tidak cukup dimainkan.<br>Ia harus terlihat, ia harus terdengar,<br>sampai semua orang ikut merasakannya.</p>
+  <div style="position:absolute; left:128px; top:900px; width:704px; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:12px; align-items:center"><img src="a/2d502e1f4b71.gif" alt="" style="width:48px; height:48px"><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:40px; line-height:40px; color:#ff8af8">Yang dilihat</p></div>
+    <p style="font-size:24px; line-height:32px; color:#ffffff">Lampu menyala satu per satu, namamu berjalan di pita lampu, dan bendera membuka jalan.</p>
+  </div>
+  <div style="position:absolute; left:1088px; top:900px; width:704px; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:12px; align-items:center"><img src="a/377f682c64a8.gif" alt="" style="width:48px; height:48px"><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:40px; line-height:40px; color:#4d55ff">Yang didengar</p></div>
+    <p style="font-size:24px; line-height:32px; color:#ffffff">Namamu dipanggil, satu lagu menemani tiga hari, dan tribun menjawab dengan tepuk yang sama.</p>
+  </div>
+  
+  
+</section>
+<section class="slide" data-track="mars" id="s-parade" data-transition="fade" style="background:#070b3a">
+  <img src="a/01e58fd368b9.png" alt="Stadion malam, dua lampu sorot menyorot jalur parade di lapangan" style="position:absolute; top:0; left:0; width:1920px; height:1080px">
+  <img src="a/d435308674ce.gif" alt="Pemain berbaris dari kanan bawah menuju tengah stadion, diapit color guard yang mengibarkan bendera pink dan biru" style="position:absolute; top:230px; left:729px; width:1191px; height:850px; object-fit:contain">
+  <p data-build-in="fade 1" style="position:absolute; top:96px; left:560px; width:800px; font-family:'Jersey 15', Arial, sans-serif; font-size:48px; line-height:1; text-align:center; color:#ffffff; text-shadow:0 4px 0 #0202e6">PLAYERS JOINED <span style="color:#ff8af8">07/20</span></p>
+  <div style="position:absolute; top:676px; left:128px; width:760px; display:flex; flex-direction:row; gap:12px">
+    <p style="padding:8px 16px; font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#0b0d12; background:#ff8af8">Opening</p>
+    <p style="padding:6px 16px; font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#ffffff; background:#0c1150; border:2px solid #232a7a">Sabtu 5 Des, 19.00</p>
+  </div>
+  <h2 style="position:absolute; top:740px; left:128px; width:900px; font-family:'Jersey 15', Arial, sans-serif; font-size:128px; font-weight:400; line-height:1; color:#ffffff; text-shadow:0 6px 0 #0202e6">Parade Pemain</h2>
+  <div style="position:absolute; left:128px; top:884px; width:760px; display:flex; flex-direction:row; gap:16px; align-items:flex-start"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; text-align:center; color:#0b0d12; background:#ff8af8; padding:4px 0">LIHAT</p><p style="flex:1; font-size:24px; line-height:32px; color:#ffffff">Lorong bendera, tim berhenti di home plate</p></div>
+  <div style="position:absolute; left:128px; top:928px; width:760px; display:flex; flex-direction:row; gap:16px; align-items:flex-start"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; text-align:center; color:#ffffff; background:#4d55ff; padding:4px 0">DENGAR</p><p style="flex:1; font-size:24px; line-height:32px; color:#ffffff">Mars per pool, stinger tiap tim, nama dari PA</p></div>
+  
+  
+</section>
+<section class="slide" data-track="north" id="s-formasi" data-transition="fade" style="background:#070b3a;color:#ffffff;font-family:Inter, Arial, sans-serif">
+  <img src="a/136961c0c317.png" alt="Denah lapangan softball dari atas pada malam hari: dua pintu di sisi base 1 dan base 3, diamond, barisan melengkung 19 tim di outfield berwarna per pool, tribun" style="position:absolute; top:0; left:0; width:1920px; height:1080px">
+  <img src="a/7e1d0dda946a.gif" alt="Tim ke-20 masuk dari pintu base 1, berhenti di depan home plate, berjalan lewat lorong bendera 16 color guard ke base 2, lalu mengisi slot terakhir di tengah barisan; bendera pink dan biru berkibar" style="position:absolute; top:288px; left:1200px; width:366px; height:750px; object-fit:contain">
+  <div style="position:absolute; left:128px; top:72px; width:640px; display:flex; flex-direction:row; gap:12px">
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#0b0d12; background:#ff8af8; padding:8px 16px">Opening</p>
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:6px 16px">Formasi dari atas</p>
+  </div>
+  <h2 style="position:absolute; left:128px; top:124px; width:700px; font-family:'Jersey 15', Arial, sans-serif; font-size:112px; font-weight:400; line-height:1; color:#ffffff; text-shadow:0 6px 0 #0202e6">Lorong bendera</h2>
+  <div style="position:absolute; left:128px; top:248px; width:470px; display:flex; flex-direction:row; gap:16px; align-items:flex-start"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; text-align:center; color:#0b0d12; background:#ff8af8; padding:4px 0">LIHAT</p><p style="flex:1; font-size:24px; line-height:32px; color:#ffffff">Dua pintu, berhenti di home plate, barisan melengkung</p></div>
+  <div style="position:absolute; left:128px; top:328px; width:470px; display:flex; flex-direction:row; gap:16px; align-items:flex-start"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; text-align:center; color:#ffffff; background:#4d55ff; padding:4px 0">DENGAR</p><p style="flex:1; font-size:24px; line-height:32px; color:#ffffff">Stinger saat berhenti, mars jalan terus sampai LEVEL UP</p></div>
+  <div style="position:absolute; left:128px; top:664px; width:600px; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:16px; align-items:baseline"><p style="width:88px; font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#ff8af8">19.00</p><p style="flex:1; font-size:22px; line-height:32px; color:#ffffff">Insert coin, hitung mundur 10 bareng penonton</p></div>
+    <div style="display:flex; flex-direction:row; gap:16px; align-items:baseline"><p style="width:88px; font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#ff8af8">19.01</p><p style="flex:1; font-size:22px; line-height:32px; color:#ffffff">Color guard lari masuk, membentuk lorong</p></div>
+    <div style="display:flex; flex-direction:row; gap:16px; align-items:baseline"><p style="width:88px; font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#ff8af8">19.03</p><p style="flex:1; font-size:22px; line-height:32px; color:#ffffff">20 tim masuk per pool, pintu base 3 dan base 1 bergantian</p></div>
+    <div style="display:flex; flex-direction:row; gap:16px; align-items:baseline"><p style="width:88px; font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#ff8af8">19.16</p><p style="flex:1; font-size:22px; line-height:32px; color:#ffffff">Game Master masuk terakhir, berdiri di depan barisan</p></div>
+    <div style="display:flex; flex-direction:row; gap:16px; align-items:baseline"><p style="width:88px; font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#ff8af8">19.23</p><p style="flex:1; font-size:22px; line-height:32px; color:#ffffff">Rifle toss, lampu penuh, LEVEL UP</p></div>
+  </div>
+  <p style="position:absolute; left:880px; top:600px; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:4px 12px">Lorong 24 x 5 m, 8 kiri 8 kanan</p>
+  <p style="position:absolute; left:1520px; top:940px; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:4px 12px">Pintu base 1: South, North</p>
+  <p style="position:absolute; left:752px; top:940px; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:4px 12px">Pintu base 3: East, West</p>
+  <p style="position:absolute; left:1340px; top:1036px; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:4px 12px">Game Master menunggu</p>
+  <p style="position:absolute; left:1032px; top:280px; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:4px 12px">Barisan melengkung 20 tim, 160 orang</p>
+  <div style="position:absolute; left:128px; top:424px; display:flex; flex-direction:row; gap:20px; align-items:center"><div style="display:flex; flex-direction:row; gap:8px; align-items:center"><div style="width:16px; height:16px; background:#ff8af8"></div><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#ffffff">East</p></div><div style="display:flex; flex-direction:row; gap:8px; align-items:center"><div style="width:16px; height:16px; background:#4d55ff"></div><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#ffffff">West</p></div><div style="display:flex; flex-direction:row; gap:8px; align-items:center"><div style="width:16px; height:16px; background:#c9cce6"></div><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#ffffff">North</p></div><div style="display:flex; flex-direction:row; gap:8px; align-items:center"><div style="width:16px; height:16px; background:#7a2cf5"></div><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#ffffff">South</p></div></div>
+  <div style="position:absolute; left:1688px; top:1016px; width:134px; height:4px; background:#ffffff"></div>
+  <p style="position:absolute; left:1688px; top:976px; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#ffffff">10 m</p>
+  
+  
+</section>
+<section class="slide" data-track="inning" id="s-game" data-transition="fade" style="background:#070b3a;color:#ffffff;font-family:Inter, Arial, sans-serif">
+  <img src="a/ad96995519f0.png" alt="Stadion malam dari kamera center field, digambar untuk sisi kiri slide: tribun penuh, press box LIVE, papan skor, backstop" style="position:absolute; top:0; left:0; width:1182px; height:1080px">
+  <img src="a/51064bcc9e2e.gif" alt="Pitcher melempar windmill, batter memukul, bola melesat ke arah kamera, tulisan HIT muncul, tribun berkilat" style="position:absolute; top:0; left:0; width:1182px; height:1080px">
+  <div style="position:absolute; left:128px; top:96px; width:620px; height:56px; display:flex; flex-direction:row; align-items:center; background:#070b3a; border:2px solid #232a7a">
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#0b0d12; background:#ff8af8; padding:12px 16px">LIVE</p>
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#ffffff; padding:12px 16px; border-right:2px solid #232a7a">CAT <span style="color:#ff8af8">2</span></p>
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#ffffff; padding:12px 16px; border-right:2px solid #232a7a">RBD 1</p>
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#a9aedb; padding:12px 16px; border-right:2px solid #232a7a">INN 3</p>
+    <div style="flex:1; display:flex; flex-direction:row; gap:8px; padding:0 16px; align-items:center">
+      <div style="width:16px; height:16px; background:#ff8af8"></div>
+      <div style="width:16px; height:16px; background:#ff8af8"></div>
+      <div style="width:16px; height:16px; border:2px solid #4d55ff"></div>
+    </div>
+  </div>
+  <div style="position:absolute; left:1184px; top:0px; width:736px; height:1080px; background:#070b3a; border-left:2px solid #232a7a"></div>
+  <div style="position:absolute; left:1232px; top:48px; width:600px; display:flex; flex-direction:row; gap:12px">
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#0b0d12; background:#ff8af8; padding:8px 16px">Setiap game</p>
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:6px 16px">63 game, 2 lapangan</p>
+  </div>
+  <h2 style="position:absolute; left:1232px; top:100px; width:624px; font-family:'Jersey 15', Arial, sans-serif; font-size:96px; font-weight:400; line-height:96px; color:#ffffff; text-shadow:0 6px 0 #0202e6">Feel the game</h2>
+  <p style="position:absolute; left:1232px; top:212px; width:624px; font-size:22px; line-height:32px; color:#c9ccff">Tiap kejadian punya bunyi dan cahayanya sendiri.</p>
+  <div style="position:absolute; left:1232px; top:260px; width:624px; display:flex; flex-direction:column; border-top:1px solid #232a7a"><div style="display:flex; flex-direction:row; gap:16px; padding:8px 0; border-bottom:1px solid #232a7a"><p style="width:168px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:28px; line-height:32px; color:#ff8af8">Tim masuk</p><div style="flex:1; display:flex; flex-direction:column; gap:4px"><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#4d55ff">Dengar</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Loop walk-out, PA sebut tim</p></div><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#ff8af8">Lihat</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Nama tim berjalan di pita</p></div></div></div><div style="display:flex; flex-direction:row; gap:16px; padding:8px 0; border-bottom:1px solid #232a7a"><p style="width:168px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:28px; line-height:32px; color:#ff8af8">Batter maju</p><div style="flex:1; display:flex; flex-direction:column; gap:4px"><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#4d55ff">Dengar</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Walk-up song 5 detik</p></div><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#ff8af8">Lihat</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">NOW BATTING dan nomor</p></div></div></div><div style="display:flex; flex-direction:row; gap:16px; padding:8px 0; border-bottom:1px solid #232a7a"><p style="width:168px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:28px; line-height:32px; color:#ff8af8">Bola hidup</p><div style="flex:1; display:flex; flex-direction:column; gap:4px"><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#4d55ff">Dengar</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Hening, suara lapangan saja</p></div><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#ff8af8">Lihat</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Skor di pita, tiang redup</p></div></div></div><div style="display:flex; flex-direction:row; gap:16px; padding:8px 0; border-bottom:1px solid #232a7a"><p style="width:168px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:28px; line-height:32px; color:#ff8af8">HIT</p><div style="flex:1; display:flex; flex-direction:column; gap:4px"><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#4d55ff">Dengar</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Bunyi koin, tribun bersorak</p></div><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#ff8af8">Lihat</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">HIT! di pita, tiang berombak</p></div></div></div><div style="display:flex; flex-direction:row; gap:16px; padding:8px 0; border-bottom:1px solid #232a7a"><p style="width:168px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:28px; line-height:32px; color:#ff8af8">Home run</p><div style="flex:1; display:flex; flex-direction:column; gap:4px"><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#4d55ff">Dengar</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">1UP lalu stinger 10 detik</p></div><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#ff8af8">Lihat</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Semua tiang menyala putih</p></div></div></div><div style="display:flex; flex-direction:row; gap:16px; padding:8px 0; border-bottom:1px solid #232a7a"><p style="width:168px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:28px; line-height:32px; color:#ff8af8">Out, inning</p><div style="flex:1; display:flex; flex-direction:column; gap:4px"><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#4d55ff">Dengar</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Bunyi out, lalu loop jeda</p></div><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#ff8af8">Lihat</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">OUT!, lalu DUG DUG CLAP</p></div></div></div></div>
+  <p style="position:absolute; left:1232px; top:744px; width:624px; font-size:20px; line-height:28px; color:#c9ccff"><span style="font-family:'Jersey 15', Arial, sans-serif; font-size:22px; color:#ff8af8">Sistem LED strip</span> 12 tiang outfield, pita di pagar tribun, 1 operator</p>
+  <img src="a/b9bfcb4a3174.gif" alt="Cuplikan sistem LED strip berganti adegan: NOW BATTING, HIT!, OUT!, lalu DUG DUG CLAP; tiang outfield menyala dan pita tribun menulis teks dari garis strip" style="position:absolute; left:1232px; top:784px; width:576px; height:264px; border:2px solid #232a7a; box-sizing:border-box">
+  
+  
+</section>
+<section class="slide" data-track="inning" id="s-produksi" data-transition="fade" style="background:#070b3a;color:#ffffff;font-family:Inter, Arial, sans-serif">
+  <img src="a/367ab597ce6c.png" alt="Lapangan softball malam dilihat dari tribun di belakang home plate: pagar outfield dengan tiang net, batter dan catcher di home, pita LED di pagar tribun, kepala penonton" style="position:absolute; top:0; left:0; width:1920px; height:1080px">
+  <img src="a/5d3fb7c63070.gif" alt="Tiang outfield kiri dan kanan menyala ungu sementara tiang tengah gelap, pita tribun menampilkan skor CAT 3-2 RBD, lalu HIT! berkedip dengan tiang berombak, lalu DUG DUG CLAP mengikuti ketukan, lalu NOW BATTING #07 berjalan" style="position:absolute; top:228px; left:18px; width:1854px; height:492px">
+  <div style="position:absolute; left:66px; top:40px; width:900px; display:flex; flex-direction:row; gap:12px">
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#0b0d12; background:#ff8af8; padding:8px 16px">Produksi</p>
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:6px 16px">Yang dilihat, dua lokasi</p>
+  </div>
+  <h2 style="position:absolute; left:66px; top:92px; width:1788px; font-family:'Jersey 15', Arial, sans-serif; font-size:96px; font-weight:400; line-height:96px; color:#ffffff; text-shadow:0 6px 0 #0202e6">Lampu dua lokasi</h2>
+  <p style="position:absolute; left:760px; top:172px; width:400px; text-align:center; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#c9ccff; background:#0c1150; border:2px solid #232a7a; padding:6px 12px">Tengah gelap: mata batter</p>
+  <p style="position:absolute; left:66px; top:536px; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#c9ccff; background:#0c1150; border:2px solid #232a7a; padding:6px 12px">Pita LED strip di pagar tribun, menghadap penonton</p>
+  
+  <div style="position:absolute; left:66px; top:856px; width:572px; display:flex; flex-direction:column; gap:12px">
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#ff8af8">Tiang outfield</p>
+    <div style="display:flex; flex-direction:column; gap:0px"><div style="display:flex; flex-direction:row; gap:16px; align-items:flex-start"><div style="width:12px; height:12px; flex:none; margin-top:10px; background:#ff8af8"></div><p style="flex:1; font-size:24px; line-height:32px; color:#ffffff">12 tiang net, 6 kiri dan 6 kanan</p></div><div style="display:flex; flex-direction:row; gap:16px; align-items:flex-start"><div style="width:12px; height:12px; flex:none; margin-top:10px; background:#ff8af8"></div><p style="flex:1; font-size:24px; line-height:32px; color:#ffffff">Tiang tengah gelap demi mata batter</p></div><div style="display:flex; flex-direction:row; gap:16px; align-items:flex-start"><div style="width:12px; height:12px; flex:none; margin-top:10px; background:#ff8af8"></div><p style="flex:1; font-size:24px; line-height:32px; color:#ffffff">Saat bola hidup: diam, satu warna</p></div></div>
+  </div>
+  <div style="position:absolute; left:674px; top:856px; width:572px; display:flex; flex-direction:column; gap:12px">
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#4d55ff">Pagar tribun</p>
+    <div style="display:flex; flex-direction:column; gap:0px"><div style="display:flex; flex-direction:row; gap:16px; align-items:flex-start"><div style="width:12px; height:12px; flex:none; margin-top:10px; background:#4d55ff"></div><p style="flex:1; font-size:24px; line-height:32px; color:#ffffff">7 garis LED strip, 15 m di belakang catcher</p></div><div style="display:flex; flex-direction:row; gap:16px; align-items:flex-start"><div style="width:12px; height:12px; flex:none; margin-top:10px; background:#4d55ff"></div><p style="flex:1; font-size:24px; line-height:32px; color:#ffffff">Menghadap penonton, boleh jalan terus</p></div><div style="display:flex; flex-direction:row; gap:16px; align-items:flex-start"><div style="width:12px; height:12px; flex:none; margin-top:10px; background:#4d55ff"></div><p style="flex:1; font-size:24px; line-height:32px; color:#ffffff">Skor, OUT, HIT!, nama, DUG DUG CLAP</p></div></div>
+  </div>
+  <div style="position:absolute; left:1282px; top:856px; width:572px; display:flex; flex-direction:column; gap:12px">
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#c9ccff">Kendali</p>
+    <div style="display:flex; flex-direction:column; gap:0px"><div style="display:flex; flex-direction:row; gap:16px; align-items:flex-start"><div style="width:12px; height:12px; flex:none; margin-top:10px; background:#c9ccff"></div><p style="flex:1; font-size:24px; line-height:32px; color:#ffffff">Laptop, panel tombol, 3 controller</p></div><div style="display:flex; flex-direction:row; gap:16px; align-items:flex-start"><div style="width:12px; height:12px; flex:none; margin-top:10px; background:#c9ccff"></div><p style="flex:1; font-size:24px; line-height:32px; color:#ffffff">1 operator di samping PA dan DJ</p></div><div style="display:flex; flex-direction:row; gap:16px; align-items:flex-start"><div style="width:12px; height:12px; flex:none; margin-top:10px; background:#c9ccff"></div><p style="flex:1; font-size:24px; line-height:32px; color:#ffffff">10 adegan siap tekan (slide berikut)</p></div></div>
+  </div>
+  <p style="position:absolute; left:66px; top:1016px; width:1788px; font-size:20px; line-height:28px; color:#a9aedb">Tanpa layar LED: nama dan skor tampil di pita lampu.</p>
+  
+  
+</section>
+<section class="slide" data-track="inning" id="s-adegan" data-transition="fade" style="background:#070b3a;color:#ffffff;font-family:Inter, Arial, sans-serif">
+  <div style="position:absolute; left:64px; top:40px; width:900px; display:flex; flex-direction:row; gap:12px">
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#0b0d12; background:#ff8af8; padding:8px 16px">Produksi</p>
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:6px 16px">Satu tombol, satu adegan</p>
+  </div>
+  <h2 style="position:absolute; left:64px; top:92px; width:1792px; font-family:'Jersey 15', Arial, sans-serif; font-size:96px; font-weight:400; line-height:96px; color:#ffffff; text-shadow:0 6px 0 #0202e6">Adegan lampu</h2>
+  <img src="a/9062b3251e5b.gif" alt="Adegan Bola hidup: skor CAT 3-2 RBD di pita, tiang ungu diam" style="position:absolute; left:64px; top:232px; width:576px; height:264px; border:2px solid #232a7a; box-sizing:border-box">
+  <p style="position:absolute; left:64px; top:512px; width:576px; font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#ff8af8">Bola hidup</p>
+  <p style="position:absolute; left:64px; top:552px; width:576px; font-size:20px; line-height:28px; color:#ffffff">Tiang diam satu warna, tengah gelap. Pita menampilkan skor.</p>
+  <img src="a/9e74b3951364.gif" alt="Adegan Now batting: NOW BATTING #07 berjalan, tiang menyala dari kiri" style="position:absolute; left:672px; top:232px; width:576px; height:264px; border:2px solid #232a7a; box-sizing:border-box">
+  <p style="position:absolute; left:672px; top:512px; width:576px; font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#ff8af8">Now batting</p>
+  <p style="position:absolute; left:672px; top:552px; width:576px; font-size:20px; line-height:28px; color:#ffffff">Walk-up batter. Nama dan nomor berjalan di pita, tiang menyala satu per satu.</p>
+  <img src="a/ccedde51ac96.gif" alt="Adegan HIT!: HIT! berkedip, tiang berombak" style="position:absolute; left:1280px; top:232px; width:576px; height:264px; border:2px solid #232a7a; box-sizing:border-box">
+  <p style="position:absolute; left:1280px; top:512px; width:576px; font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#ff8af8">HIT!</p>
+  <p style="position:absolute; left:1280px; top:552px; width:576px; font-size:20px; line-height:28px; color:#ffffff">Pukulan masuk. Pita berkedip HIT!, tiang berombak warna.</p>
+  <img src="a/fec432bba7dd.gif" alt="Adegan Out: OUT! berkedip lalu 2 OUT" style="position:absolute; left:64px; top:632px; width:576px; height:264px; border:2px solid #232a7a; box-sizing:border-box">
+  <p style="position:absolute; left:64px; top:912px; width:576px; font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#ff8af8">Out</p>
+  <p style="position:absolute; left:64px; top:952px; width:576px; font-size:20px; line-height:28px; color:#ffffff">Pita OUT! lalu jumlah out. Tiang tetap diam, bola bisa masih hidup.</p>
+  <img src="a/795b2c3f55f0.gif" alt="Adegan Ganti inning: DUG, DUG, CLAP bergantian, tiang berdenyut" style="position:absolute; left:672px; top:632px; width:576px; height:264px; border:2px solid #232a7a; box-sizing:border-box">
+  <p style="position:absolute; left:672px; top:912px; width:576px; font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#ff8af8">Ganti inning</p>
+  <p style="position:absolute; left:672px; top:952px; width:576px; font-size:20px; line-height:28px; color:#ffffff">Pita DUG DUG CLAP di 120 BPM, tiang berdenyut di tiap ketukan.</p>
+  <img src="a/ebc5c624e802.gif" alt="Adegan Warning: WARNING berkedip, tiang merah muda berkedip" style="position:absolute; left:1280px; top:632px; width:576px; height:264px; border:2px solid #232a7a; box-sizing:border-box">
+  <p style="position:absolute; left:1280px; top:912px; width:576px; font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#ff8af8">Warning</p>
+  <p style="position:absolute; left:1280px; top:952px; width:576px; font-size:20px; line-height:28px; color:#ffffff">The Grand Final, Minggu 18.25. Pita dan tiang berkedip bersama alarm.</p>
+  
+  
+</section>
+<section class="slide" data-track="grandfinal" id="s-final" data-transition="fade" style="background:#070b3a;color:#ffffff;font-family:Inter, Arial, sans-serif">
+  <img src="a/1bd0142a7a2d.png" alt="Stadion dari belakang home plate, lampu turun, satu lampu sorot ke lingkar pitcher, tribun gelap dengan lampu ponsel" style="position:absolute; top:0; left:0; width:1920px; height:1080px">
+  <img src="a/3407833ceb43.gif" alt="Banner WARNING berkedip, tulisan FIGHT, pitcher melempar windmill, batter bernomor 07 di depan kamera mengayun dan memukul bola" style="position:absolute; top:190px; left:0; width:1920px; height:890px; object-fit:contain">
+  <div style="position:absolute; left:128px; top:64px; width:1664px; height:48px; display:flex; flex-direction:row; align-items:center; gap:16px">
+    <p style="width:88px; font-family:'Jersey 15', Arial, sans-serif; font-size:40px; line-height:48px; color:#ff8af8">CAT</p>
+    <div style="flex:1; height:32px; border:2px solid #232a7a; background:#0c1150; display:flex; flex-direction:row; justify-content:flex-end">
+      <div style="width:72%; height:28px; background:#ff8af8"></div>
+    </div>
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#0b0d12; background:#ffffff; padding:8px 16px">FINAL</p>
+    <div style="flex:1; height:32px; border:2px solid #232a7a; background:#0c1150; display:flex; flex-direction:row; justify-content:flex-start">
+      <div style="width:64%; height:28px; background:#4d55ff"></div>
+    </div>
+    <p style="width:88px; font-family:'Jersey 15', Arial, sans-serif; font-size:40px; line-height:48px; text-align:right; color:#4d55ff">RBD</p>
+  </div>
+  <div style="position:absolute; left:1112px; top:752px; width:640px; display:flex; flex-direction:row; gap:12px">
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#0b0d12; background:#ff8af8; padding:8px 16px">Level terakhir</p>
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:6px 16px">Minggu 6 Des, 18.30</p>
+  </div>
+  <h2 style="position:absolute; left:1112px; top:804px; width:680px; font-family:'Jersey 15', Arial, sans-serif; font-size:96px; font-weight:400; line-height:112px; color:#ffffff; text-shadow:0 6px 0 #0202e6">The Grand Final</h2>
+  <div style="position:absolute; left:1112px; top:928px; width:640px; display:flex; flex-direction:row; gap:16px; align-items:flex-start"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; text-align:center; color:#0b0d12; background:#ff8af8; padding:4px 0">LIHAT</p><p style="flex:1; font-size:24px; line-height:32px; color:#ffffff">Lampu turun, WARNING di pita, walk-out</p></div>
+  <div style="position:absolute; left:1112px; top:972px; width:640px; display:flex; flex-direction:row; gap:16px; align-items:flex-start"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; text-align:center; color:#ffffff; background:#4d55ff; padding:4px 0">DENGAR</p><p style="flex:1; font-size:24px; line-height:32px; color:#ffffff">Alarm, lagu Grand Final, PA mode besar</p></div>
+  
+  
+</section>
+<section class="slide" data-track="grandfinal" id="s-final-menit" data-transition="fade" style="background:#070b3a;color:#ffffff;font-family:Inter, Arial, sans-serif">
+  <img src="a/1bd0142a7a2d.png" alt="Stadion gelap dengan satu lampu sorot ke lingkar pitcher" style="position:absolute; top:0; left:0; width:1920px; height:1080px">
+  <div style="position:absolute; left:64px; top:40px; width:900px; display:flex; flex-direction:row; gap:12px">
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#0b0d12; background:#ff8af8; padding:8px 16px">The Grand Final</p>
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:6px 16px">Minggu 6 Des</p>
+  </div>
+  <h2 style="position:absolute; left:64px; top:92px; width:1792px; font-family:'Jersey 15', Arial, sans-serif; font-size:96px; font-weight:400; line-height:96px; color:#ffffff; text-shadow:0 6px 0 #0202e6">Tiga babak</h2>
+  <div id="backdrop-babak" style="position:absolute; left:0px; top:200px; width:1920px; height:880px; background:#070b3a"></div>
+  <img src="a/ebc5c624e802.gif" alt="Masuk arena: WARNING berkedip di pita, tiang merah muda berkedip" style="position:absolute; left:64px; top:224px; width:576px; height:264px; border:2px solid #232a7a; box-sizing:border-box">
+  <div style="position:absolute; left:64px; top:512px; width:576px; display:flex; flex-direction:row; gap:12px; align-items:center"><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:40px; line-height:40px; color:#ffffff">Masuk arena</p><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#ff8af8; background:#0c1150; border:2px solid #232a7a; padding:4px 10px">18.00 sampai 18.30</p></div>
+  <div style="position:absolute; left:64px; top:572px; width:576px; display:flex; flex-direction:column; border-top:1px solid #232a7a"><div style="display:flex; flex-direction:row; gap:12px; padding:10px 0; border-bottom:1px solid #232a7a"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#ff8af8">Lihat</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Lampu turun ke 30%, WARNING di pita dan tiang, walk-out lewat lorong bendera</p></div><div style="display:flex; flex-direction:row; gap:12px; padding:10px 0; border-bottom:1px solid #232a7a"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#4d55ff">Dengar</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Lagu Grand Final versi drone, alarm tiga kali, walk-up 5 detik per pemain</p></div><div style="display:flex; flex-direction:row; gap:12px; padding:10px 0; border-bottom:1px solid #232a7a"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#ffffff">MC, PA</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Mode besar: pelan dan berat. Line-up dipanggil nomor, lalu nama</p></div><div style="display:flex; flex-direction:row; gap:12px; padding:10px 0; border-bottom:1px solid #232a7a"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#c9ccff">Komentator</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Paket 2 menit jalan kedua tim ke final, wawancara kapten</p></div></div>
+  <img src="a/ccedde51ac96.gif" alt="Pertarungan: HIT! berkedip di pita, tiang berombak" style="position:absolute; left:672px; top:224px; width:576px; height:264px; border:2px solid #232a7a; box-sizing:border-box">
+  <div style="position:absolute; left:672px; top:512px; width:576px; display:flex; flex-direction:row; gap:12px; align-items:center"><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:40px; line-height:40px; color:#ffffff">Pertarungan</p><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#ff8af8; background:#0c1150; border:2px solid #232a7a; padding:4px 10px">18.30 sampai selesai</p></div>
+  <div style="position:absolute; left:672px; top:572px; width:576px; display:flex; flex-direction:column; border-top:1px solid #232a7a"><div style="display:flex; flex-direction:row; gap:12px; padding:10px 0; border-bottom:1px solid #232a7a"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#ff8af8">Lihat</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Lampu penuh, FIGHT!, skor ala fighting game, FINAL ROUND di inning akhir</p></div><div style="display:flex; flex-direction:row; gap:12px; padding:10px 0; border-bottom:1px solid #232a7a"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#4d55ff">Dengar</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Lagu Grand Final penuh, combo tiap run, round over di out ketiga</p></div><div style="display:flex; flex-direction:row; gap:12px; padding:10px 0; border-bottom:1px solid #232a7a"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#ffffff">MC, PA</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Singkat: nama dan skor</p></div><div style="display:flex; flex-direction:row; gap:12px; padding:10px 0; border-bottom:1px solid #232a7a"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#c9ccff">Komentator</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Dua orang: pemandu laga dan analis, replay tiap run</p></div></div>
+  <img src="a/8022ef99564f.gif" alt="Juara lahir: GAME CLEAR di pita, semua tiang menyala bergantian warna" style="position:absolute; left:1280px; top:224px; width:576px; height:264px; border:2px solid #232a7a; box-sizing:border-box">
+  <div style="position:absolute; left:1280px; top:512px; width:576px; display:flex; flex-direction:row; gap:12px; align-items:center"><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:40px; line-height:40px; color:#ffffff">Juara lahir</p><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#ff8af8; background:#0c1150; border:2px solid #232a7a; padding:4px 10px">Out terakhir</p></div>
+  <div style="position:absolute; left:1280px; top:572px; width:576px; display:flex; flex-direction:column; border-top:1px solid #232a7a"><div style="display:flex; flex-direction:row; gap:12px; padding:10px 0; border-bottom:1px solid #232a7a"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#ff8af8">Lihat</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Satu lampu sorot di pitch terakhir, lalu semua tiang menyala</p></div><div style="display:flex; flex-direction:row; gap:12px; padding:10px 0; border-bottom:1px solid #232a7a"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#4d55ff">Dengar</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Semua bunyi mati, lalu GAME CLEAR dan chorus</p></div><div style="display:flex; flex-direction:row; gap:12px; padding:10px 0; border-bottom:1px solid #232a7a"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#ffffff">MC, PA</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">“GAME CLEAR! Juara CDJ 2026”</p></div><div style="display:flex; flex-direction:row; gap:12px; padding:10px 0; border-bottom:1px solid #232a7a"><p style="width:112px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#c9ccff">Komentator</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Ikut diam di pitch terakhir, lalu sebut juara</p></div></div>
+  <p style="position:absolute; left:64px; top:1000px; width:1792px; font-size:20px; line-height:28px; color:#a9aedb">Aturan main tidak berubah; mode spesialnya di lampu, pita LED, dan suara. Cue sheet lengkap: acara/musik/cue-sheet-final.md.</p>
+  
+  
+</section>
+<section class="slide" data-track="nameentry" id="s-closing-tinggal" data-transition="fade" style="background:#070b3a;color:#ffffff;font-family:Inter, Arial, sans-serif">
+  <img src="a/136961c0c317.png" alt="Denah lapangan dari atas pada malam hari: barisan melengkung tim di outfield seperti opening, diamond, tribun" style="position:absolute; top:0; left:0; width:1920px; height:1080px">
+  <div style="position:absolute; left:128px; top:72px; width:640px; display:flex; flex-direction:row; gap:12px">
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#0b0d12; background:#ff8af8; padding:8px 16px">Closing</p>
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:6px 16px">Minggu 6 Des, 19.45</p>
+  </div>
+  <h2 style="position:absolute; left:128px; top:124px; width:700px; font-family:'Jersey 15', Arial, sans-serif; font-size:112px; font-weight:400; line-height:112px; color:#ffffff; text-shadow:0 6px 0 #0202e6">Semua tinggal</h2>
+  <p style="position:absolute; left:128px; top:252px; width:600px; font-size:22px; line-height:32px; color:#c9ccff">Tiga alasan peserta bertahan sampai lampu terakhir.</p>
+  <div style="position:absolute; left:128px; top:308px; width:600px; display:flex; flex-direction:column; gap:28px"><div style="display:flex; flex-direction:column; gap:8px"><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#ff8af8">Undian koin, wajib hadir</p><p style="font-size:22px; line-height:32px; color:#ffffff">Koin dari registrasi, tiap main, dan challenge. Nomor keluar 20.35; yang tidak di tribun diundi ulang.</p></div><div style="display:flex; flex-direction:column; gap:8px"><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#ff8af8">Spirit Award tribun</p><p style="font-size:22px; line-height:32px; color:#ffffff">Untuk tim yang paling ramai dan paling lengkap di tribun selama closing.</p></div><div style="display:flex; flex-direction:column; gap:8px"><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:32px; color:#ff8af8">Foto terakhir 20 tim</p><p style="font-size:22px; line-height:32px; color:#ffffff">Sesudah juara 1, semua tim lari ke tengah di bawah confetti. Diumumkan sejak opening.</p></div></div>
+  <p style="position:absolute; left:128px; top:776px; width:600px; font-size:20px; line-height:28px; color:#a9aedb">Pengingat berjalan di pita tribun sejak The Grand Final: GRAND PRIZE 20.35, HARUS HADIR.</p>
+  <p style="position:absolute; left:1032px; top:280px; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:4px 12px">20 tim kembali ke barisan opening</p>
+  <p style="position:absolute; left:1328px; top:660px; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:4px 12px">Pemenang lewat lorong bendera</p>
+  <div style="position:absolute; left:1258px; top:763px; width:64px; height:32px; background:#ff8af8; border:2px solid #0c1150"></div>
+  <p style="position:absolute; left:1340px; top:764px; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:4px 12px">Podium, menghadap tribun</p>
+  <p style="position:absolute; left:752px; top:1000px; font-family:'Jersey 15', Arial, sans-serif; font-size:24px; line-height:24px; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:4px 12px">Tribun: supporter duduk per blok pool</p>
+  
+  
+</section>
+<section class="slide" data-track="nameentry" id="s-closing" data-transition="fade" style="background:#070b3a;color:#ffffff;font-family:Inter, Arial, sans-serif">
+  <img src="a/52a9492c8f83.png" alt="Dari kursi tribun di belakang home: podium tiga tingkat di bawah satu lampu sorot, lorong bendera menuju barisan 20 tim di outfield, tiang net outfield, pita LED strip di pagar tribun, kepala penonton" style="position:absolute; top:0; left:0; width:1182px; height:1080px">
+  <img src="a/fba44a1cdd5f.gif" alt="Pita strip menulis 1ST lalu mengetik YOU, NEW HIGH SCORE berkedip, juara 1 mengangkat trofi, confetti meledak dari dua sisi podium, tiang outfield naik dan berombak, bendera lorong berkibar, tribun mengangkat tangan, lalu GAME CLEAR" style="position:absolute; top:0; left:0; width:1182px; height:1038px">
+  <div style="position:absolute; left:1184px; top:0px; width:736px; height:1080px; background:#070b3a; border-left:2px solid #232a7a"></div>
+  <div style="position:absolute; left:1232px; top:48px; width:560px; display:flex; flex-direction:row; gap:12px">
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#0b0d12; background:#ff8af8; padding:8px 16px">Closing</p>
+    <p style="font-family:'Jersey 15', Arial, sans-serif; font-size:32px; line-height:1; color:#ffffff; background:#0c1150; border:2px solid #232a7a; padding:6px 16px">Minggu 6 Des, 20.00</p>
+  </div>
+  <h2 style="position:absolute; left:1232px; top:100px; width:624px; font-family:'Jersey 15', Arial, sans-serif; font-size:96px; font-weight:400; line-height:96px; color:#ffffff; text-shadow:0 6px 0 #0202e6">High Score</h2>
+  <p style="position:absolute; left:1232px; top:212px; width:624px; font-size:22px; line-height:32px; color:#c9ccff">Satu jam, tujuh adegan, semua tetap di tribun.</p>
+  <div style="position:absolute; left:1232px; top:260px; width:624px; display:flex; flex-direction:column; border-top:1px solid #232a7a"><div style="display:flex; flex-direction:row; gap:16px; padding:8px 0; border-bottom:1px solid #232a7a"><div style="width:168px; flex:none; display:flex; flex-direction:column"><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:28px; line-height:28px; color:#ff8af8">20.00</p><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#c9ccff">Enter name</p></div><div style="flex:1; display:flex; flex-direction:column; gap:0px"><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#ff8af8">Lihat</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">ENTER YOUR NAME di pita</p></div><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#4d55ff">Dengar</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Jingle name entry</p></div></div></div><div style="display:flex; flex-direction:row; gap:16px; padding:8px 0; border-bottom:1px solid #232a7a"><div style="width:168px; flex:none; display:flex; flex-direction:column"><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:28px; line-height:28px; color:#ff8af8">20.02</p><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#c9ccff">Recap</p></div><div style="flex:1; display:flex; flex-direction:column; gap:0px"><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#ff8af8">Lihat</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Video 90 detik tiga hari</p></div><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#4d55ff">Dengar</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Potongan lagu Instrumental</p></div></div></div><div style="display:flex; flex-direction:row; gap:16px; padding:8px 0; border-bottom:1px solid #232a7a"><div style="width:168px; flex:none; display:flex; flex-direction:column"><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:28px; line-height:28px; color:#ff8af8">20.05</p><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#c9ccff">Naik level</p></div><div style="flex:1; display:flex; flex-direction:column; gap:0px"><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#ff8af8">Lihat</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Challenger sampai juara 2 diketik</p></div><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#4d55ff">Dengar</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Bleep per huruf, Awarding Slow</p></div></div></div><div style="display:flex; flex-direction:row; gap:16px; padding:8px 0; border-bottom:1px solid #232a7a"><div style="width:168px; flex:none; display:flex; flex-direction:column"><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:28px; line-height:28px; color:#ff8af8">20.35</p><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#c9ccff">Undian koin</p></div><div style="flex:1; display:flex; flex-direction:column; gap:0px"><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#ff8af8">Lihat</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Nomor koin di pita, wajib hadir</p></div><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#4d55ff">Dengar</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Drumroll, bunyi koin</p></div></div></div><div style="display:flex; flex-direction:row; gap:16px; padding:8px 0; border-bottom:1px solid #232a7a"><div style="width:168px; flex:none; display:flex; flex-direction:column"><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:28px; line-height:28px; color:#ffffff">20.40</p><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#c9ccff">Lampu mati</p></div><div style="flex:1; display:flex; flex-direction:column; gap:0px"><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#ff8af8">Lihat</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Gelap, tinggal satu lampu sorot</p></div><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#4d55ff">Dengar</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Diam 3 detik</p></div></div></div><div style="display:flex; flex-direction:row; gap:16px; padding:8px 0; border-bottom:1px solid #232a7a"><div style="width:168px; flex:none; display:flex; flex-direction:column"><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:28px; line-height:28px; color:#ffffff">20.41</p><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#c9ccff">Juara 1</p></div><div style="flex:1; display:flex; flex-direction:column; gap:0px"><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#ff8af8">Lihat</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">1ST dan nama, trofi naik, confetti</p></div><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#4d55ff">Dengar</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Beat drop lagu signature</p></div></div></div><div style="display:flex; flex-direction:row; gap:16px; padding:8px 0; border-bottom:1px solid #232a7a"><div style="width:168px; flex:none; display:flex; flex-direction:column"><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:28px; line-height:28px; color:#ff8af8">20.50</p><p style="font-family:'Jersey 15', Arial, sans-serif; font-size:22px; line-height:28px; color:#c9ccff">Continue?</p></div><div style="flex:1; display:flex; flex-direction:column; gap:0px"><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#ff8af8">Lihat</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">CDJ 2027, hitung mundur 10 ke 0</p></div><div style="display:flex; flex-direction:row; gap:8px"><p style="width:72px; flex:none; font-family:'Jersey 15', Arial, sans-serif; font-size:20px; line-height:28px; color:#4d55ff">Dengar</p><p style="flex:1; font-size:20px; line-height:28px; color:#ffffff">Bunyi koin seperti opening</p></div></div></div></div>
+  <p style="position:absolute; left:1232px; top:1000px; width:624px; font-size:20px; line-height:28px; color:#a9aedb">Gambar dari kursi tribun. Tim dan nama hanya contoh.</p>
+  
+  
+</section>
+      </div>
+      <div class="crt" aria-hidden="true"></div>
+      <div class="koin" id="koin">
+        <p class="besar">INSERT COIN</p>
+        <p class="kecil">Klik layar atau tekan Enter. Musik ikut berputar.<br>Panah kanan lanjut, panah kiri kembali, M musik, F layar penuh.</p>
+      </div>
+    </div>
+  </div>
+  <section class="panel" aria-label="Panel kendali">
+    <div class="stik">
+      <div class="joy" id="joy" aria-hidden="true"></div>
+      <div class="info"><p class="stage" id="stage">STAGE 01/11</p><p class="lagu" id="lagu">Siap main</p></div>
+    </div>
+    <div class="tombol">
+      <button class="tbl back" id="b-back" aria-label="Slide sebelumnya"><span class="b"></span>BACK</button>
+      <button class="tbl next" id="b-next" aria-label="Lanjut"><span class="b"></span>NEXT</button>
+      <button class="tbl musik" id="b-musik" aria-pressed="true" aria-label="Musik nyala atau mati"><span class="b"></span>MUSIK</button>
+    </div>
+    <div class="kanan">
+      <button class="slot" id="b-full" aria-label="Layar penuh"><i></i>FULL</button>
+    </div>
+  </section>
+  <div class="kaki" aria-hidden="true"></div>
+  <p class="sr" id="umum" aria-live="polite"></p>
+</main>
+<p class="putar">Putar HP ke samping untuk layar yang lebih besar.</p>
+<script>
+(function () {
+  var TRACKS = {"signature": {"src": "m/signature.mp3", "title": "Signature, lagu tema CDJ 2026", "loop": true}, "instrumental": {"src": "m/instrumental.mp3", "title": "Instrumental lagu tema", "loop": true}, "mars": {"src": "m/mars.mp3", "title": "Mars pembuka", "loop": true}, "north": {"src": "m/north.mp3", "title": "Mars pool North", "loop": true}, "inning": {"src": "m/inning.mp3", "title": "Musik jeda inning", "loop": true}, "grandfinal": {"src": "m/grandfinal.mp3", "title": "The Grand Final", "loop": true}, "nameentry": {"src": "m/nameentry.mp3", "title": "Name entry", "loop": true}, "coin": {"src": "m/coin.mp3", "title": "Game start", "loop": false}};
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var panggung = document.getElementById("panggung"), layar = document.getElementById("layar"), koin = document.getElementById("koin");
+  var stage = document.getElementById("stage"), lagu = document.getElementById("lagu"), umum = document.getElementById("umum"), joy = document.getElementById("joy");
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var idx = 0, step = 0, mulai = false, musikOn = true, audio = {}, kini = null;
+
+  // build steps: data-build-in="pop 4" -> group 4, revealed in ascending order on NEXT
+  slides.forEach(function (s) {
+    var groups = {};
+    s.querySelectorAll("[data-build-in]").forEach(function (el) {
+      var p = el.getAttribute("data-build-in").split(/\s+/), kind = p[0], n = parseInt(p[1] || "1", 10);
+      el.classList.add("bi", kind); (groups[n] = groups[n] || []).push(el);
+    });
+    s._steps = Object.keys(groups).map(Number).sort(function (a, b) { return a - b; }).map(function (k) { return groups[k]; });
+    s.setAttribute("aria-hidden", "true");
+  });
+
+  // marquee chaser lights
+  document.querySelectorAll(".lampu").forEach(function (row) { for (var i = 0; i < 40; i++) row.appendChild(document.createElement("i")); });
+  var lampu = document.querySelectorAll(".lampu i"), t = 0;
+  if (!reduce) setInterval(function () { t++; lampu.forEach(function (l, i) { l.classList.toggle("on", (i + t) % 4 === 0); }); }, 160);
+
+  function ukur() {
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var s = Math.min((vw - 32) / 1.08, (vh - 24) / 0.98);   // cabinet height is about 0.98 x screen width
+    s = Math.max(280, Math.floor(s / 4) * 4);
+    document.documentElement.style.setProperty("--s", s + "px");
+    panggung.style.transform = "scale(" + (s / 1920) + ")";
+  }
+  window.addEventListener("resize", ukur); ukur();
+
+  function track(k) {
+    if (!audio[k]) { var a = new Audio(TRACKS[k].src); a.loop = TRACKS[k].loop; a.preload = "auto"; a.volume = 0.85; audio[k] = a; }
+    return audio[k];
+  }
+  function fadeOut(a) {
+    if (reduce) { a.pause(); return; }
+    var v = a.volume, id = setInterval(function () { v -= 0.1; if (v <= 0) { clearInterval(id); a.pause(); a.volume = 0.85; } else a.volume = v; }, 30);
+  }
+  function musik() {
+    var k = slides[idx].getAttribute("data-track");
+    lagu.textContent = musikOn ? "Lagu: " + TRACKS[k].title : "Musik mati";
+    if (!mulai) return;
+    if (!musikOn) { if (kini) audio[kini].pause(); return; }
+    if (kini !== k) {
+      if (kini) fadeOut(audio[kini]);
+      var a = track(k); a.currentTime = 0; a.volume = 0.85; a.play().catch(function () {});
+      kini = k;
+    } else if (audio[k].paused) audio[k].play().catch(function () {});
+  }
+  function tampil(i, full) {
+    slides[idx].classList.remove("aktif"); slides[idx].setAttribute("aria-hidden", "true");
+    idx = i; step = 0;
+    var s = slides[idx];
+    s._steps.forEach(function (g) { g.forEach(function (el) { el.classList.toggle("muncul", !!full); }); });
+    if (full) step = s._steps.length;
+    s.classList.add("aktif"); s.removeAttribute("aria-hidden");
+    stage.textContent = "STAGE " + String(idx + 1).padStart(2, "0") + "/" + String(slides.length).padStart(2, "0");
+    var h = s.querySelector("h1, h2");
+    umum.textContent = "Slide " + (idx + 1) + " dari " + slides.length + (h ? ": " + h.textContent : "");
+    history.replaceState(null, "", "#" + (idx + 1));
+    musik();
+  }
+  function goyang(arah) { joy.classList.remove("kiri", "kanan"); joy.classList.add(arah); setTimeout(function () { joy.classList.remove(arah); }, 160); }
+  function start() {
+    if (mulai) return true;
+    mulai = true; koin.hidden = true;
+    var c = track("coin"); c.currentTime = 0; if (musikOn) c.play().catch(function () {});
+    musik();
+    return false;
+  }
+  function next() {
+    if (!start()) return;
+    goyang("kanan");
+    var s = slides[idx];
+    if (step < s._steps.length) { s._steps[step].forEach(function (el) { el.classList.add("muncul"); }); step++; return; }
+    if (idx < slides.length - 1) tampil(idx + 1, false);
+  }
+  function prev() {
+    if (!start()) return;
+    goyang("kiri");
+    if (idx > 0) tampil(idx - 1, true);
+  }
+  function toggleMusik() {
+    musikOn = !musikOn; document.getElementById("b-musik").setAttribute("aria-pressed", String(musikOn));
+    if (!musikOn && kini) audio[kini].pause();
+    musik();
+  }
+  function full() {
+    var d = document;
+    if (!d.fullscreenElement) (d.documentElement.requestFullscreen || function () {}).call(d.documentElement);
+    else d.exitFullscreen();
+  }
+  function tekan(id) { var b = document.getElementById(id); b.classList.add("tekan"); setTimeout(function () { b.classList.remove("tekan"); }, 120); }
+
+  document.getElementById("b-next").addEventListener("click", next);
+  document.getElementById("b-back").addEventListener("click", prev);
+  document.getElementById("b-musik").addEventListener("click", toggleMusik);
+  document.getElementById("b-full").addEventListener("click", full);
+  layar.addEventListener("click", function (e) {
+    var r = layar.getBoundingClientRect();
+    if (mulai && e.clientX - r.left < r.width * 0.35) prev(); else next();
+  });
+  var x0 = null;
+  layar.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  layar.addEventListener("touchend", function (e) {
+    if (x0 === null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if (Math.abs(dx) > 40) { e.preventDefault(); dx < 0 ? next() : prev(); }
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.target.tagName === "BUTTON" && (e.key === "Enter" || e.key === " ")) return;
+    if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].indexOf(e.key) >= 0) { e.preventDefault(); tekan("b-next"); next(); }
+    else if (["ArrowLeft", "ArrowUp", "PageUp"].indexOf(e.key) >= 0) { e.preventDefault(); tekan("b-back"); prev(); }
+    else if (e.key === "m" || e.key === "M") { tekan("b-musik"); toggleMusik(); }
+    else if (e.key === "f" || e.key === "F") full();
+    else if (e.key === "Home") { if (start()) tampil(0, false); }
+    else if (e.key === "End") { if (start()) tampil(slides.length - 1, true); }
+  });
+
+  window.addEventListener("hashchange", function () {
+    var n = parseInt(location.hash.slice(1), 10) - 1;
+    if (!isNaN(n) && n !== idx && n >= 0 && n < slides.length) tampil(n, true);
+  });
+  var awal = parseInt((location.hash || "#1").slice(1), 10);
+  idx = 0; tampil(isNaN(awal) ? 0 : Math.min(Math.max(awal - 1, 0), slides.length - 1), awal > 1);
+})();
+</script>
+</body>
+</html>
