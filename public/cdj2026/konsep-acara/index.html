@@ -89,6 +89,16 @@ body::before { /* the arcade room: a faint pixel floor grid fading up */
 .slot { display: flex; align-items: center; gap: 8px; min-height: 44px; font-family: var(--j); font-size: max(13px, calc(var(--s) * 0.018)); color: var(--pink); background: none; border: 0; cursor: pointer; }
 .slot i { display: block; width: max(8px, calc(var(--s) * 0.012)); height: max(24px, calc(var(--s) * 0.04)); background: #02030f; border: 2px solid var(--pink); }
 .slot:focus-visible { outline: 2px solid var(--putih); outline-offset: 4px; }
+.vol { display: flex; align-items: center; gap: 8px; font-family: var(--j); font-size: max(13px, calc(var(--s) * 0.018)); color: var(--kabut); }
+.vol button { width: 32px; height: 32px; min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: 0; color: var(--pink); font-family: var(--j); font-size: 24px; line-height: 1; cursor: pointer; }
+.vol button:focus-visible { outline: 2px solid var(--putih); outline-offset: -4px; }
+.vol .bar { display: flex; align-items: flex-end; gap: 2px; height: 20px; }
+.vol .bar i { display: block; width: 4px; background: var(--garis); }
+.vol .bar i.on { background: var(--pink); }
+body.lanskap .kanan { display: contents; }
+body.lanskap #b-full { grid-column: 1; grid-row: 3; }
+body.lanskap .vol { grid-column: 3; grid-row: 3; display: grid; grid-template-columns: 44px 44px; justify-items: center; row-gap: 0; }
+body.lanskap .vol .bar { grid-column: 1 / span 2; grid-row: 1; }
 .kaki { width: 100%; height: calc(var(--s) * 0.03); background: var(--navy); border: 4px solid var(--pink); border-top: 0; clip-path: polygon(3% 0, 97% 0, 97% 100%, 3% 100%); }
 .putar { display: none; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; font-size: 14px; line-height: 20px; color: var(--kabut); }
 .putar svg { flex: none; }
@@ -97,8 +107,8 @@ body::before { /* the arcade room: a faint pixel floor grid fading up */
 body.potret { align-items: center; padding: 16px 0; overflow-y: auto; }
 body.potret .kabinet { width: calc(var(--s) + 24px); }
 body.potret .bezel { padding: 8px; }
-body.potret .panel { grid-template-columns: 1fr auto; grid-template-areas: "stik kanan" "tombol tombol"; row-gap: 16px; padding: 16px 20px 20px; clip-path: polygon(0 0, 100% 0, 96% 100%, 4% 100%); }
-body.potret .stik { grid-area: stik; } body.potret .kanan { grid-area: kanan; }
+body.potret .panel { grid-template-columns: 1fr; grid-template-areas: "stik" "tombol" "kanan"; row-gap: 16px; padding: 16px 20px 20px; clip-path: polygon(0 0, 100% 0, 96% 100%, 4% 100%); }
+body.potret .stik { grid-area: stik; justify-content: center; } body.potret .kanan { grid-area: kanan; justify-content: center; gap: 24px; }
 body.potret .tombol { grid-area: tombol; justify-content: center; gap: 28px; }
 body.potret .kaki { height: 16px; }
 body.potret .putar { display: flex; }
@@ -114,7 +124,7 @@ body.lanskap .info { text-align: center; } body.lanskap .info .lagu { display: n
 body.lanskap #b-back { grid-column: 1; grid-row: 2; }
 body.lanskap #b-next { grid-column: 3; grid-row: 1; }
 body.lanskap #b-musik { grid-column: 3; grid-row: 2; }
-body.lanskap .kanan { grid-column: 1; grid-row: 3; }
+
 body.lanskap .koin .kecil { display: none; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) {
@@ -400,7 +410,7 @@ if(!reduce){frame();setInterval(frame,80);}
       <div class="crt" aria-hidden="true"></div>
       <div class="koin" id="koin">
         <p class="besar">INSERT COIN</p>
-        <p class="kecil">Klik layar atau tekan Enter. Musik ikut berputar.<br>Panah kanan lanjut, panah kiri kembali, M musik, F layar penuh.</p>
+        <p class="kecil">Klik layar atau tekan Enter. Musik ikut berputar.<br>Panah kanan lanjut, kiri kembali, M musik, tombol minus dan plus atur volume, F layar penuh.</p>
       </div>
     </div>
   </div>
@@ -415,6 +425,12 @@ if(!reduce){frame();setInterval(frame,80);}
       <button class="tbl musik" id="b-musik" aria-pressed="true" aria-label="Musik nyala atau mati"><span class="b"></span>MUSIK</button>
     </div>
     <div class="kanan">
+      <div class="vol" role="group" aria-label="Volume musik">
+        <button id="v-turun" aria-label="Kecilkan musik">-</button>
+        <span class="bar" id="v-bar" aria-hidden="true"></span>
+        <button id="v-naik" aria-label="Besarkan musik">+</button>
+        <span class="sr" id="v-angka"></span>
+      </div>
       <button class="slot" id="b-full" aria-label="Layar penuh"><i></i>FULL</button>
     </div>
   </section>
@@ -431,6 +447,12 @@ if(!reduce){frame();setInterval(frame,80);}
   var stage = document.getElementById("stage"), lagu = document.getElementById("lagu"), umum = document.getElementById("umum"), joy = document.getElementById("joy");
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var idx = 0, step = 0, mulai = false, musikOn = true, audio = {}, kini = null;
+  // music volume in 10 steps; ?vol=0..100 in the URL wins (handy when presenting over a call), then the last choice
+  var level = 8;
+  try { var sv = localStorage.getItem("cdj-vol"); if (sv !== null) level = Math.max(0, Math.min(10, parseInt(sv, 10))); } catch (e) {}
+  var qv = new URLSearchParams(location.search).get("vol");
+  if (qv !== null && !isNaN(parseInt(qv, 10))) level = Math.max(0, Math.min(10, Math.round(parseInt(qv, 10) / 10)));
+  function VOL() { return level / 10; }
 
   // build steps: data-build-in="pop 4" -> group 4, revealed in ascending order on NEXT
   slides.forEach(function (s) {
@@ -462,7 +484,7 @@ if(!reduce){frame();setInterval(frame,80);}
   window.addEventListener("resize", ukur); window.addEventListener("orientationchange", function () { setTimeout(ukur, 200); }); ukur();
 
   function track(k) {
-    if (!audio[k]) { var a = new Audio(TRACKS[k].src); a.loop = TRACKS[k].loop; a.preload = "auto"; a.volume = 0.85; audio[k] = a; }
+    if (!audio[k]) { var a = new Audio(TRACKS[k].src); a.loop = TRACKS[k].loop; a.preload = "auto"; a.volume = VOL(); audio[k] = a; }
     return audio[k];
   }
   var fades = {};
@@ -470,8 +492,8 @@ if(!reduce){frame();setInterval(frame,80);}
     var a = audio[k]; if (!a || a.paused) return;
     clearInterval(fades[k]);
     if (reduce) { a.pause(); return; }
-    var v = a.volume;
-    fades[k] = setInterval(function () { v -= 0.1; if (v <= 0) { clearInterval(fades[k]); a.pause(); a.volume = 0.85; } else a.volume = v; }, 30);
+    var v = a.volume, d = Math.max(0.02, v / 8);
+    fades[k] = setInterval(function () { v -= d; if (v <= 0) { clearInterval(fades[k]); a.pause(); a.volume = VOL(); } else a.volume = v; }, 30);
   }
   function hanya(k) {                        // exactly one song: everything else fades out
     Object.keys(audio).forEach(function (o) { if (o !== k) fadeOut(o); });
@@ -482,7 +504,7 @@ if(!reduce){frame();setInterval(frame,80);}
     if (!mulai) return;
     if (!musikOn) { Object.keys(audio).forEach(function (o) { clearInterval(fades[o]); audio[o].pause(); }); return; }
     hanya(k);
-    var a = track(k); clearInterval(fades[k]); a.volume = 0.85;
+    var a = track(k); clearInterval(fades[k]); a.volume = VOL();
     if (kini !== k) { a.currentTime = 0; kini = k; }
     if (a.paused) a.play().catch(function () {});
   }
@@ -518,6 +540,21 @@ if(!reduce){frame();setInterval(frame,80);}
     goyang("kiri");
     if (idx > 0) tampil(idx - 1, true);
   }
+  var vbar = document.getElementById("v-bar");
+  for (var vi = 0; vi < 10; vi++) { var bi = document.createElement("i"); bi.style.height = (4 + vi * 1.6) + "px"; vbar.appendChild(bi); }
+  function gambarVol() {
+    vbar.querySelectorAll("i").forEach(function (b, i) { b.classList.toggle("on", i < level); });
+    document.getElementById("v-angka").textContent = "Volume musik " + level * 10 + " persen";
+  }
+  function setVol(n) {
+    level = Math.max(0, Math.min(10, n));
+    try { localStorage.setItem("cdj-vol", String(level)); } catch (e) {}
+    if (kini && audio[kini] && !audio[kini].paused) { clearInterval(fades[kini]); audio[kini].volume = VOL(); }
+    gambarVol();
+  }
+  gambarVol();
+  document.getElementById("v-turun").addEventListener("click", function () { setVol(level - 1); });
+  document.getElementById("v-naik").addEventListener("click", function () { setVol(level + 1); });
   function toggleMusik() {
     musikOn = !musikOn; document.getElementById("b-musik").setAttribute("aria-pressed", String(musikOn));
     if (musikOn) kini = null;                // restart the current slide's song from the top
@@ -552,6 +589,8 @@ if(!reduce){frame();setInterval(frame,80);}
     if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].indexOf(e.key) >= 0) { e.preventDefault(); tekan("b-next"); next(); }
     else if (["ArrowLeft", "ArrowUp", "PageUp"].indexOf(e.key) >= 0) { e.preventDefault(); tekan("b-back"); prev(); }
     else if (e.key === "m" || e.key === "M") { tekan("b-musik"); toggleMusik(); }
+    else if (e.key === "-" || e.key === "_") setVol(level - 1);
+    else if (e.key === "=" || e.key === "+") setVol(level + 1);
     else if (e.key === "f" || e.key === "F") full();
     else if (e.key === "Home") { if (start()) tampil(0, false); }
     else if (e.key === "End") { if (start()) tampil(slides.length - 1, true); }
