@@ -138,7 +138,7 @@ body.lanskap .koin .kecil { display: none; }
 </style>
 </head>
 <body>
-<main class="kabinet" aria-label="Kabinet arcade CDJ 2026: konsep acara">
+<main class="kabinet" aria-label="CDJ 2026 arcade cabinet: event concept">
   <header class="marquee">
     <div class="lampu atas" aria-hidden="true"></div>
     <h1 class="judul">CDJ 2026</h1><p class="sub">KONSEP ACARA</p>
@@ -414,39 +414,39 @@ if(!reduce){frame();setInterval(frame,80);}
       <div class="crt" aria-hidden="true"></div>
       <div class="koin" id="koin">
         <p class="besar">INSERT COIN</p>
-        <p class="kecil">Klik layar atau tekan Enter. Musik ikut berputar.<br>Panah kanan lanjut, kiri kembali, T talk, M musik, minus dan plus volume, F layar penuh.</p>
+        <p class="kecil">Click the screen or press Enter. The music starts too.<br>Right arrow next, left back, T talk, M music, minus and plus volume, F fullscreen.</p>
       </div>
     </div>
   </div>
-  <section class="panel" aria-label="Panel kendali">
+  <section class="panel" aria-label="Control panel">
     <div class="stik">
       <div class="joy" id="joy" aria-hidden="true"></div>
-      <div class="info"><p class="stage" id="stage">STAGE 01/11</p><p class="lagu" id="lagu">Siap main</p></div>
+      <div class="info"><p class="stage" id="stage">STAGE 01/11</p><p class="lagu" id="lagu">Ready to play</p></div>
     </div>
     <div class="tombol">
-      <button class="tbl back" id="b-back" aria-label="Slide sebelumnya"><span class="b"></span>BACK</button>
-      <button class="tbl next" id="b-next" aria-label="Lanjut"><span class="b"></span>NEXT</button>
-      <button class="tbl musik" id="b-musik" aria-pressed="true" aria-label="Musik nyala atau mati"><span class="b"></span>MUSIK</button>
+      <button class="tbl back" id="b-back" aria-label="Previous slide"><span class="b"></span>BACK</button>
+      <button class="tbl next" id="b-next" aria-label="Next"><span class="b"></span>NEXT</button>
+      <button class="tbl musik" id="b-musik" aria-pressed="true" aria-label="Music on or off"><span class="b"></span>MUSIC</button>
       <button class="tbl talk" id="b-talk" aria-pressed="false" aria-label="Talk mode: lower the music"><span class="b"></span>TALK</button>
     </div>
     <div class="kanan">
-      <div class="vol" role="group" aria-label="Volume musik">
-        <button id="v-turun" aria-label="Kecilkan musik">-</button>
+      <div class="vol" role="group" aria-label="Music volume">
+        <button id="v-turun" aria-label="Lower the music">-</button>
         <span class="bar" id="v-bar" aria-hidden="true"></span>
-        <button id="v-naik" aria-label="Besarkan musik">+</button>
+        <button id="v-naik" aria-label="Raise the music">+</button>
         <span class="sr" id="v-angka"></span>
       </div>
-      <button class="slot" id="b-full" aria-label="Layar penuh"><i></i>FULL</button>
+      <button class="slot" id="b-full" aria-label="Fullscreen"><i></i>FULL</button>
     </div>
   </section>
   <div class="kaki" aria-hidden="true"></div>
-  <p class="putar"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect x="5" y="2" width="10" height="16" rx="2" fill="none" stroke="#ff8af8" stroke-width="2"/><path d="M2 8 L2 4 L6 4" fill="none" stroke="#c9ccff" stroke-width="2"/></svg>Putar HP ke samping supaya layar lebih besar.</p>
+  <p class="putar"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect x="5" y="2" width="10" height="16" rx="2" fill="none" stroke="#ff8af8" stroke-width="2"/><path d="M2 8 L2 4 L6 4" fill="none" stroke="#c9ccff" stroke-width="2"/></svg>Turn your phone sideways for a bigger screen.</p>
   <p class="sr" id="umum" aria-live="polite"></p>
 </main>
 
 <script>
 (function () {
-  var TRACKS = {"signature": {"src": "m/signature.mp3", "title": "Signature, lagu tema CDJ 2026", "loop": true}, "instrumental": {"src": "m/instrumental.mp3", "title": "Instrumental lagu tema", "loop": true}, "mars": {"src": "m/mars.mp3", "title": "Mars pembuka", "loop": true}, "north": {"src": "m/north.mp3", "title": "Mars pool North", "loop": true}, "inning": {"src": "m/inning.mp3", "title": "Musik jeda inning", "loop": true}, "grandfinal": {"src": "m/grandfinal.mp3", "title": "The Grand Final", "loop": true}, "nameentry": {"src": "m/nameentry.mp3", "title": "Name entry", "loop": true}};
+  var TRACKS = {"signature": {"src": "m/signature.mp3", "title": "Signature, CDJ 2026 theme song", "loop": true}, "instrumental": {"src": "m/instrumental.mp3", "title": "Theme song instrumental", "loop": true}, "mars": {"src": "m/mars.mp3", "title": "Opening march", "loop": true}, "north": {"src": "m/north.mp3", "title": "Pool North march", "loop": true}, "inning": {"src": "m/inning.mp3", "title": "Inning break music", "loop": true}, "grandfinal": {"src": "m/grandfinal.mp3", "title": "The Grand Final", "loop": true}, "nameentry": {"src": "m/nameentry.mp3", "title": "Name entry", "loop": true}};
   var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
   var panggung = document.getElementById("panggung"), layar = document.getElementById("layar"), koin = document.getElementById("koin");
   var stage = document.getElementById("stage"), lagu = document.getElementById("lagu"), umum = document.getElementById("umum"), joy = document.getElementById("joy");
@@ -506,7 +506,7 @@ if(!reduce){frame();setInterval(frame,80);}
   }
   function musik() {
     var k = slides[idx].getAttribute("data-track");
-    lagu.textContent = !musikOn ? "Musik mati" : talk ? "Talk mode: music low" : "Lagu: " + TRACKS[k].title;
+    lagu.textContent = !musikOn ? "Music off" : talk ? "Talk mode: music low" : "Song: " + TRACKS[k].title;
     if (!mulai) return;
     if (!musikOn) { Object.keys(audio).forEach(function (o) { clearInterval(fades[o]); audio[o].pause(); }); return; }
     hanya(k);
@@ -523,7 +523,7 @@ if(!reduce){frame();setInterval(frame,80);}
     s.classList.add("aktif"); s.removeAttribute("aria-hidden");
     stage.textContent = "STAGE " + String(idx + 1).padStart(2, "0") + "/" + String(slides.length).padStart(2, "0");
     var h = s.querySelector("h1, h2");
-    umum.textContent = "Slide " + (idx + 1) + " dari " + slides.length + (h ? ": " + h.textContent : "");
+    umum.textContent = "Slide " + (idx + 1) + " of " + slides.length + (h ? ": " + h.textContent : "");
     history.replaceState(null, "", "#" + (idx + 1));
     musik();
   }
@@ -550,7 +550,7 @@ if(!reduce){frame();setInterval(frame,80);}
   for (var vi = 0; vi < 10; vi++) { var bi = document.createElement("i"); bi.style.height = (4 + vi * 1.6) + "px"; vbar.appendChild(bi); }
   function gambarVol() {
     vbar.querySelectorAll("i").forEach(function (b, i) { b.classList.toggle("on", i < level); });
-    document.getElementById("v-angka").textContent = "Volume musik " + level * 10 + " persen";
+    document.getElementById("v-angka").textContent = "Music volume " + level * 10 + " percent";
   }
   function setVol(n) {
     level = Math.max(0, Math.min(10, n));
@@ -575,7 +575,7 @@ if(!reduce){frame();setInterval(frame,80);}
     talk = !talk; document.getElementById("b-talk").setAttribute("aria-pressed", String(talk));
     if (kini && audio[kini] && !audio[kini].paused) { clearInterval(fades[kini]); ramp(audio[kini], VOL()); }
     var k = slides[idx].getAttribute("data-track");
-    lagu.textContent = !musikOn ? "Musik mati" : talk ? "Talk mode: music low" : "Lagu: " + TRACKS[k].title;
+    lagu.textContent = !musikOn ? "Music off" : talk ? "Talk mode: music low" : "Song: " + TRACKS[k].title;
     umum.textContent = talk ? "Talk mode on, music low" : "Talk mode off, music back";
   }
   function full() {
