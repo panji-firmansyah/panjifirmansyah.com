@@ -83,6 +83,10 @@ body::before { /* the arcade room: a faint pixel floor grid fading up */
 .tbl.next span.b { width: max(56px, calc(var(--s) * 0.072)); height: max(56px, calc(var(--s) * 0.072)); background: var(--pink); }
 .tbl.musik span.b { background: var(--ungu); }
 .tbl.musik[aria-pressed="false"] span.b { background: var(--garis); }
+.tbl.talk span.b { background: var(--garis); }
+.tbl.talk[aria-pressed="true"] span.b { background: var(--putih); box-shadow: 0 0 0 4px var(--pink), inset 0 calc(var(--s) * -0.006) 0 rgba(0,0,0,.25); }
+.tbl.talk[aria-pressed="true"] { color: var(--putih); }
+body.lanskap #b-talk { grid-column: 1; grid-row: 3; } body.lanskap #b-full { display: none; }
 .tbl:active span.b, .tbl.tekan span.b { translate: 0 calc(var(--s) * 0.005); box-shadow: inset 0 calc(var(--s) * -0.003) 0 rgba(0,0,0,.35), 0 calc(var(--s) * 0.001) 0 #02030f; }
 .tbl:focus-visible { outline: 2px solid var(--putih); outline-offset: 4px; border-radius: 8px; }
 .kanan { display: flex; justify-content: flex-end; align-items: center; gap: calc(var(--s) * 0.02); }
@@ -410,7 +414,7 @@ if(!reduce){frame();setInterval(frame,80);}
       <div class="crt" aria-hidden="true"></div>
       <div class="koin" id="koin">
         <p class="besar">INSERT COIN</p>
-        <p class="kecil">Klik layar atau tekan Enter. Musik ikut berputar.<br>Panah kanan lanjut, kiri kembali, M musik, tombol minus dan plus atur volume, F layar penuh.</p>
+        <p class="kecil">Klik layar atau tekan Enter. Musik ikut berputar.<br>Panah kanan lanjut, kiri kembali, T talk, M musik, minus dan plus volume, F layar penuh.</p>
       </div>
     </div>
   </div>
@@ -423,6 +427,7 @@ if(!reduce){frame();setInterval(frame,80);}
       <button class="tbl back" id="b-back" aria-label="Slide sebelumnya"><span class="b"></span>BACK</button>
       <button class="tbl next" id="b-next" aria-label="Lanjut"><span class="b"></span>NEXT</button>
       <button class="tbl musik" id="b-musik" aria-pressed="true" aria-label="Musik nyala atau mati"><span class="b"></span>MUSIK</button>
+      <button class="tbl talk" id="b-talk" aria-pressed="false" aria-label="Talk mode: lower the music"><span class="b"></span>TALK</button>
     </div>
     <div class="kanan">
       <div class="vol" role="group" aria-label="Volume musik">
@@ -452,7 +457,8 @@ if(!reduce){frame();setInterval(frame,80);}
   try { var sv = localStorage.getItem("cdj-vol"); if (sv !== null) level = Math.max(0, Math.min(10, parseInt(sv, 10))); } catch (e) {}
   var qv = new URLSearchParams(location.search).get("vol");
   if (qv !== null && !isNaN(parseInt(qv, 10))) level = Math.max(0, Math.min(10, Math.round(parseInt(qv, 10) / 10)));
-  function VOL() { return level / 10; }
+  var talk = false;                        // talk mode: music drops to 15 percent so the presenter can speak
+  function VOL() { return level / 10 * (talk ? 0.15 : 1); }
 
   // build steps: data-build-in="pop 4" -> group 4, revealed in ascending order on NEXT
   slides.forEach(function (s) {
@@ -500,7 +506,7 @@ if(!reduce){frame();setInterval(frame,80);}
   }
   function musik() {
     var k = slides[idx].getAttribute("data-track");
-    lagu.textContent = musikOn ? "Lagu: " + TRACKS[k].title : "Musik mati";
+    lagu.textContent = !musikOn ? "Musik mati" : talk ? "Talk mode: music low" : "Lagu: " + TRACKS[k].title;
     if (!mulai) return;
     if (!musikOn) { Object.keys(audio).forEach(function (o) { clearInterval(fades[o]); audio[o].pause(); }); return; }
     hanya(k);
@@ -560,6 +566,18 @@ if(!reduce){frame();setInterval(frame,80);}
     if (musikOn) kini = null;                // restart the current slide's song from the top
     musik();
   }
+  var rampT = null;
+  function ramp(a, to) {                     // 300 ms glide so the drop and the return never sound like a cut
+    clearInterval(rampT); var from = a.volume, n = 0;
+    rampT = setInterval(function () { n++; a.volume = Math.max(0, Math.min(1, from + (to - from) * Math.min(1, n / 10))); if (n >= 10) clearInterval(rampT); }, 30);
+  }
+  function toggleTalk() {
+    talk = !talk; document.getElementById("b-talk").setAttribute("aria-pressed", String(talk));
+    if (kini && audio[kini] && !audio[kini].paused) { clearInterval(fades[kini]); ramp(audio[kini], VOL()); }
+    var k = slides[idx].getAttribute("data-track");
+    lagu.textContent = !musikOn ? "Musik mati" : talk ? "Talk mode: music low" : "Lagu: " + TRACKS[k].title;
+    umum.textContent = talk ? "Talk mode on, music low" : "Talk mode off, music back";
+  }
   function full() {
     var d = document;
     if (!d.fullscreenElement && d.documentElement.requestFullscreen) {
@@ -574,6 +592,7 @@ if(!reduce){frame();setInterval(frame,80);}
   document.getElementById("b-back").addEventListener("click", prev);
   document.getElementById("b-musik").addEventListener("click", toggleMusik);
   document.getElementById("b-full").addEventListener("click", full);
+  document.getElementById("b-talk").addEventListener("click", toggleTalk);
   layar.addEventListener("click", function (e) {
     var r = layar.getBoundingClientRect();
     if (mulai && e.clientX - r.left < r.width * 0.35) prev(); else next();
@@ -592,6 +611,7 @@ if(!reduce){frame();setInterval(frame,80);}
     else if (e.key === "-" || e.key === "_") setVol(level - 1);
     else if (e.key === "=" || e.key === "+") setVol(level + 1);
     else if (e.key === "f" || e.key === "F") full();
+    else if (e.key === "t" || e.key === "T") { tekan("b-talk"); toggleTalk(); }
     else if (e.key === "Home") { if (start()) tampil(0, false); }
     else if (e.key === "End") { if (start()) tampil(slides.length - 1, true); }
   });
